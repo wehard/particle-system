@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   obj_loader.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wkorande <wkorande@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 19:25:13 by wkorande          #+#    #+#             */
-/*   Updated: 2020/04/13 17:19:06 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 20:53:57 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ namespace wgl
 Mesh *loadObj(std::string path)
 {
 	Mesh *m = new Mesh();
+	m->name = path;
 	// std::vector<glm::vec3> out_verts;
 	// std::vector<glm::vec2> out_uvs;
 	std::vector<glm::vec3> temp_normals;

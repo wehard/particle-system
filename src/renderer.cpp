@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 11:52:19 by wkorande          #+#    #+#             */
-/*   Updated: 2021/11/22 20:27:43 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 21:11:29 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Renderer::Renderer(Camera *camera) : camera(camera), lightPos(glm::vec3(0.0, 0.0
 
 Renderer::~Renderer()
 {
+	printf("destroyed renderer\n");
 }
 
 void Renderer::drawEntity(Entity *entity)

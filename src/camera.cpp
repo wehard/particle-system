@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   camera.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wkorande <wkorande@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 09:46:35 by wkorande          #+#    #+#             */
-/*   Updated: 2020/04/13 17:20:03 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 21:07:19 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "camera.h"
-
+#include <stdio.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace wgl
@@ -23,7 +23,10 @@ Camera::Camera(float fovy, float aspect)
 	this->projection_matrix = glm::perspective(fovy, aspect, 0.1f, 1000.0f);
 }
 Camera::Camera() {}
-Camera::~Camera() {}
+Camera::~Camera()
+{
+	printf("destroyed camera\n");
+}
 
 glm::mat4x4 Camera::getViewMatrix()
 {

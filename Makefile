@@ -17,13 +17,17 @@ SRC = shader.cpp\
 
 SRCDIR = src
 
+OBJDIR = build
+
 INCLUDE = include
 
 SRCS = $(addprefix $(SRCDIR)/, $(SRC))
 
-OBJS = $(SRC:.cpp=.o)
+OBJ = $(SRC:.cpp=.o)
 
-CC = g++
+OBJS = $(addprefix $(OBJDIR)/, $(OBJ))
+
+CC = clang
 
 CFLAGS = -std=c++17 -lstdc++ #-Wall -Wextra -Werror
 LDFLAGS = -lglfw -lGL -lGLEW -lm -ldl -lXrandr -lXi -lX11 -lXxf86vm -lpthread
@@ -33,12 +37,19 @@ vpath %.h $(INCLUDE)
 
 all: $(NAME)
 
-$(NAME):
-	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS)
+$(NAME): $(OBJ)
+	@printf "compiling %s\n" "$(NAME)"
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDE) $(LDFLAGS)
+# $(CC) $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) -fsanitize=address -O2
 
+
+%.o: %.cpp
+	@mkdir -p build
+	@printf "compiling %s\n" "$<"
+	@$(CC) -I $(INCLUDE) -c $< -o $(OBJDIR)/$@
 
 debug:
-	$(CC) -g $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS)
+	$(CC) -g $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) 
 
 check: fclean
 	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) CXX=~/Dev/temp/build/bin/include-what-you-use

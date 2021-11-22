@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/27 18:09:56 by wkorande          #+#    #+#             */
-/*   Updated: 2021/11/22 20:28:52 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 21:01:03 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ Entity::~Entity()
 	glDeleteBuffers(1, &ebo_id);
 
 	glDeleteVertexArrays(1, &vao_id);
+	printf("destroyed entity: %d\n", vbo_id);
+	delete collider;
 }
 
 void Entity::genBuffers()

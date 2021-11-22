@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/31 11:01:04 by wkorande          #+#    #+#             */
-/*   Updated: 2021/11/22 20:29:28 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 20:56:26 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ Mesh::Mesh(/* args */)
 
 Mesh::~Mesh()
 {
-	// clear();
+	clear();
 	printf("destroyed mesh: %s\n", name.c_str());
 }
 

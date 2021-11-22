@@ -29,10 +29,10 @@ Application::Application(std::string title, int windowWidth, int windowHeight) :
 	init();
 }
 
-// Application::Application() {}
-
 Application::~Application()
 {
+	delete renderer;
+	delete camera;
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	printf("destroyed application\n");
@@ -40,9 +40,10 @@ Application::~Application()
 
 void Application::init()
 {
-	glfwSetErrorCallback(GLFWErrorCallback);
 	if (!glfwInit())
 		std::cout << "GLFW failed to initialize!" << std::endl;
+
+	glfwSetErrorCallback(GLFWErrorCallback);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
