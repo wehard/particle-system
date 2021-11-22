@@ -40,13 +40,13 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@printf "compiling %s\n" "$(NAME)"
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDE) $(LDFLAGS)
-# $(CC) $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) -fsanitize=address -O2
-
+	@printf "all done\n"
 
 %.o: %.cpp
 	@mkdir -p build
-	@printf "compiling %s\n" "$<"
+	@printf "compiling %s..." "$<"
 	@$(CC) -I $(INCLUDE) -c $< -o $(OBJDIR)/$@
+	@printf "done\n"
 
 debug:
 	$(CC) -g $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) 
