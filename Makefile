@@ -23,7 +23,7 @@ SRCS = $(addprefix $(SRCDIR)/, $(SRC))
 
 OBJS = $(SRC:.cpp=.o)
 
-CC = clang
+CC = g++
 
 CFLAGS = -std=c++17 -lstdc++ #-Wall -Wextra -Werror
 LDFLAGS = -lglfw -lGL -lGLEW -lm -ldl -lXrandr -lXi -lX11 -lXxf86vm -lpthread

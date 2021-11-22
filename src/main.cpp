@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/11/22 20:39:04 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/11/22 20:42:13 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@ class App : public wgl::Application
 		wgl::Mesh *m = wgl::loadObj("./res/obj/cube.obj");
 		m->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
 		wgl::Entity *e = new wgl::Entity(s, m);
-		e->position = glm::vec3(0.0, 0.0, -50.0);
+		e->position = glm::vec3(0.0, 0.0, 0.0);
 		e->scale = glm::vec3(10.0f, 10.0f, 10.0f);
 		addEntity(e);
 
-		camera->position = glm::vec3(0.0, 0.0, 95.0);
+		camera->position = glm::vec3(0.0, 0.0, 20.0);
 	}
 
 	virtual void onUpdate(float deltaTime) override
