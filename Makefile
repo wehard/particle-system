@@ -1,25 +1,28 @@
 NAME = particle-system
 
-SRC = shader.cpp\
-	entity.cpp\
-	camera.cpp\
-	renderer.cpp\
-	application.cpp\
-	input.cpp\
-	obj_loader.cpp\
-	mesh.cpp\
-	collider.cpp\
-	framebuffer.cpp\
-	textured_quad.cpp\
-	texture.cpp\
-	bitmap_font.cpp\
-	main.cpp
+	
+SRC = main.cpp\
+	# shader.cpp\
+	# entity.cpp\
+	# camera.cpp\
+	# renderer.cpp\
+	# application.cpp\
+	# input.cpp\
+	# obj_loader.cpp\
+	# mesh.cpp\
+	# collider.cpp\
+	# framebuffer.cpp\
+	# textured_quad.cpp\
+	# texture.cpp\
+	# bitmap_font.cpp\
 
 SRCDIR = src
 
 OBJDIR = build
 
 INCLUDE = include
+
+CLINCLUDE = -I vendor/OpenCL-SDK/include/api -I vendor/OpenCL-SDK/include/cpp 
 
 SRCS = $(addprefix $(SRCDIR)/, $(SRC))
 
@@ -30,7 +33,9 @@ OBJS = $(addprefix $(OBJDIR)/, $(OBJ))
 CC = clang
 
 CFLAGS = -std=c++17 -lstdc++ #-Wall -Wextra -Werror
-LDFLAGS = -lglfw -lGL -lGLEW -lm -ldl -lXrandr -lXi -lX11 -lXxf86vm -lpthread
+LDFLAGS = -lglfw -lGL -lGLEW -lm -ldl -lXrandr -lXi -lX11 -lXxf86vm -lpthread 
+
+CLLIB = -L vendor/OpenCL-SDK/build -lOpenCL
 
 vpath %.cpp $(SRCDIR)
 vpath %.h $(INCLUDE)
@@ -39,13 +44,13 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@printf "compiling %s\n" "$(NAME)"
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDE) $(LDFLAGS)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDE) $(LDFLAGS) $(CLINCLUDE) $(CLLIB)
 	@printf "all done\n"
 
 %.o: %.cpp
 	@mkdir -p build
 	@printf "compiling %s..." "$<"
-	@$(CC) -I $(INCLUDE) -c $< -o $(OBJDIR)/$@
+	@$(CC) -I $(INCLUDE) $(CLINCLUDE) -c $< -o $(OBJDIR)/$@
 	@printf "done\n"
 
 debug:
