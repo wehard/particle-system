@@ -1,26 +1,13 @@
 NAME = particle-system
 
 	
-SRC = main.cpp\
-	# shader.cpp\
-	# entity.cpp\
-	# camera.cpp\
-	# renderer.cpp\
-	# application.cpp\
-	# input.cpp\
-	# obj_loader.cpp\
-	# mesh.cpp\
-	# collider.cpp\
-	# framebuffer.cpp\
-	# textured_quad.cpp\
-	# texture.cpp\
-	# bitmap_font.cpp\
+SRC = main.cpp
 
 SRCDIR = src
 
 OBJDIR = build
 
-INCLUDE = include
+INCLUDE = -I include -I gl-engine/include
 
 CLINCLUDE = -I vendor/OpenCL-SDK/include/api -I vendor/OpenCL-SDK/include/cpp 
 
@@ -44,20 +31,20 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@printf "compiling %s\n" "$(NAME)"
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -I $(INCLUDE) $(LDFLAGS) $(CLINCLUDE) $(CLLIB)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(INCLUDE) $(LDFLAGS) $(CLINCLUDE) $(CLLIB)
 	@printf "all done\n"
 
 %.o: %.cpp
 	@mkdir -p build
 	@printf "compiling %s..." "$<"
-	@$(CC) -I $(INCLUDE) $(CLINCLUDE) -c $< -o $(OBJDIR)/$@
+	@$(CC) $(INCLUDE) $(CLINCLUDE) -c $< -o $(OBJDIR)/$@
 	@printf "done\n"
 
 debug:
-	$(CC) -g $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) 
+	$(CC) -g $(CFLAGS) -o $(NAME) $(SRCS) $(INCLUDE) $(LDFLAGS) $(CLINCLUDE) $(CLLIB)
 
 check: fclean
-	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) -I $(INCLUDE) $(LDFLAGS) CXX=~/Dev/temp/build/bin/include-what-you-use
+	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) $(INCLUDE) $(LDFLAGS) CXX=~/Dev/temp/build/bin/include-what-you-use
 
 clean:
 	@echo "removing objects"

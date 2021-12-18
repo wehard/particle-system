@@ -6,32 +6,32 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/11/24 23:45:19 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/18 23:11:36 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "wgl.h"
+#include "gl-engine.h"
 #define CL_HPP_TARGET_OPENCL_VERSION 200
 #include "CL/opencl.hpp"
 #include <stdlib.h>
 
-class App : public wgl::Application
+class App : public glengine::Application
 {
 	private:
-	wgl::Shader *s;
-	wgl::Mesh *m;
-	wgl::Entity *e;
+	glengine::Shader *s;
+	glengine::Mesh *m;
+	glengine::Entity *e;
 
 	public:
-	App(std::string title) : wgl::Application(title, 1280, 720) {}
+	App(std::string title) : glengine::Application(title, 1280, 720) {}
 
 	virtual void onAttach() override
 	{
-		s = new wgl::Shader("./res/shaders/phong.vert", "./res/shaders/phong.frag");
-		m = wgl::loadObj("./res/obj/cube.obj");
+		s = new glengine::Shader("./res/shaders/phong.vert", "./res/shaders/phong.frag");
+		m = glengine::loadObj("./res/obj/cube.obj");
 		m->setVertexColors(glm::vec4(0.0, 1.0, 1.0, 1.0));
 		
-		e = new wgl::Entity(s, m);
+		e = new glengine::Entity(s, m);
 		e->position = glm::vec3(0.0, 0.0, 0.0);
 		e->scale = glm::vec3(10.0f, 10.0f, 10.0f);
 		addEntity(e);
@@ -128,9 +128,9 @@ int main(void)
 
 
 	// read result into array
-	int C[10];
+	int C[10] = {0};
 
-	queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, C);
+	queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, &C);
 
 	printf("Result:\n");
 	for (size_t i = 0; i < 10; i++)
