@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/19 03:24:47 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/19 03:29:26 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ int main(void)
 			"__kernel void simple_add(__global int* A, __global int* B, __global int* C)"
 			"{"
 			"  C[get_global_id(0)] = A[get_global_id(0)] + B[get_global_id(0)];"
+			"printf(\"hello\\n\");"
 			"}";
 
 	sources.push_back({kernel_code.c_str(), kernel_code.length()});
