@@ -4,6 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
+
+class ParticleSystem;
+
 class GLContext
 {
 private:
@@ -12,6 +15,6 @@ private:
 public:
 	GLContext(std::string title, int width, int height);
 	~GLContext();
-	void run();
+	void run(ParticleSystem *ps);
 };
 

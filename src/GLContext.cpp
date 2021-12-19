@@ -1,6 +1,8 @@
 #include "GLContext.h"
 #include <iostream>
 
+#include "ParticleSystem.h"
+
 GLContext::GLContext(std::string title, int width, int height) 
 {
 	if (!glfwInit())
@@ -49,7 +51,7 @@ GLContext::~GLContext()
 	glfwTerminate();
 }
 
-void GLContext::run() 
+void GLContext::run(ParticleSystem *ps) 
 {
 	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
@@ -68,6 +70,7 @@ void GLContext::run()
 		}
 
 		// Render here!
+		ps->update(1.0);
 
 		glfwSwapBuffers(window);
 

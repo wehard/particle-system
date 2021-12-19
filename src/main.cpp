@@ -6,16 +6,16 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/19 21:11:46 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/20 00:05:47 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "gl-engine.h"
-#define CL_HPP_TARGET_OPENCL_VERSION 200
 #include "CL/opencl.hpp"
 #include <stdlib.h>
 #include "CLContext.h"
 #include "GLContext.h"
+#include "ParticleSystem.h"
 
 #include <iostream>
 #include <string>
@@ -108,13 +108,7 @@ static cl::Device getDevice(cl::Platform &platform)
 	return device;
 }
 
-static std::string loadKernelSource(std::string path)
-{
-	std::ifstream t(path);
-	std::stringstream buffer;
-	buffer << t.rdbuf();
-	return buffer.str();
-}
+
 
 
 int main(void)
@@ -124,51 +118,54 @@ int main(void)
 	// delete app;
 
 	GLContext gl = GLContext("particle-system", 1280, 720);
-	gl.run();
 	
 	cl::Platform plat = getPlatform();
 	cl::Device dev = getDevice(plat);
-	CLContext ctx = CLContext(plat, dev);
-	cl::string src = loadKernelSource("./res/kernel/simple_add.cl").c_str();
-	ctx.addSource(src);
-	ctx.compileProgram();
+	CLContext cl = CLContext(plat, dev);
+	// cl::string src = loadKernelSource("./res/kernel/simple_add.cl").c_str();
+	// cl.addSource(src);
+	// cl.compileProgram();
 
-	cl_int result;
+	ParticleSystem ps = ParticleSystem(gl, cl);
+	ps.init();
 
-	// Allocate space on device
-	cl::Buffer buffer_a(ctx.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
-	cl::Buffer buffer_b(ctx.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
-	cl::Buffer buffer_c(ctx.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
+	gl.run(&ps);
+	// cl_int result;
+
+	// // Allocate space on device
+	// cl::Buffer buffer_a(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
+	// cl::Buffer buffer_b(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
+	// cl::Buffer buffer_c(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
 	
-	int A[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	int B[] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
+	// int A[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	// int B[] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
 
-	// Create queue to push commands to device
-	ctx.queue.enqueueWriteBuffer(buffer_a, CL_TRUE, 0, sizeof(int) * 10, A);
-	ctx.queue.enqueueWriteBuffer(buffer_b, CL_TRUE, 0, sizeof(int) * 10, B);
+	// // Create queue to push commands to device
+	// cl.queue.enqueueWriteBuffer(buffer_a, CL_TRUE, 0, sizeof(int) * 10, A);
+	// cl.queue.enqueueWriteBuffer(buffer_b, CL_TRUE, 0, sizeof(int) * 10, B);
 
-	// Run kernel (needs deprecated apis)
-	cl::Kernel kernel_add = cl::Kernel(ctx.program, "simple_add", &result);
-	kernel_add.setArg(0, buffer_a);
-	kernel_add.setArg(1, buffer_b);
-	kernel_add.setArg(2, buffer_c);
-	printf("cl::Kernel error %d\n", result);
-	cl_int ret = ctx.queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10), cl::NullRange);
+	// // Run kernel (needs deprecated apis)
+	// cl::Kernel kernel_add = cl::Kernel(cl.program, "simple_add", &result);
+	// kernel_add.setArg(0, buffer_a);
+	// kernel_add.setArg(1, buffer_b);
+	// kernel_add.setArg(2, buffer_c);
+	// printf("cl::Kernel error %d\n", result);
+	// cl_int ret = cl.queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10), cl::NullRange);
 
-	printf("%d\n", ret);
-	ctx.queue.finish();
+	// printf("%d\n", ret);
+	// cl.queue.finish();
 
-	int C[10] = {-1};
+	// int C[10] = {-1};
 
-	ctx.queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, &C);
-	ctx.queue.finish(); // ?
+	// cl.queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, &C);
+	// cl.queue.finish(); // ?
 
-	printf("Result:\n");
-	for (size_t i = 0; i < 10; i++)
-	{
-		printf("%d ", C[i]);
-	}
-	printf("\n");
+	// printf("Result:\n");
+	// for (size_t i = 0; i < 10; i++)
+	// {
+	// 	printf("%d ", C[i]);
+	// }
+	// printf("\n");
 	
 
 	return (0);
