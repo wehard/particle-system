@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/18 23:11:36 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/19 02:40:32 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ class App : public glengine::Application
 	virtual void onAttach() override
 	{
 		s = new glengine::Shader("./res/shaders/phong.vert", "./res/shaders/phong.frag");
-		m = glengine::loadObj("./res/obj/cube.obj");
+		m = glengine::Mesh::makeQuad();// glengine::loadObj("./res/obj/cube.obj");
+
 		m->setVertexColors(glm::vec4(0.0, 1.0, 1.0, 1.0));
 		
 		e = new glengine::Entity(s, m);
@@ -42,7 +43,7 @@ class App : public glengine::Application
 
 	virtual void onUpdate(float deltaTime) override
 	{
-
+		e->rotation.y += 45.0 * deltaTime;
 	}
 
 	virtual void onDetach() override
@@ -56,9 +57,9 @@ class App : public glengine::Application
 
 int main(void)
 {
-	// App *app = new App("particle-system");
-	// app->run();
-	// delete app;
+	App *app = new App("particle-system");
+	app->run();
+	delete app;
 	int platformIndex = 0;
 
 	std::vector<cl::Platform> platforms;
