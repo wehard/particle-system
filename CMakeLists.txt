@@ -5,7 +5,8 @@ project(particle-system)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES src/main.cpp
-			src/CLContext.cpp)
+			src/CLContext.cpp
+			src/GLContext.cpp)
 
 include_directories(include 
 					gl-engine/include

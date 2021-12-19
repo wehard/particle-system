@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/19 20:23:43 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/19 21:11:46 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "CL/opencl.hpp"
 #include <stdlib.h>
 #include "CLContext.h"
+#include "GLContext.h"
 
 #include <iostream>
 #include <string>
@@ -121,6 +122,9 @@ int main(void)
 	// App *app = new App("particle-system");
 	// app->run();
 	// delete app;
+
+	GLContext gl = GLContext("particle-system", 1280, 720);
+	gl.run();
 	
 	cl::Platform plat = getPlatform();
 	cl::Device dev = getDevice(plat);
