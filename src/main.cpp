@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/19 02:40:32 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/19 03:24:47 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,11 @@ class App : public glengine::Application
 
 int main(void)
 {
-	App *app = new App("particle-system");
-	app->run();
-	delete app;
+	// App *app = new App("particle-system");
+	// app->run();
+	// delete app;
 	int platformIndex = 0;
+	cl_int result;
 
 	std::vector<cl::Platform> platforms;
 	cl::Platform::get(&platforms);
@@ -74,31 +75,43 @@ int main(void)
 
 
 	std::vector<cl::Device> all_devices;
-	default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
+	result = default_platform.getDevices(CL_DEVICE_TYPE_ALL, &all_devices);
 	if (all_devices.size() == 0)
 	{
 		printf("OpenCL: No devices found.");
 		exit(EXIT_FAILURE);
 	}
+	printf("getDevice: %d\n", result);
 	cl::Device default_device = all_devices[0];
 	printf("Using device: %s\n", default_device.getInfo<CL_DEVICE_NAME>().c_str());
 
 	cl::Context context({default_device});
 	cl::Program::Sources sources;
-	std::string kernel_code=
-			"   void kernel simple_add(global const int* A, global const int* B, global int* C){       "
-			"       C[get_global_id(0)]=A[get_global_id(0)]+B[get_global_id(0)];                 "
-			"   }                                                                               ";
+	// cl::string kernel_code =
+	// 		"void kernel simple_add(global int* A, global int* B, global int* C)"
+	// 		"{"
+	// 		"  C[get_global_id(0)] = A[get_global_id(0)] + B[get_global_id(0)];"
+	// 		"  A[get_global_id(0)] = 99;"
+	// 		"}";
+
+	cl::string kernel_code =
+			"__kernel void simple_add(__global int* A, __global int* B, __global int* C)"
+			"{"
+			"  C[get_global_id(0)] = A[get_global_id(0)] + B[get_global_id(0)];"
+			"}";
 
 	sources.push_back({kernel_code.c_str(), kernel_code.length()});
 
 
-	cl::Program program(context, sources);
-	if (program.build({default_device}) != CL_SUCCESS)
+	cl::Program program(context, sources, &result);
+	printf("program: %d\n", result);
+	result = program.build({default_device});
+	if (result != CL_SUCCESS)
 	{
 		printf("OpenCL: Error building: %s\n", program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device).c_str());
 		exit(EXIT_FAILURE);
 	}
+	printf("program.build: %d\n", result);
 
 	// Allocate space on device
 	cl::Buffer buffer_a(context, CL_MEM_READ_WRITE, sizeof(int) * 10);
@@ -109,7 +122,8 @@ int main(void)
 	int B[] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
 
 	// Create queue to push commands to device
-	cl::CommandQueue queue(context, default_device);
+	cl::CommandQueue queue(context, default_device, cl::QueueProperties::OutOfOrder, &result);
+	printf("queue construct: %d\n", result);
 	queue.enqueueWriteBuffer(buffer_a, CL_TRUE, 0, sizeof(int) * 10, A);
 	queue.enqueueWriteBuffer(buffer_b, CL_TRUE, 0, sizeof(int) * 10, B);
 
@@ -118,20 +132,15 @@ int main(void)
 	kernel_add.setArg(0, buffer_a);
 	kernel_add.setArg(1, buffer_b);
 	kernel_add.setArg(2, buffer_c);
-	queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10), cl::NullRange);
+	cl_int ret = queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10));
+
+	printf("%d\n", ret);
 	queue.finish();
 
-	//  auto simple_add2 = cl::KernelFunctor<cl::Buffer, cl::Buffer, cl::Buffer>(program, "simple_add2");
-	// auto simple_add2 = cl::make_kernel<cl::Buffer&, cl::Buffer&, cl::Buffer&>(program, "simple_add");
-	// simple_add2(buffer_a, buffer_b, buffer_c);
-
-	// queue.enqueueReleaseGLObjects(&cl.vbos);
-
-
-	// read result into array
-	int C[10] = {0};
+	int C[10] = {-1};
 
 	queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, &C);
+	queue.finish(); // ?
 
 	printf("Result:\n");
 	for (size_t i = 0; i < 10; i++)
