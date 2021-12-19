@@ -18,3 +18,6 @@ add_subdirectory(vendor/OpenCL-SDK)
 
 target_link_libraries(${PROJECT_NAME} gl-engine)
 target_link_libraries(${PROJECT_NAME} OpenCL)
+target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} GLEW)
+target_link_libraries(${PROJECT_NAME} GL)
