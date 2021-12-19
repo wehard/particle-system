@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.18.4)
+
+project(particle-system)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(SOURCES src/main.cpp)
+
+include_directories(include 
+					gl-engine/include
+					vendor/OpenCL-SDK/include/api
+					vendor/OpenCL-SDK/include/cpp)
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+add_subdirectory(gl-engine)
+add_subdirectory(vendor/OpenCL-SDK)
+
+target_link_libraries(${PROJECT_NAME} gl-engine)
+target_link_libraries(${PROJECT_NAME} OpenCL)
