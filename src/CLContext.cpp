@@ -6,13 +6,22 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:18:47 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 21:56:19 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 23:07:06 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CLContext.h"
 #include <iostream>
 #include "GL/glx.h"
+
+static void	CheckCLResult(int32_t result, std::string name)
+{
+	if (result != CL_SUCCESS)
+	{
+		std::cout << "OpenCL error: " << name << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
 
 CLContext::CLContext(cl::Platform &platform, cl::Device &device) : platform(platform), device(device)
 {
@@ -25,8 +34,13 @@ CLContext::CLContext(cl::Platform &platform, cl::Device &device) : platform(plat
 
 	try
 	{
+		cl_int result;
 		ctx = cl::Context({device, &properties[0]});
-		queue = cl::CommandQueue(ctx, device, cl::QueueProperties::Profiling);
+		// ctx = clCreateContext(properties, 0, 0, NULL, NULL, &result);
+		// CheckCLResult(result, "clCreateContext");
+		// CheckCLResult(clGetContextInfo(ctx, CL_CONTEXT_NUM_DEVICES, sizeof(cl_int), &(this->numDevices), NULL),"clGetContextInfo");
+		queue = clCreateCommandQueue(ctx.get(), device.get(), CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &result);
+		CheckCLResult(result, "create command queue");
 	}
 	catch (const cl::Error &e)
 	{
@@ -69,11 +83,4 @@ void CLContext::compileProgram()
 CLContext::~CLContext() {}
 
 
-void	CheckCLResult(int32_t result, std::string name)
-{
-	if (result != CL_SUCCESS)
-	{
-		std::cout << "OpenCL error: " << name << std::endl;
-		exit(EXIT_FAILURE);
-	}
-}
+
