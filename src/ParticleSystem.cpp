@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 21:16:11 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 22:04:04 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,13 @@ static std::string loadKernelSource(std::string path)
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	return buffer.str();
+}
+
+static void	checkCLSuccess(cl_int errNum, std::string name) {
+	if (errNum != CL_SUCCESS) {
+		std::cout << "OpenCL error " << errNum << " : " << name << std::endl;
+		exit(EXIT_FAILURE);
+	}
 }
 
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
@@ -84,20 +91,22 @@ void ParticleSystem::init()
 	{
 		glFinish();
 		// cl::CommandQueue &	queue;
-		cl::Kernel			kernel(cl.program, "init_particles");
+		// cl::Kernel			kernel(cl.program, "init_particles");
+		cl_int result = CL_SUCCESS;
+		cl_command_queue queue = cl.queue.get();
+		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles", &result);
+		checkCLSuccess(result, "clCreateKernel");
 
-		kernel.setArg(0, &clmem);
-		// kernel.setArg(1, sizeof(cl_int), &numParticles);
-
-		// cl.queue.enqueueAcquireGLObjects(&clMem);
-		// cl.queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(numParticles), cl::NullRange);
-		// cl.queue.enqueueReleaseGLObjects(&clMem);
-		// cl.queue.finish();
-
-		clEnqueueAcquireGLObjects(cl.queue.get(), 1, &clmem, 0, NULL, NULL);
-		clEnqueueNDRangeKernel(cl.queue.get(), kernel.get(), 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
-		clEnqueueReleaseGLObjects(cl.queue.get(), 1, &clmem, 0, nullptr, nullptr);
-		clFinish(cl.queue.get());
+		result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
+		checkCLSuccess(result, "clSetKernelArg");
+		result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
+		checkCLSuccess(result, "clEnqueueAcquireGLObjects");
+		result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
+		checkCLSuccess(result, "clEnqueueNDRangeKernel");
+		// result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
+		// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+		result = clFinish(queue);
+		checkCLSuccess(result, "clFinish");
 	}
 	catch (const cl::Error & e)
 	{
@@ -107,16 +116,34 @@ void ParticleSystem::init()
 
 void ParticleSystem::update(float deltaTime) 
 {
-	cl::Kernel	kernel(cl.program, "update_particles");
-	kernel.setArg(0, &clmem);
-	kernel.setArg(1, sizeof(cl_float), &deltaTime);
-
 	glFinish();
+	// cl::CommandQueue &	queue;
+	// cl::Kernel			kernel(cl.program, "init_particles");
+	cl_int result = CL_SUCCESS;
+	cl_kernel kernel = clCreateKernel(cl.program.get(), "update_particles", &result);
+	cl_command_queue queue = cl.queue.get();
+	checkCLSuccess(result, "clCreateKernel");
 
-	clEnqueueAcquireGLObjects(cl.queue.get(), 1, &clmem, 0, NULL, NULL);
-	clEnqueueNDRangeKernel(cl.queue.get(), kernel.get(), 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
-	clEnqueueReleaseGLObjects(cl.queue.get(), 1, &clmem, 0, nullptr, nullptr);
-	clFinish(cl.queue.get());
+	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
+	checkCLSuccess(result, "clSetKernelArg");
+	result = clSetKernelArg(kernel, 1, sizeof(GLfloat), &deltaTime);
+	checkCLSuccess(result, "clSetKernelArg");
+
+	// Mouse pos
+	result = clSetKernelArg(kernel, 2, sizeof(GLfloat), &m_pos.x);
+	checkCLSuccess(result, "clSetKernelArg");
+	result = clSetKernelArg(kernel, 3, sizeof(GLfloat), &m_pos.y);
+	checkCLSuccess(result, "clSetKernelArg");
+
+
+	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
+	checkCLSuccess(result, "clEnqueueAcquireGLObjects");
+	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
+	checkCLSuccess(result, "clEnqueueNDRangeKernel");
+	// result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
+	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	// result = clFinish(queue);
+	// checkCLSuccess(result, "clFinish");
 }
 
 ParticleSystem::~ParticleSystem()

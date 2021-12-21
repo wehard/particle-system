@@ -76,6 +76,8 @@ void GLContext::run(ParticleSystem *ps)
 		xpos -= (1280.0 / 2.0);
 		ypos -= (720.0 / 2.0);
 
+		ps->m_pos = glm::vec2(xpos / 1280.0, -ypos / 720.0);
+
 		// Update particles
 		ps->update(deltaTime);
 
@@ -85,7 +87,7 @@ void GLContext::run(ParticleSystem *ps)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ps->shader->use();
-		ps->shader->setVec2("m_pos", glm::vec2(xpos / 1280.0, -ypos / 720.0));
+		ps->shader->setVec2("m_pos", ps->m_pos);
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);

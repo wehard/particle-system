@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:18:47 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 19:50:19 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 21:56:19 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ CLContext::CLContext(cl::Platform &platform, cl::Device &device) : platform(plat
 	try
 	{
 		ctx = cl::Context({device, &properties[0]});
-		queue = cl::CommandQueue(ctx, device, cl::QueueProperties::OutOfOrder);
+		queue = cl::CommandQueue(ctx, device, cl::QueueProperties::Profiling);
 	}
 	catch (const cl::Error &e)
 	{
