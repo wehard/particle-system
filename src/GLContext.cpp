@@ -69,8 +69,16 @@ void GLContext::run(ParticleSystem *ps)
 			lastUpdateFpsTime = currentTime;
 		}
 
-		// Render here!
+		// Update particles
 		ps->update(1.0);
+
+		// Render here!
+		ps->shader->use();
+		ps->shader->setVec2("m_pos", glm::vec2(0.0, 0.0));
+
+		glBindVertexArray(ps->vao);
+		glDrawArrays(GL_POINTS, 0, ps->numParticles);
+
 
 		glfwSwapBuffers(window);
 

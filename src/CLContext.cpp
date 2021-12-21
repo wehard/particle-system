@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:18:47 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/19 23:59:06 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 19:50:19 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,3 +67,13 @@ void CLContext::compileProgram()
 }
 
 CLContext::~CLContext() {}
+
+
+void	CheckCLResult(int32_t result, std::string name)
+{
+	if (result != CL_SUCCESS)
+	{
+		std::cout << "OpenCL error: " << name << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}

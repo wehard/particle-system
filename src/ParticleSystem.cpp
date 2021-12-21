@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/20 00:16:40 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 20:15:44 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 
 	try
 	{
-		clMem.push_back(cl::BufferGL(cl.ctx, CL_MEM_READ_WRITE, vbo, nullptr));
+		clmem = clCreateFromGLBuffer(cl.ctx.get(), CL_MEM_READ_WRITE, vbo, nullptr);
 	}
 	catch (const cl::Error & e)
 	{
@@ -62,16 +62,21 @@ void ParticleSystem::init()
 	try
 	{
 		glFinish();
-		cl::CommandQueue &	queue = cl.queue;
+		// cl::CommandQueue &	queue;
 		cl::Kernel			kernel(cl.program, "init_particles");
 
-		kernel.setArg(0, clMem);
+		kernel.setArg(0, &clmem);
 		// kernel.setArg(1, sizeof(cl_int), &numParticles);
 
-		queue.enqueueAcquireGLObjects(&clMem);
-		queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(numParticles), cl::NullRange);
-		queue.enqueueReleaseGLObjects(&clMem);
-		queue.finish();
+		// cl.queue.enqueueAcquireGLObjects(&clMem);
+		// cl.queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(numParticles), cl::NullRange);
+		// cl.queue.enqueueReleaseGLObjects(&clMem);
+		// cl.queue.finish();
+
+		clEnqueueAcquireGLObjects(cl.queue.get(), 1, &clmem, 0, NULL, NULL);
+		clEnqueueNDRangeKernel(cl.queue.get(), kernel.get(), 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
+		clEnqueueReleaseGLObjects(cl.queue.get(), 1, &clmem, 0, nullptr, nullptr);
+		clFinish(cl.queue.get());
 	}
 	catch (const cl::Error & e)
 	{
@@ -84,23 +89,16 @@ void ParticleSystem::update(float deltaTime)
 	shader->use();
 	shader->setVec2("m_pos", glm::vec2(0.0, 0.0));
 
-	cl::CommandQueue &	queue = cl.queue;
-
 	cl::Kernel	kernel(cl.program, "update_particles");
-	kernel.setArg(0, &clMem);
+	kernel.setArg(0, &clmem);
 	kernel.setArg(1, sizeof(cl_float), &deltaTime);
 
 	glFinish();
 
-	queue.enqueueAcquireGLObjects(&clMem);
-	queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(numParticles), cl::NullRange);
-	cl_int result = queue.finish();
-	if (result != CL_SUCCESS)
-	{
-		std::cout << result << std::endl;
-	}
-	queue.enqueueReleaseGLObjects(&clMem);
-	queue.finish();
+	clEnqueueAcquireGLObjects(cl.queue.get(), 1, &clmem, 0, NULL, NULL);
+	clEnqueueNDRangeKernel(cl.queue.get(), kernel.get(), 1, NULL, cl::NDRange(numParticles).get(), NULL, 0, NULL, NULL);
+	clEnqueueReleaseGLObjects(cl.queue.get(), 1, &clmem, 0, nullptr, nullptr);
+	clFinish(cl.queue.get());
 }
 
 ParticleSystem::~ParticleSystem()
