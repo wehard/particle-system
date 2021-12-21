@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 20:15:44 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 21:16:11 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,17 @@
 #include <fstream>
 #include <streambuf>
 #include <sstream>
+
+#include <stdio.h>
+#include <stdlib.h>
+
+static double randfrom(double min, double max) 
+{
+	double range = (max - min); 
+	double div = RAND_MAX / range;
+	return min + (rand() / div);
+}
+
 
 static std::string loadKernelSource(std::string path)
 {
@@ -29,7 +40,17 @@ static std::string loadKernelSource(std::string path)
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 {
 	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
-	shader->setVec2("m_pos", glm::vec2(0.0, 0.0));
+	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
+
+
+	GLfloat test[numParticles * 3];
+	for (size_t i = 0; i < numParticles * 3; i += 3)
+	{
+		test[i+0] = randfrom(-1.0, 1.0);
+		test[i+1] = randfrom(-1.0, 1.0);
+		test[i+2] = 0.0;
+	}
+	
 
 	cl::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
 	cl.addSource(src);
@@ -41,7 +62,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	glGenBuffers(1, &vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numParticles * 3, nullptr, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numParticles * 3, &test, GL_STREAM_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void *)0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -86,9 +107,6 @@ void ParticleSystem::init()
 
 void ParticleSystem::update(float deltaTime) 
 {
-	shader->use();
-	shader->setVec2("m_pos", glm::vec2(0.0, 0.0));
-
 	cl::Kernel	kernel(cl.program, "update_particles");
 	kernel.setArg(0, &clmem);
 	kernel.setArg(1, sizeof(cl_float), &deltaTime);

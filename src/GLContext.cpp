@@ -68,15 +68,27 @@ void GLContext::run(ParticleSystem *ps)
 			glfwSetWindowTitle(window, std::to_string(fps).c_str());
 			lastUpdateFpsTime = currentTime;
 		}
+		double xpos;
+		double ypos;
+
+		glfwGetCursorPos(window, &xpos, &ypos);
+
+		xpos -= (1280.0 / 2.0);
+		ypos -= (720.0 / 2.0);
 
 		// Update particles
-		ps->update(1.0);
+		ps->update(deltaTime);
+
 
 		// Render here!
+		glClearColor(0.1, 0.1, 0.1, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		ps->shader->use();
-		ps->shader->setVec2("m_pos", glm::vec2(0.0, 0.0));
+		ps->shader->setVec2("m_pos", glm::vec2(xpos / 1280.0, -ypos / 720.0));
 
 		glBindVertexArray(ps->vao);
+		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
 

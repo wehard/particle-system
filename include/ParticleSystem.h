@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 20:20:29 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/21 21:17:16 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ private:
 	CLContext &cl;
 	GLContext &gl;
 public:
-	const int numParticles = 100;
+	const int numParticles = 10000;
 	GLuint vao;
 	GLuint vbo;
 	glengine::Shader *shader;

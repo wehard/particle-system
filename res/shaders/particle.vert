@@ -7,5 +7,6 @@ out float distance;
 
 void main()
 {
-	gl_Position = vec4(m_pos, 1.0, 1.0);
+	distance = 1.0 - length(vec2(m_pos.x, m_pos.y) - vec2(v_pos.x, v_pos.y));
+	gl_Position = vec4(v_pos, 1.0);
 }
