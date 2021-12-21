@@ -77,6 +77,7 @@ void GLContext::run(ParticleSystem *ps)
 		ypos -= (720.0 / 2.0);
 
 		ps->m_pos = glm::vec2(xpos / 1280.0, -ypos / 720.0);
+		ps->m_pos *= 2.0;
 
 		// Update particles
 		ps->update(deltaTime);
