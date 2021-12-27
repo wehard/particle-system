@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 23:23:43 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/27 23:06:26 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,17 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
 
 
-	GLfloat particles[numParticles * 6];
-	for (size_t i = 0; i < numParticles * 6; i += 6)
-	{
-		particles[i+0] = randfrom(-1.0, 1.0);
-		particles[i+1] = randfrom(-1.0, 1.0);
-		particles[i+2] = 0.0;
+	// GLfloat particles[numParticles * 6];
+	// for (size_t i = 0; i < numParticles * 6; i += 6)
+	// {
+	// 	particles[i+0] = randfrom(-1.0, 1.0);
+	// 	particles[i+1] = randfrom(-1.0, 1.0);
+	// 	particles[i+2] = 0.0;
 
-		particles[i+3] = randfrom(-1.0, 1.0);
-		particles[i+4] = randfrom(-1.0, 1.0);
-		particles[i+5] = 0.0;
-	}
+	// 	particles[i+3] = randfrom(-1.0, 1.0);
+	// 	particles[i+4] = randfrom(-1.0, 1.0);
+	// 	particles[i+5] = 0.0;
+	// }
 
 	cl::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
 	cl.addSource(src);
@@ -72,7 +72,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	// positions
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numParticles * 6, &particles, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numParticles * 6, (const GLvoid*)0, GL_STREAM_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid*)12);
