@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/27 23:06:26 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/27 23:09:09 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,10 @@ void ParticleSystem::init()
 
 		result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
 		checkCLSuccess(result, "clSetKernelArg");
+		result = clSetKernelArg(kernel, 1, sizeof(GLint), &numParticles);
+		checkCLSuccess(result, "clSetKernelArg");
+
+
 		result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
 		checkCLSuccess(result, "clEnqueueAcquireGLObjects");
 		result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
