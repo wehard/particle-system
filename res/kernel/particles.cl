@@ -71,16 +71,16 @@ __kernel void update_particles(__global t_particle* ps, float dt, float mx, floa
 	float3 dir = normalize(mouse - coord);
 
 	float3	direction = mouse - coord;
-	float	distance = length(direction);
 
 	float3 prev_vel = (float3)(ps[i].vel.x, ps[i].vel.y, ps[i].vel.z);
-	float3 new_vel = lerp(prev_vel, dir, (0.001f / (distance * distance)));
+	float distance = length(direction);
+	float3 new_vel = lerp(prev_vel, dir, (0.00001f / (distance * distance)));
 
 	// float4 axis = cross(ps[i].vel, (float4)(dir.x, dir.y, dir.z, 1.0f));
 
 	float len_vel = length(new_vel);
-	if (len_vel > 1.0)
-		new_vel = normalize(new_vel) * 1.0f;
+	if (len_vel > 0.1)
+		new_vel = normalize(new_vel) * 0.1f;
 
 	ps[i].vel = (float4)(new_vel.x, new_vel.y, new_vel.z, 1.0f);
 

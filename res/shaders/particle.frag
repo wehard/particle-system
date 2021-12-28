@@ -10,4 +10,6 @@ out vec4 color;
 void main()
 {
 	color = mix(COLOR_MIN, COLOR_MAX, distance);
+	// vec3 absvel = abs(velocity);
+	// color = vec4(absvel*10f, 1.0f);
 }
