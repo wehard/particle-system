@@ -9,7 +9,37 @@ static float noise3D(float x, float y, float z) {
 	return fract(sin(x*112.9898f + y*179.233f + z*237.212f) * 43758.5453f, &ptr);
 }
 
+#define RADIUS 0.5
+
 __kernel void init_particles(__global t_particle * ps, int num_particles)
+{
+	int i = get_global_id(0);
+
+	int subd = 360;
+
+	int lon = i / subd;
+	int lat = i % subd;
+
+	float sign = -2.0f * (lon % 2) + 1.0f;
+	float phi = 2.0 * M_PI_F * lon / subd;
+	float theta = M_PI_F * lat / subd;
+
+	ps[i].pos = (float4)(
+		RADIUS * sin(theta) * cos(phi),
+		RADIUS * sign * cos(theta),
+		RADIUS * sin(theta) * sin(phi),
+		1.0f
+	);
+
+	ps[i].vel = (float4)(
+		0.0f,
+		0.0f,
+		0.0f,
+		1.0f
+	);
+};
+
+__kernel void init_particles_rect(__global t_particle * ps, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -74,7 +104,7 @@ __kernel void update_particles(__global t_particle* ps, float dt, float mx, floa
 
 	float3 prev_vel = (float3)(ps[i].vel.x, ps[i].vel.y, ps[i].vel.z);
 	float distance = length(direction);
-	float3 new_vel = lerp(prev_vel, dir, (0.00001f / (distance * distance)));
+	float3 new_vel = lerp(prev_vel, dir, (0.0001f / (distance * distance)));
 
 	// float4 axis = cross(ps[i].vel, (float4)(dir.x, dir.y, dir.z, 1.0f));
 
@@ -87,6 +117,6 @@ __kernel void update_particles(__global t_particle* ps, float dt, float mx, floa
 
 	// Then move towards that point with some speed
 
-	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt;
+	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 5.0f;
 
 };

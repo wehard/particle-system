@@ -3,6 +3,19 @@
 
 #include "ParticleSystem.h"
 
+static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		double xpos;
+		double ypos;
+
+		glfwGetCursorPos(window, &xpos, &ypos);
+
+		printf("mouse screen: %f, %f\n", xpos, ypos);
+	}
+}
+
 GLContext::GLContext(std::string title, int width, int height) 
 {
 	if (!glfwInit())
@@ -42,6 +55,11 @@ GLContext::GLContext(std::string title, int width, int height)
 	// glEnable(GL_BLEND);
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// glClearColor(0, 0, 0, 1.f);
+
+	camera = new glengine::Camera(45.0f, (float)1280 / (float)720);
+	camera->position = glm::vec3(0.0, 0.0, 2.0);
+
+	glfwSetMouseButtonCallback(window, mouseCallback);
 	
 	glfwSwapInterval(0);
 }
@@ -89,6 +107,8 @@ void GLContext::run(ParticleSystem *ps)
 
 		ps->shader->use();
 		ps->shader->setVec2("m_pos", ps->m_pos);
+		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
+		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
