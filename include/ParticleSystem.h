@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/27 23:53:14 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/28 15:04:11 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 #include "GLContext.h"
 #include "CLContext.h"
 #include "shader.h"
+
+typedef struct
+{
+	cl_float4 pos;
+	cl_float4 vel;
+}		t_particle;
 
 class ParticleSystem
 {
