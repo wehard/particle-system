@@ -21,6 +21,8 @@ __kernel void init_particles(__global t_particle * ps, int num_particles)
 	ps[i].vel[2] = 0.0;
 };
 
+
+
 __kernel void update_particles(__global t_particle* ps, float dt, float mx, float my)
 {
 	int i = get_global_id(0);
