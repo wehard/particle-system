@@ -1,6 +1,7 @@
 #include "GLContext.h"
 #include <iostream>
-
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include "ParticleSystem.h"
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
@@ -14,6 +15,15 @@ static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 
 		printf("mouse screen: %f, %f\n", xpos, ypos);
 	}
+}
+
+static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+{
+	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
+	glm::mat4 matTranslate = glm::translate(glm::mat4(1.0), position);
+	glm::mat4 matRotate = glm::eulerAngleXYZ( glm::radians(rotation.x),  glm::radians(rotation.y),  glm::radians(rotation.z));
+	glm::mat4 m = matTranslate * matRotate * matScale;
+	return (m);
 }
 
 GLContext::GLContext(std::string title, int width, int height) 
@@ -109,6 +119,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setVec2("m_pos", ps->m_pos);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
+		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0), glm::vec3(0.0, 45.0, 0.0), glm::vec3(1.0)));
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);

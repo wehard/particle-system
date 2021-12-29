@@ -9,9 +9,39 @@ static float noise3D(float x, float y, float z) {
 	return fract(sin(x*112.9898f + y*179.233f + z*237.212f) * 43758.5453f, &ptr);
 }
 
-#define RADIUS 0.5
+#define CUBE_SIZE 1.0
+#define SPHERE_RADIUS 0.5
 
 __kernel void init_particles(__global t_particle * ps, int num_particles)
+{
+	int				i = get_global_id(0);
+
+	uint	cube_root = cbrt((float)num_particles);
+
+	uint	x = fmod((float)i, (float)cube_root);
+	uint	y = fmod((float)i / cube_root, (float)cube_root);
+	uint	z = i / (cube_root * cube_root);
+
+	float	sub_div = CUBE_SIZE / cube_root;
+	float	sub_div_half = sub_div / 2.0f;
+
+	ps[i].pos = (float4)(
+		x * sub_div - 0.5 + sub_div_half,
+		y * sub_div - 0.5 + sub_div_half,
+		z * sub_div - 0.5 + sub_div_half,
+		1.0f
+	);
+
+
+	ps[i].vel = (float4)(
+		0.0f,
+		0.0f,
+		0.0f,
+		1.0f
+	);
+};
+
+__kernel void init_particles_sphere(__global t_particle * ps, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -25,9 +55,9 @@ __kernel void init_particles(__global t_particle * ps, int num_particles)
 	float theta = M_PI_F * lat / subd;
 
 	ps[i].pos = (float4)(
-		RADIUS * sin(theta) * cos(phi),
-		RADIUS * sign * cos(theta),
-		RADIUS * sin(theta) * sin(phi),
+		SPHERE_RADIUS * sin(theta) * cos(phi),
+		SPHERE_RADIUS * sign * cos(theta),
+		SPHERE_RADIUS * sin(theta) * sin(phi),
 		1.0f
 	);
 
