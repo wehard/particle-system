@@ -16,6 +16,8 @@ private:
 	glm::mat4x4 projection;
 	glm::mat4x4 view;
 	glengine::Camera *camera;
+	int width;
+	int height;
 public:
 	GLContext(std::string title, int width, int height);
 	~GLContext();

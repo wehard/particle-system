@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/28 15:04:41 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/30 23:18:24 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,19 +49,6 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
 
-
-	// GLfloat particles[numParticles * 6];
-	// for (size_t i = 0; i < numParticles * 6; i += 6)
-	// {
-	// 	particles[i+0] = randfrom(-1.0, 1.0);
-	// 	particles[i+1] = randfrom(-1.0, 1.0);
-	// 	particles[i+2] = 0.0;
-
-	// 	particles[i+3] = randfrom(-1.0, 1.0);
-	// 	particles[i+4] = randfrom(-1.0, 1.0);
-	// 	particles[i+5] = 0.0;
-	// }
-
 	cl::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
 	cl.addSource(src);
 	cl.compileProgram();
@@ -100,7 +87,7 @@ void ParticleSystem::init()
 		// cl::Kernel			kernel(cl.program, "init_particles");
 		cl_int result = CL_SUCCESS;
 		cl_command_queue queue = cl.queue;
-		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles", &result);
+		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles_sphere", &result);
 		checkCLSuccess(result, "clCreateKernel");
 
 		result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);

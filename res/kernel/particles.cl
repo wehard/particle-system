@@ -12,7 +12,7 @@ static float noise3D(float x, float y, float z) {
 #define CUBE_SIZE 1.0
 #define SPHERE_RADIUS 0.5
 
-__kernel void init_particles(__global t_particle * ps, int num_particles)
+__kernel void init_particles_cube(__global t_particle * ps, int num_particles)
 {
 	int				i = get_global_id(0);
 

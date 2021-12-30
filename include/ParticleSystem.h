@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/28 19:24:32 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/30 23:51:05 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ private:
 	GLContext &gl;
 public:
 	const size_t numParticles = 2000000;
-	glm::vec2	m_pos;
+	glm::vec3	m_pos;
 	GLuint vao;
 	GLuint vbo;
 	glengine::Shader *shader;

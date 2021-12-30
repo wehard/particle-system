@@ -6,6 +6,7 @@
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
+	auto mndc = (glm::vec3*)glfwGetWindowUserPointer(window);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
 		double xpos;
@@ -13,7 +14,7 @@ static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 
 		glfwGetCursorPos(window, &xpos, &ypos);
 
-		printf("mouse screen: %f, %f\n", xpos, ypos);
+		printf("mouse screen: %f, %f | %f, %f, % f\n", xpos, ypos, mndc->x, mndc->y, mndc->z);
 	}
 }
 
@@ -26,7 +27,7 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 	return (m);
 }
 
-GLContext::GLContext(std::string title, int width, int height) 
+GLContext::GLContext(std::string title, int width, int height) : width(width), height(height)
 {
 	if (!glfwInit())
 	{
@@ -66,8 +67,8 @@ GLContext::GLContext(std::string title, int width, int height)
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// glClearColor(0, 0, 0, 1.f);
 
-	camera = new glengine::Camera(45.0f, (float)1280 / (float)720);
-	camera->position = glm::vec3(0.0, 0.0, 2.0);
+	camera = new glengine::Camera(45.0f, (float)width / (float)height);
+	camera->position = glm::vec3(0.0, 0.0, 0.0);
 
 	glfwSetMouseButtonCallback(window, mouseCallback);
 	
@@ -85,6 +86,8 @@ void GLContext::run(ParticleSystem *ps)
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
 
+	glfwSetWindowUserPointer(window, &ps->m_pos);
+
 	while (!glfwWindowShouldClose(window )&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		double currentTime = glfwGetTime();
@@ -101,11 +104,27 @@ void GLContext::run(ParticleSystem *ps)
 
 		glfwGetCursorPos(window, &xpos, &ypos);
 
-		xpos -= (1280.0 / 2.0);
-		ypos -= (720.0 / 2.0);
+		// ps->m_pos = glm::vec3(xpos / ((float)width / 2.0) - 1.0f, -1.0 * (ypos / ((float)height / 2.0) - 1.0f), 0.0f);
+		
+		glm::vec3 screen_pos = glm::vec3(xpos, ypos, 0.0f);
+		glm::mat4x4 projection = camera->getProjectionMatrix() * camera->getViewMatrix();
+		glm::vec4 viewport(0.0f, 0.0f, (float)width, -(float)height);
+		glm::vec3 world = glm::unProject(screen_pos, glm::mat4x4(1.0), projection, viewport);
+		
 
-		ps->m_pos = glm::vec2(xpos / 1280.0, -ypos / 720.0);
-		ps->m_pos *= 2.0;
+		// make cursor coordinates from -1 to +1
+		float pt_x = ((float)xpos / (float)width) * 2.0f - 1.0f;
+		float pt_y = -((float)ypos / (float)height) * 2.0f + 1.0f;
+
+		glm::vec4 origin = glm::inverse(projection) * glm::vec4(pt_x, pt_y, -1.0f, 1.0f);
+
+		origin.w = 1.0f / origin.w;
+		origin.x *= origin.w;
+		origin.y *= origin.w;
+		origin.z *= origin.w;
+
+
+		ps->m_pos = glm::vec3(origin.x, origin.y, origin.z);
 
 		// Update particles
 		ps->update(deltaTime);
@@ -116,10 +135,10 @@ void GLContext::run(ParticleSystem *ps)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ps->shader->use();
-		ps->shader->setVec2("m_pos", ps->m_pos);
+		ps->shader->setVec3("m_pos", ps->m_pos);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
-		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0), glm::vec3(0.0, 45.0, 0.0), glm::vec3(1.0)));
+		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 45.0, 0.0), glm::vec3(1.0)));
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);

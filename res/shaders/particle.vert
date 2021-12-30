@@ -2,7 +2,7 @@
 layout(location = 0) in vec3 v_pos;
 layout(location = 1) in vec3 v_vel;
 
-uniform vec2 m_pos;
+uniform vec3 m_pos;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 proj_matrix;
