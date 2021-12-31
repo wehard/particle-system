@@ -150,3 +150,36 @@ __kernel void update_particles(__global t_particle* ps, float dt, float mx, floa
 	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 5.0f;
 
 };
+
+__kernel void update_particles_test(__global t_particle *ps, float dt, float mx, float my)
+{
+    int i = get_global_id(0);
+
+	float dx = mx - ps[i].pos.x;
+	float dy = my - ps[i].pos.y;
+	float dz = 0.0;
+	float ir = 1.0 / (dx * dx + dy * dy + dz * dz + 0.00001);
+	ir = sqrt(ir);
+
+	float att = 1.0f;
+	float ax = att * ir * dx;
+	float ay = att * ir * dy;
+	float az = att * ir * dz;
+	// for (int j = 0; j < mouse.n; j++)
+	// {
+	// 	dx = mouse.m[2 * j] - ps[i].x;
+	// 	dy = mouse.m[2 * j + 1] - ps[i].y;
+	// 	dz = mouse.z - ps[i].z;
+	// 	ir = 1.0/(dx * dx + dy * dy + dz * dz + 0.00001);
+	// 	ir = sqrt(ir);
+	// 	ax += mouse.att * ir * dx;
+	// 	ay += mouse.att * ir * dy;
+	// 	az += mouse.att * ir * dz;
+	// }
+
+	ps[i].vel.x += 1.0 * ax;
+	ps[i].vel.y += 1.0 * ay;
+	ps[i].vel.z += 1.0 * az;
+
+	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 0.0001f;
+}

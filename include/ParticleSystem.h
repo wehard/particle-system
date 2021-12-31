@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/31 13:27:51 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/31 14:51:49 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ private:
 	CLContext &cl;
 	GLContext &gl;
 public:
-	const size_t numParticles = 2000000;
+	const size_t numParticles = 200000;
 	glm::vec3	m_pos;
 	GLuint vao;
 	GLuint vbo;

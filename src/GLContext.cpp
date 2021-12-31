@@ -75,6 +75,9 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// glClearColor(0, 0, 0, 1.f);
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable( GL_BLEND );
+
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
 

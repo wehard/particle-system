@@ -4,8 +4,8 @@ in float distance;
 in vec3 velocity;
 out vec4 color;
 
-#define	COLOR_MAX	vec4(1, 0, 0, 1.0)
-#define	COLOR_MIN	vec4(1.0, 1.0, 0.0, 1.0)
+#define	COLOR_MAX	vec4(1, 0, 0, 0.9)
+#define	COLOR_MIN	vec4(1.0, 1.0, 0.0, 0.9)
 
 void main()
 {
