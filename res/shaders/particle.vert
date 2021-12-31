@@ -14,6 +14,10 @@ out vec3 velocity;
 void main()
 {
 	velocity = v_vel;
-	distance = 1.0 - length(vec2(m_pos.x, m_pos.y) - vec2(v_pos.x, v_pos.y));
-	gl_Position = proj_matrix * view_matrix * model_matrix * vec4(v_pos, 1.0);
+	vec4 m = proj_matrix * view_matrix * model_matrix * vec4(m_pos, 1.0);
+	vec4 p = proj_matrix * view_matrix * model_matrix * vec4(v_pos, 1.0);
+
+	distance = 1.0 - length(vec2(m.x, m.y) - vec2(p.x, p.y));
+
+	gl_Position = p;
 }

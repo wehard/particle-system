@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/30 23:18:24 by wkorande         ###   ########.fr       */
+/*   Updated: 2021/12/31 13:09:02 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void ParticleSystem::init()
 		// cl::Kernel			kernel(cl.program, "init_particles");
 		cl_int result = CL_SUCCESS;
 		cl_command_queue queue = cl.queue;
-		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles_sphere", &result);
+		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles_rect", &result);
 		checkCLSuccess(result, "clCreateKernel");
 
 		result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);

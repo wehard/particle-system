@@ -68,7 +68,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	// glClearColor(0, 0, 0, 1.f);
 
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
-	camera->position = glm::vec3(0.0, 0.0, 0.0);
+	camera->position = glm::vec3(0.0, 0.0, 1.0);
 
 	glfwSetMouseButtonCallback(window, mouseCallback);
 	
@@ -106,25 +106,22 @@ void GLContext::run(ParticleSystem *ps)
 
 		// ps->m_pos = glm::vec3(xpos / ((float)width / 2.0) - 1.0f, -1.0 * (ypos / ((float)height / 2.0) - 1.0f), 0.0f);
 		
-		glm::vec3 screen_pos = glm::vec3(xpos, ypos, 0.0f);
-		glm::mat4x4 projection = camera->getProjectionMatrix() * camera->getViewMatrix();
-		glm::vec4 viewport(0.0f, 0.0f, (float)width, -(float)height);
-		glm::vec3 world = glm::unProject(screen_pos, glm::mat4x4(1.0), projection, viewport);
-		
-
-		// make cursor coordinates from -1 to +1
 		float pt_x = ((float)xpos / (float)width) * 2.0f - 1.0f;
 		float pt_y = -((float)ypos / (float)height) * 2.0f + 1.0f;
 
-		glm::vec4 origin = glm::inverse(projection) * glm::vec4(pt_x, pt_y, -1.0f, 1.0f);
+		float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
+		float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
 
-		origin.w = 1.0f / origin.w;
-		origin.x *= origin.w;
-		origin.y *= origin.w;
-		origin.z *= origin.w;
+		glm::mat4 proj = camera->getProjectionMatrix(); // glm::perspective(FoV, AspectRatio, Near, Far);
+		glm::mat4 view = camera->getViewMatrix(); //glm::lookAt(glm::vec3(0.0f), CameraDirection, CameraUpVector);
 
+		glm::mat4 invVP = glm::inverse(proj * view);
+		glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
+		glm::vec4 worldPos = invVP * screenPos;
 
-		ps->m_pos = glm::vec3(origin.x, origin.y, origin.z);
+		glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
+
+		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 
 		// Update particles
 		ps->update(deltaTime);
@@ -138,7 +135,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setVec3("m_pos", ps->m_pos);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
-		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, 45.0, 0.0), glm::vec3(1.0)));
+		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0)));
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
