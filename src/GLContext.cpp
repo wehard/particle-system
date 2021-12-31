@@ -6,7 +6,7 @@
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
-	auto mndc = (glm::vec3*)glfwGetWindowUserPointer(window);
+	auto ctx = (GLContext*)glfwGetWindowUserPointer(window);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
 		double xpos;
@@ -14,8 +14,16 @@ static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 
 		glfwGetCursorPos(window, &xpos, &ypos);
 
-		printf("mouse screen: %f, %f | %f, %f, % f\n", xpos, ypos, mndc->x, mndc->y, mndc->z);
+		printf("mouse screen: %f, %f | %f, %f, % f\n", xpos, ypos, ctx->m_pos.x, ctx->m_pos.y, ctx->m_pos.z);
 	}
+}
+
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	auto ctx = (GLContext*)glfwGetWindowUserPointer(window);
+	ctx->camera->position.z += yoffset * 0.1f;
+	printf("scroll x %f, y %f ", xoffset, yoffset);
+	printf("camera z %f\n", ctx->camera->position.z);
 }
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
@@ -71,6 +79,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
 
 	glfwSetMouseButtonCallback(window, mouseCallback);
+	glfwSetScrollCallback(window, scroll_callback);
 	
 	glfwSwapInterval(0);
 }
@@ -86,7 +95,7 @@ void GLContext::run(ParticleSystem *ps)
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
 
-	glfwSetWindowUserPointer(window, &ps->m_pos);
+	glfwSetWindowUserPointer(window, this);
 
 	while (!glfwWindowShouldClose(window )&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
@@ -104,16 +113,11 @@ void GLContext::run(ParticleSystem *ps)
 
 		glfwGetCursorPos(window, &xpos, &ypos);
 
-		// ps->m_pos = glm::vec3(xpos / ((float)width / 2.0) - 1.0f, -1.0 * (ypos / ((float)height / 2.0) - 1.0f), 0.0f);
-		
-		float pt_x = ((float)xpos / (float)width) * 2.0f - 1.0f;
-		float pt_y = -((float)ypos / (float)height) * 2.0f + 1.0f;
-
 		float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
 		float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
 
-		glm::mat4 proj = camera->getProjectionMatrix(); // glm::perspective(FoV, AspectRatio, Near, Far);
-		glm::mat4 view = camera->getViewMatrix(); //glm::lookAt(glm::vec3(0.0f), CameraDirection, CameraUpVector);
+		glm::mat4 proj = camera->getProjectionMatrix();
+		glm::mat4 view = camera->getViewMatrix();
 
 		glm::mat4 invVP = glm::inverse(proj * view);
 		glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
@@ -122,6 +126,10 @@ void GLContext::run(ParticleSystem *ps)
 		glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
 
 		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
+
+		// ps->m_pos = glm::unProject(glm::vec3(xpos, ypos, 0.0), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0,0,width, height));
+
+		this->m_pos = ps->m_pos;
 
 		// Update particles
 		ps->update(deltaTime);

@@ -11,6 +11,7 @@ class ParticleSystem;
 class GLContext
 {
 private:
+public:
 	GLFWwindow *window;
 	double	lastTime;
 	glm::mat4x4 projection;
@@ -18,7 +19,7 @@ private:
 	glengine::Camera *camera;
 	int width;
 	int height;
-public:
+	glm::vec3 m_pos;
 	GLContext(std::string title, int width, int height);
 	~GLContext();
 	void run(ParticleSystem *ps);
