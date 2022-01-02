@@ -3,6 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include "ParticleSystem.h"
+#include "entity.h"
+#include "mesh.h"
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
@@ -98,6 +100,17 @@ void GLContext::run(ParticleSystem *ps)
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
 
+	auto s = new glengine::Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+	auto quad = glengine::Mesh::makeQuad();
+	// quad->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
+
+	auto entity = new glengine::Entity(s, quad);
+	entity->position = glm::vec3(0.0);
+	entity->rotation = glm::vec3(0.0);
+	entity->scale = glm::vec3(0.01);
+	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	
+
 	glfwSetWindowUserPointer(window, this);
 
 	while (!glfwWindowShouldClose(window )&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
@@ -130,7 +143,6 @@ void GLContext::run(ParticleSystem *ps)
 
 		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 
-		// ps->m_pos = glm::unProject(glm::vec3(xpos, ypos, 0.0), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0,0,width, height));
 
 		this->m_pos = ps->m_pos;
 
@@ -152,6 +164,14 @@ void GLContext::run(ParticleSystem *ps)
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
+		// entity->position = glm::unProjectNO(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix() * entity->getModelMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
+		entity->position = worldPos;
+		s->use();
+		s->setMat4("proj_matrix", camera->getProjectionMatrix());
+		s->setMat4("view_matrix", camera->getViewMatrix());
+		s->setMat4("model_matrix", entity->getModelMatrix());
+		s->setVec4("obj_color", entity->color);
+		entity->draw();
 
 		glfwSwapBuffers(window);
 

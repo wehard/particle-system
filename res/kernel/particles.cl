@@ -181,5 +181,5 @@ __kernel void update_particles_test(__global t_particle *ps, float dt, float mx,
 	ps[i].vel.y += 1.0 * ay;
 	ps[i].vel.z += 1.0 * az;
 
-	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 0.0001f;
+	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 0.001f;
 }
