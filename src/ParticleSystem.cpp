@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/31 21:45:27 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/03 22:33:28 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void ParticleSystem::update(float deltaTime)
 	// cl::CommandQueue &	queue;
 	// cl::Kernel			kernel(cl.program, "init_particles");
 	cl_int result = CL_SUCCESS;
-	cl_kernel kernel = clCreateKernel(cl.program.get(), "update_particles_test", &result);
+	cl_kernel kernel = clCreateKernel(cl.program.get(), "update_particles", &result);
 	cl_command_queue queue = cl.queue;
 	checkCLSuccess(result, "clCreateKernel");
 

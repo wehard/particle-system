@@ -165,7 +165,7 @@ void GLContext::run(ParticleSystem *ps)
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
 		// entity->position = glm::unProjectNO(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix() * entity->getModelMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
-		entity->position = worldPos;
+		entity->position = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 		s->use();
 		s->setMat4("proj_matrix", camera->getProjectionMatrix());
 		s->setMat4("view_matrix", camera->getViewMatrix());
