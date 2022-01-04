@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2022/01/05 00:04:16 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/05 00:19:40 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ static cl_device_id getDevice(cl_platform_id platform)
 		std::cout << "\t" << device_name << std::endl;
 	}
 
-	cl_device_id device = devices[1];
+	cl_device_id device = devices[0];
 	char device_name[40];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
 	std::cout << "Selected device: " << device_name << ", " << std::endl;

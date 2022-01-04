@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2022/01/03 22:33:28 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/05 00:29:03 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 
 void ParticleSystem::init()
 {
-	glFinish();
 
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
@@ -87,19 +86,19 @@ void ParticleSystem::init()
 	result = clSetKernelArg(kernel, 1, sizeof(GLint), &numParticles);
 	checkCLSuccess(result, "clSetKernelArg");
 
+	glFinish();
 	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueAcquireGLObjects");
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
-	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
-	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
+	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
 	checkCLSuccess(result, "clFinish");
 }
 
 void ParticleSystem::update(float deltaTime)
 {
-	glFinish();
 	cl_int result = CL_SUCCESS;
 	cl_kernel kernel = clCreateKernel(clCtx.program, "update_particles", &result);
 	cl_command_queue queue = clCtx.queue;
@@ -117,12 +116,13 @@ void ParticleSystem::update(float deltaTime)
 	result = clSetKernelArg(kernel, 3, sizeof(GLfloat), &m_pos.y);
 	checkCLSuccess(result, "clSetKernelArg");
 
+	glFinish();
 	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueAcquireGLObjects");
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
-	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
-	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
+	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
 	checkCLSuccess(result, "clFinish");
 }
