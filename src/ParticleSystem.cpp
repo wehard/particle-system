@@ -21,13 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static float randfrom(float min, float max) 
+static float randfrom(float min, float max)
 {
-	float range = (max - min); 
+	float range = (max - min);
 	float div = RAND_MAX / range;
 	return min + (rand() / div);
 }
-
 
 static std::string loadKernelSource(std::string path)
 {
@@ -37,88 +36,91 @@ static std::string loadKernelSource(std::string path)
 	return buffer.str();
 }
 
-static void	checkCLSuccess(cl_int errNum, std::string name) {
-	if (errNum != CL_SUCCESS) {
+static void checkCLSuccess(cl_int errNum, std::string name)
+{
+	if (errNum != CL_SUCCESS)
+	{
 		std::cout << "OpenCL error " << errNum << " : " << name << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
-ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
+ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx), clCtx(clCtx)
 {
 	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
 
-	cl::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
-	cl.addSource(src);
-	cl.compileProgram();
-	
+	std::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
+
+	clCtx.addSource(src);
+	clCtx.compileProgram();
+
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
 	// positions
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(t_particle) * numParticles, (const GLvoid*)0, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(t_particle) * numParticles, (const GLvoid *)0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(t_particle), 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(t_particle), (const GLvoid*)16);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(t_particle), (const GLvoid *)16);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
 
-	try
-	{
-		clmem = clCreateFromGLBuffer(cl.ctx.get(), CL_MEM_READ_WRITE, vbo, nullptr);
-	}
-	catch (const cl::Error & e)
-	{
-		std::cout << "cl::Memory init error!: " << e.err() << std::endl;
-	}
+	clmem = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, vbo, nullptr);
+	// try
+	// {
+	// }
+	// catch (const cl::Error & e)
+	// {
+	// 	std::cout << "cl::Memory init error!: " << e.err() << std::endl;
+	// }
 }
 
-void ParticleSystem::init() 
-{
-	try
-	{
-		glFinish();
-		// cl::CommandQueue &	queue;
-		// cl::Kernel			kernel(cl.program, "init_particles");
-		cl_int result = CL_SUCCESS;
-		cl_command_queue queue = cl.queue;
-		cl_kernel kernel = clCreateKernel(cl.program.get(), "init_particles_sphere", &result);
-		checkCLSuccess(result, "clCreateKernel");
-
-		result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
-		checkCLSuccess(result, "clSetKernelArg");
-		result = clSetKernelArg(kernel, 1, sizeof(GLint), &numParticles);
-		checkCLSuccess(result, "clSetKernelArg");
-
-
-		result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-		checkCLSuccess(result, "clEnqueueAcquireGLObjects");
-		result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
-		checkCLSuccess(result, "clEnqueueNDRangeKernel");
-		result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
-		// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
-		result = clFinish(queue);
-		// checkCLSuccess(result, "clFinish");
-	}
-	catch (const cl::Error & e)
-	{
-		std::cout << e.err() << "\n" << e.what() << std::endl;
-	}
-}
-
-void ParticleSystem::update(float deltaTime) 
+void ParticleSystem::init()
 {
 	glFinish();
 	// cl::CommandQueue &	queue;
 	// cl::Kernel			kernel(cl.program, "init_particles");
 	cl_int result = CL_SUCCESS;
-	cl_kernel kernel = clCreateKernel(cl.program.get(), "update_particles", &result);
-	cl_command_queue queue = cl.queue;
+	cl_command_queue queue = clCtx.queue;
+	cl_kernel kernel = clCreateKernel(clCtx.program, "init_particles_sphere", &result);
+	checkCLSuccess(result, "clCreateKernel");
+
+	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
+	checkCLSuccess(result, "clSetKernelArg");
+	result = clSetKernelArg(kernel, 1, sizeof(GLint), &numParticles);
+	checkCLSuccess(result, "clSetKernelArg");
+
+	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
+	checkCLSuccess(result, "clEnqueueAcquireGLObjects");
+	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
+	checkCLSuccess(result, "clEnqueueNDRangeKernel");
+	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
+	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	result = clFinish(queue);
+	// checkCLSuccess(result, "clFinish");
+	// try
+	// {
+	// }
+	// catch (const cl::Error &e)
+	// {
+	// 	std::cout << e.err() << "\n"
+	// 			  << e.what() << std::endl;
+	// }
+}
+
+void ParticleSystem::update(float deltaTime)
+{
+	glFinish();
+	// cl::CommandQueue &	queue;
+	// cl::Kernel			kernel(cl.program, "init_particles");
+	cl_int result = CL_SUCCESS;
+	cl_kernel kernel = clCreateKernel(clCtx.program, "update_particles", &result);
+	cl_command_queue queue = clCtx.queue;
 	checkCLSuccess(result, "clCreateKernel");
 
 	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);

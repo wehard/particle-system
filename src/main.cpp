@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #include "gl-engine.h"
-#include "CL/opencl.hpp"
+// #include "CL/opencl.hpp"
+#include "OpenCL/opencl.h"
 #include <stdlib.h>
 #include "CLContext.h"
 #include "GLContext.h"
@@ -62,49 +63,69 @@ class App : public glengine::Application
 	}
 };
 
-static cl::Platform getPlatform()
+static cl_platform_id getPlatform()
 {
-	std::vector<cl::Platform> platforms;
+	cl_int result = CL_SUCCESS;
+	// std::vector<cl::Platform> platforms;
 
-	cl_int result = cl::Platform::get(&platforms);
+	cl_platform_id *platforms;
+    cl_uint num_platforms = 0;
+	clGetPlatformIDs(5, NULL, &num_platforms);
+	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * num_platforms);
+	clGetPlatformIDs(num_platforms, platforms, NULL);
 
-	if (platforms.size() == 0)
+	if (num_platforms == 0)
 	{
 		std::cout << "CLPlatform::CLPlatform -- Error: No OpenCL platforms found!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	std::cout << "Available platforms:" << std::endl;
-	for (auto p : platforms)
+
+	for (int i = 0; i < num_platforms; i++)
 	{
-		std::cout << "\t" << p.getInfo<CL_PLATFORM_NAME>() << std::endl;
+		char pform_vendor[40];
+
+		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
+		std::cout << "\t" << pform_vendor << std::endl;
 	}
 
-	cl::Platform platform = platforms[0];
-	std::cout << "Selected platform: " << platform.getInfo<CL_PLATFORM_VENDOR>() << ", " << platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
+	cl_platform_id platform = platforms[0];
+	char pform_vendor[40];
+	char pform_name[40];
+	clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
+	clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(pform_name), &pform_name, NULL);
+	std::cout << "Selected platform: " << pform_vendor << ", " << pform_name << std::endl;
 	return platform;
 }
 
-static cl::Device getDevice(cl::Platform &platform)
+static cl_device_id getDevice(cl_platform_id platform)
 {
-	std::vector<cl::Device> devices;
+	cl_device_id *devices;
+	cl_uint num_devices = 0;
 
-	cl_int result = platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 5, NULL, &num_devices);
+	devices = (cl_device_id*)malloc(sizeof(cl_device_id) * num_devices);
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, num_devices, devices, NULL);
 
-	if (devices.size() == 0)
+	if (num_devices == 0)
 	{
 		std::cout << "CLDevice::CLDevice -- Error: No devices found!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	std::cout << "Available devices:" << std::endl;
-	for (auto d : devices)
+	for (int i = 0; i < num_devices; i++)
 	{
-		std::cout << "\t" << d.getInfo<CL_DEVICE_NAME>() << std::endl;
+		char device_name[40];
+		clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
+		std::cout << "\t" << device_name << std::endl;
 	}
 
-	cl::Device device = devices[0];
-	std::cout << "Selected device: " << device.getInfo<CL_DEVICE_NAME>() << ", " << std::endl;
+	cl_device_id device = devices[0];
+	char device_name[40];
+	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
+	std::cout << "Selected device: " << device_name << ", " << std::endl;
 	return device;
 }
 
@@ -119,9 +140,9 @@ int main(void)
 
 	GLContext gl = GLContext("particle-system", 1280, 720);
 	
-	cl::Platform plat = getPlatform();
-	cl::Device dev = getDevice(plat);
-	CLContext cl = CLContext(plat, dev);
+	cl_platform_id platform = getPlatform();
+	cl_device_id device = getDevice(platform);
+	CLContext cl = CLContext(platform, device);
 	// cl::string src = loadKernelSource("./res/kernel/simple_add.cl").c_str();
 	// cl.addSource(src);
 	// cl.compileProgram();

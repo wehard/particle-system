@@ -15,24 +15,32 @@
 #define CL_HPP_ENABLE_EXCEPTIONS
 #define CL_HPP_TARGET_OPENCL_VERSION 300
 
-#include "CL/opencl.hpp"
+// #include "CL/opencl.hpp"
+#include "OpenCL/opencl.h"
+#include <string>
+#include <vector>
 
 class CLContext
 {
 private:
-	cl::Platform &platform;
-	cl::Device &device;
+	// cl::Platform &platform;
+	cl_platform_id platform;
+	// cl::Device &device;
+	cl_device_id device;
 	cl_int numDevices;
 public:
-	cl::Context ctx;
+	// cl::Context ctx;
+	cl_context ctx;
 	// cl_context ctx;
 	// cl::CommandQueue queue;
 	cl_command_queue queue;
-	cl::Program::Sources sources;
-	cl::Program program;
+	std::vector<std::string> sources;
+	// cl::Program::Sources sources;
+	cl_program program;
+	// cl::Program program;
 	// cl_program program;
-	CLContext(cl::Platform &platform, cl::Device &device);
-	void addSource(cl::string source);
+	CLContext(cl_platform_id platform, cl_device_id device);
+	void addSource(std::string source);
 	void compileProgram();
 	~CLContext();
 };
