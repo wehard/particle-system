@@ -6,14 +6,15 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:18:47 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 23:07:06 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/05 00:16:33 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CLContext.h"
 #include <iostream>
-#ifdef LINUX
-#include "GL/glxint.h" Linux only
+#ifdef __linux__
+#include "CL/opencl.hpp"
+#include "GL/glx.h"
 #endif
 
 #if defined(__APPLE__)
@@ -32,11 +33,11 @@ static void CheckCLResult(int32_t result, std::string name)
 
 CLContext::CLContext(cl_platform_id platform, cl_device_id device) : platform(platform), device(device)
 {
-#ifdef LINUX
+#ifdef __linux__
 	cl_context_properties properties[] = {
 		CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
 		CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
-		CL_CONTEXT_PLATFORM, (cl_context_properties)platform(),
+		CL_CONTEXT_PLATFORM, (cl_context_properties)platform,
 		0};
 #endif
 

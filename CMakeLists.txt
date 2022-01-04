@@ -12,13 +12,15 @@ set(SOURCES src/main.cpp
 include_directories(include 
 					gl-engine/include
 					/usr/local/include)
-					# vendor/OpenCL-SDK/include/api
-					# vendor/OpenCL-SDK/include/cpp)
+
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 add_subdirectory(gl-engine)
-# add_subdirectory(vendor/OpenCL-SDK)
+
+if (NOT APPLE)
+add_subdirectory(vendor/OpenCL-SDK)
+endif()
 
 find_package(OpenGL REQUIRED)
 
@@ -26,26 +28,38 @@ find_package(OpenGL REQUIRED)
 # if (NOT OPENGL)
 # message(FATAL_ERROR "OpenGL not found!")
 # endif()
+if (NOT APPLE)
+include_directories(
+	vendor/OpenCL-SDK/include/api
+	vendor/OpenCL-SDK/include/cpp)
+endif()
 
 
+if (APPLE)
 find_library(OPENCL OpenCL)
 if (NOT OPENCL)
 message(FATAL_ERROR "OpenCL not found!")
 endif()
+endif()
 
 
 target_link_libraries(${PROJECT_NAME} gl-engine)
-# target_link_libraries(${PROJECT_NAME} OpenCL)
-# target_link_libraries(${PROJECT_NAME} OpenGL)
 
+if (NOT APPLE)
+target_link_libraries(${PROJECT_NAME} OpenCL)
+target_link_libraries(${PROJECT_NAME} OpenGL)
+target_link_libraries(${PROJECT_NAME} GLEW)
+target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} GL)
+endif()
+
+if (APPLE)
 target_link_libraries(${PROJECT_NAME} "-framework Cocoa -framework OpenGL -framework OpenCL -framework IOKit -framework CoreVideo")
-
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/include)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/libglfw3.a)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/libGLEW.a)
+endif()
 
-# target_link_libraries(${PROJECT_NAME} GL)
 
 # add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
 #                    COMMAND ${CMAKE_COMMAND} -E copy_directory

@@ -6,13 +6,12 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 19:41:00 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/20 00:05:47 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/05 00:04:16 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "gl-engine.h"
-// #include "CL/opencl.hpp"
-#include "OpenCL/opencl.h"
+
 #include <stdlib.h>
 #include "CLContext.h"
 #include "GLContext.h"

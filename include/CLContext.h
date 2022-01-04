@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:21:55 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/21 23:06:06 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/05 00:16:23 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,13 @@
 #define CL_HPP_ENABLE_EXCEPTIONS
 #define CL_HPP_TARGET_OPENCL_VERSION 300
 
-// #include "CL/opencl.hpp"
+#ifdef __APPLE__
 #include "OpenCL/opencl.h"
+#else
+#include "CL/opencl.hpp"
+#include "GL/glx.h"
+#endif
+
 #include <string>
 #include <vector>
 
