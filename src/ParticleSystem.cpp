@@ -71,20 +71,12 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	glBindVertexArray(0);
 
 	clmem = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, vbo, nullptr);
-	// try
-	// {
-	// }
-	// catch (const cl::Error & e)
-	// {
-	// 	std::cout << "cl::Memory init error!: " << e.err() << std::endl;
-	// }
 }
 
 void ParticleSystem::init()
 {
 	glFinish();
-	// cl::CommandQueue &	queue;
-	// cl::Kernel			kernel(cl.program, "init_particles");
+
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
 	cl_kernel kernel = clCreateKernel(clCtx.program, "init_particles_sphere", &result);
@@ -100,24 +92,14 @@ void ParticleSystem::init()
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
 	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
-	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
-	// checkCLSuccess(result, "clFinish");
-	// try
-	// {
-	// }
-	// catch (const cl::Error &e)
-	// {
-	// 	std::cout << e.err() << "\n"
-	// 			  << e.what() << std::endl;
-	// }
+	checkCLSuccess(result, "clFinish");
 }
 
 void ParticleSystem::update(float deltaTime)
 {
 	glFinish();
-	// cl::CommandQueue &	queue;
-	// cl::Kernel			kernel(cl.program, "init_particles");
 	cl_int result = CL_SUCCESS;
 	cl_kernel kernel = clCreateKernel(clCtx.program, "update_particles", &result);
 	cl_command_queue queue = clCtx.queue;
@@ -140,9 +122,9 @@ void ParticleSystem::update(float deltaTime)
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
 	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, nullptr, nullptr);
-	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
-	// checkCLSuccess(result, "clFinish");
+	checkCLSuccess(result, "clFinish");
 }
 
 ParticleSystem::~ParticleSystem()

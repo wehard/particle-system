@@ -25,7 +25,7 @@ static void CheckCLResult(int32_t result, std::string name)
 {
 	if (result != CL_SUCCESS)
 	{
-		std::cout << "OpenCL error: " << name << std::endl;
+		std::cout << "OpenCL error " << result <<  " : "  << name << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -50,63 +50,49 @@ CLContext::CLContext(cl_platform_id platform, cl_device_id device) : platform(pl
 		0};
 #endif
 	cl_int result;
-	// ctx = cl::Context({device, &properties[0]});
+	cl_uint num_devices;
 
 	ctx = clCreateContextFromType(properties, CL_DEVICE_TYPE_GPU, NULL, NULL, &result);
-	// CheckCLResult(result, "clCreateContext");
-	// CheckCLResult(clGetContextInfo(ctx, CL_CONTEXT_NUM_DEVICES, sizeof(cl_int), &(this->numDevices), NULL),"clGetContextInfo");
-	queue = clCreateCommandQueue(ctx, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &result);
-	CheckCLResult(result, "create command queue");
-	// try
-	// {
-	// }
+	CheckCLResult(result, "clCreateContext");
 
-	// catch (const cl::Error &e)
-	// {
-	// 	std::cout << "cl::Error -- " << e.what() << std::endl;
-	// 	exit(EXIT_FAILURE);
-	// }
 	std::cout << "Successully created CL context." << std::endl;
+	result = clGetContextInfo(ctx, CL_CONTEXT_NUM_DEVICES, sizeof(num_devices), &num_devices, NULL);
+	CheckCLResult(result, "clGetContextInfo");
+	printf("\tNum devices: %d\n", num_devices);
+
+	queue = clCreateCommandQueue(this->ctx, device, 0, &result);
+	CheckCLResult(result, "clCreateCommandQueue");
+
 	std::cout << "Successully created CL command queue." << std::endl;
 }
 
 void CLContext::addSource(std::string source)
 {
-	sources.push_back({source.c_str(), source.length()});
+	this->source = source;
 }
 
 void CLContext::compileProgram()
 {
-	size_t program_size = 0;
 	cl_int error = CL_SUCCESS;
+	FILE *program_handle;
+	char *program_buffer, *program_log;
+	size_t program_size, log_size;
 
-	char** result = new char*[sources.size()];
-	for (int index = 0; index < sources.size(); index++) {
-		program_size += sources[index].size();
-	    result[index] = const_cast<char*>(sources[index].c_str());
-	}
+	program_buffer = (char*)source.c_str();
+	program_size = source.size();
 
-	// std::string source = sources.pop_back();
-	program = clCreateProgramWithSource(ctx, 1, (const char **)result, &program_size, &error);
+	// program_handle = fopen("res/kernel/particles.cl", "r");
+	// fseek(program_handle, 0, SEEK_END);
+	// program_size = ftell(program_handle);
+	// rewind(program_handle);
+	// program_buffer = (char*)malloc(program_size + 1); program_buffer[program_size] = '\0'; fread(program_buffer, sizeof(char), program_size, program_handle);
+	// fclose(program_handle);
 
-	// cl_int result;
-	// program = cl::Program(ctx, sources, &result);
-	// if (result != CL_SUCCESS)
-	// {
-	// 	std::cout << "CLContext::compileProgram -- Program error!" << std::endl;
-	// }
+	program = clCreateProgramWithSource(ctx, 1, (const char**)&program_buffer, NULL, &error);
+	CheckCLResult(error, "clCreateProgramWithSource");
 
-	// try
-	// {
-	// 	program.build({device});
-	// }
-	// catch (const cl::Error &e)
-	// {
-	// 	(void)e;
-
-	// 	exit(EXIT_FAILURE);
-	// 	std::cout << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device).c_str() << std::endl;
-	// }
+	error = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+	CheckCLResult(error, "clBuildProgram");
 
 	std::cout << "Successully compiled kernel program." << std::endl;
 }

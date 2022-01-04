@@ -23,22 +23,14 @@
 class CLContext
 {
 private:
-	// cl::Platform &platform;
 	cl_platform_id platform;
-	// cl::Device &device;
 	cl_device_id device;
 	cl_int numDevices;
 public:
-	// cl::Context ctx;
 	cl_context ctx;
-	// cl_context ctx;
-	// cl::CommandQueue queue;
 	cl_command_queue queue;
-	std::vector<std::string> sources;
-	// cl::Program::Sources sources;
+	std::string source;
 	cl_program program;
-	// cl::Program program;
-	// cl_program program;
 	CLContext(cl_platform_id platform, cl_device_id device);
 	void addSource(std::string source);
 	void compileProgram();

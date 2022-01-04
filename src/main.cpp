@@ -66,10 +66,9 @@ class App : public glengine::Application
 static cl_platform_id getPlatform()
 {
 	cl_int result = CL_SUCCESS;
-	// std::vector<cl::Platform> platforms;
-
 	cl_platform_id *platforms;
     cl_uint num_platforms = 0;
+	
 	clGetPlatformIDs(5, NULL, &num_platforms);
 	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * num_platforms);
 	clGetPlatformIDs(num_platforms, platforms, NULL);
@@ -104,9 +103,9 @@ static cl_device_id getDevice(cl_platform_id platform)
 	cl_device_id *devices;
 	cl_uint num_devices = 0;
 
-	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 5, NULL, &num_devices);
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, 5, NULL, &num_devices);
 	devices = (cl_device_id*)malloc(sizeof(cl_device_id) * num_devices);
-	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, num_devices, devices, NULL);
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, num_devices, devices, NULL);
 
 	if (num_devices == 0)
 	{
@@ -122,7 +121,7 @@ static cl_device_id getDevice(cl_platform_id platform)
 		std::cout << "\t" << device_name << std::endl;
 	}
 
-	cl_device_id device = devices[0];
+	cl_device_id device = devices[1];
 	char device_name[40];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
 	std::cout << "Selected device: " << device_name << ", " << std::endl;
@@ -134,60 +133,16 @@ static cl_device_id getDevice(cl_platform_id platform)
 
 int main(void)
 {
-	// App *app = new App("particle-system");
-	// app->run();
-	// delete app;
-
 	GLContext gl = GLContext("particle-system", 1280, 720);
 	
 	cl_platform_id platform = getPlatform();
 	cl_device_id device = getDevice(platform);
 	CLContext cl = CLContext(platform, device);
-	// cl::string src = loadKernelSource("./res/kernel/simple_add.cl").c_str();
-	// cl.addSource(src);
-	// cl.compileProgram();
+	
 
 	ParticleSystem ps = ParticleSystem(gl, cl);
 	ps.init();
-
 	gl.run(&ps);
-	// cl_int result;
-
-	// // Allocate space on device
-	// cl::Buffer buffer_a(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
-	// cl::Buffer buffer_b(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
-	// cl::Buffer buffer_c(cl.ctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
-	
-	// int A[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	// int B[] = {0, 1, 2, 0, 1, 2, 0, 1, 2, 0};
-
-	// // Create queue to push commands to device
-	// cl.queue.enqueueWriteBuffer(buffer_a, CL_TRUE, 0, sizeof(int) * 10, A);
-	// cl.queue.enqueueWriteBuffer(buffer_b, CL_TRUE, 0, sizeof(int) * 10, B);
-
-	// // Run kernel (needs deprecated apis)
-	// cl::Kernel kernel_add = cl::Kernel(cl.program, "simple_add", &result);
-	// kernel_add.setArg(0, buffer_a);
-	// kernel_add.setArg(1, buffer_b);
-	// kernel_add.setArg(2, buffer_c);
-	// printf("cl::Kernel error %d\n", result);
-	// cl_int ret = cl.queue.enqueueNDRangeKernel(kernel_add, cl::NullRange, cl::NDRange(10), cl::NullRange);
-
-	// printf("%d\n", ret);
-	// cl.queue.finish();
-
-	// int C[10] = {-1};
-
-	// cl.queue.enqueueReadBuffer(buffer_c, CL_TRUE, 0, sizeof(int) * 10, &C);
-	// cl.queue.finish(); // ?
-
-	// printf("Result:\n");
-	// for (size_t i = 0; i < 10; i++)
-	// {
-	// 	printf("%d ", C[i]);
-	// }
-	// printf("\n");
-	
 
 	return (0);
 }
