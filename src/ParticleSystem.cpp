@@ -99,6 +99,11 @@ void ParticleSystem::init()
 	checkCLSuccess(result, "clFinish");
 }
 
+void ParticleSystem::reset()
+{
+	init();
+}
+
 void ParticleSystem::update(float deltaTime)
 {
 	cl_int result = CL_SUCCESS;

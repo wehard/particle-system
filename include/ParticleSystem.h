@@ -37,6 +37,7 @@ public:
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void init();
 	void update(float deltaTime);
+	void reset();
 	~ParticleSystem();
 };
 

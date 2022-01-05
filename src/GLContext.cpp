@@ -69,14 +69,6 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 		std::cout << "GLEW failed to initialize!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	
-	// glEnable(GL_DEPTH_TEST);
-	// glEnable(GL_MULTISAMPLE);
-	// glEnable(GL_FOG);
-	// glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	// glEnable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// glClearColor(0, 0, 0, 1.f);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable( GL_BLEND );
@@ -152,8 +144,7 @@ void GLContext::run(ParticleSystem *ps)
 		// Update particles
 		ps->update(deltaTime);
 
-		gui.Update();
-
+		gui.Update(*ps);
 
 		// Render here!
 		glClearColor(0.1, 0.1, 0.1, 1.0);
