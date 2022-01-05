@@ -20,12 +20,16 @@ void GUIContext::Update(ParticleSystem &ps)
 
 	ImGui::Begin("particle-system");
 	ImGui::Text("Particles %zu", ps.numParticles);
+	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
 	ImGui::Text("Mouse x %f, y %f, z %f", ps.m_pos.x, ps.m_pos.y, ps.m_pos.z);
 	if (ImGui::Button("Reset", ImVec2(50, 20)))
 		ps.reset();
 	ImGui::End();
 
 	ImGui::Begin("opencl");
+	ImGui::Text("Platform: %s, %s", ps.clCtx.clInfo.platformVendor, ps.clCtx.clInfo.platformName);
+	ImGui::Text("Device: %s", ps.clCtx.clInfo.deviceName);
+	ImGui::Separator();
 	ImGui::End();
 }
 void GUIContext::Render()

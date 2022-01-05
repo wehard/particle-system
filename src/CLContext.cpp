@@ -22,18 +22,31 @@
 #include <OpenGL/OpenGL.h>
 #endif
 
-static void CheckCLResult(int32_t result, std::string name)
+void CLContext::CheckCLResult(cl_int result, std::string message)
 {
 	if (result != CL_SUCCESS)
 	{
-		std::cout << "OpenCL error " << result << " : " << name << std::endl;
+		std::cout << "OpenCL error " << result << " : " << message << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
 CLContext::CLContext()
 {
-#ifdef __linux__
+	this->getPlatform();
+	this->getDevice();
+	this->createContext();
+	this->createCommandQueue();
+}
+
+void CLContext::addSource(std::string source)
+{
+	this->source = source;
+}
+
+void CLContext::createContext()
+{
+	#ifdef __linux__
 	cl_context_properties properties[] = {
 		CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
 		CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
@@ -50,29 +63,26 @@ CLContext::CLContext()
 		(cl_context_properties)shareGroup,
 		0};
 #endif
+
 	cl_int result;
 	cl_uint num_devices;
 
-	this->getPlatform();
-	this->getDevice();
-
 	ctx = clCreateContextFromType(properties, CL_DEVICE_TYPE_GPU, NULL, NULL, &result);
 	CheckCLResult(result, "clCreateContext");
-
 	std::cout << "Successully created CL context." << std::endl;
-	result = clGetContextInfo(ctx, CL_CONTEXT_NUM_DEVICES, sizeof(num_devices), &num_devices, NULL);
-	CheckCLResult(result, "clGetContextInfo");
-	printf("\tNum devices: %d\n", num_devices);
 
+	result = clGetContextInfo(ctx, CL_CONTEXT_NUM_DEVICES, sizeof(clInfo.numDevices), &clInfo.numDevices, NULL);
+	CheckCLResult(result, "clGetContextInfo");
+	printf("\tNum devices: %d\n", clInfo.numDevices);
+}
+
+void CLContext::createCommandQueue()
+{
+	cl_int result;
 	queue = clCreateCommandQueue(this->ctx, device, 0, &result);
 	CheckCLResult(result, "clCreateCommandQueue");
 
 	std::cout << "Successully created CL command queue." << std::endl;
-}
-
-void CLContext::addSource(std::string source)
-{
-	this->source = source;
 }
 
 void CLContext::compileProgram()
@@ -134,13 +144,12 @@ void CLContext::getPlatform()
 {
 	cl_int result = CL_SUCCESS;
 	cl_platform_id *platforms;
-    cl_uint num_platforms = 0;
 	
-	clGetPlatformIDs(5, NULL, &num_platforms);
-	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * num_platforms);
-	clGetPlatformIDs(num_platforms, platforms, NULL);
+	clGetPlatformIDs(5, NULL, &clInfo.numPlatforms);
+	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * clInfo.numPlatforms);
+	clGetPlatformIDs(clInfo.numPlatforms, platforms, NULL);
 
-	if (num_platforms == 0)
+	if (clInfo.numPlatforms == 0)
 	{
 		std::cout << "CLPlatform::CLPlatform -- Error: No OpenCL platforms found!" << std::endl;
 		exit(EXIT_FAILURE);
@@ -148,7 +157,7 @@ void CLContext::getPlatform()
 
 	std::cout << "Available platforms:" << std::endl;
 
-	for (int i = 0; i < num_platforms; i++)
+	for (int i = 0; i < clInfo.numPlatforms; i++)
 	{
 		char pform_vendor[40];
 
@@ -157,11 +166,9 @@ void CLContext::getPlatform()
 	}
 
 	this->platform = platforms[0];
-	char pform_vendor[40];
-	char pform_name[40];
-	clGetPlatformInfo(this->platform, CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
-	clGetPlatformInfo(this->platform, CL_PLATFORM_VERSION, sizeof(pform_name), &pform_name, NULL);
-	std::cout << "Selected platform: " << pform_vendor << ", " << pform_name << std::endl;
+	clGetPlatformInfo(this->platform, CL_PLATFORM_VENDOR, sizeof(clInfo.platformVendor), &clInfo.platformVendor, NULL);
+	clGetPlatformInfo(this->platform, CL_PLATFORM_VERSION, sizeof(clInfo.platformName), &clInfo.platformName, NULL);
+	std::cout << "Selected platform: " << clInfo.platformVendor << ", " << clInfo.platformName << std::endl;
 }
 
 CLContext::~CLContext() {}

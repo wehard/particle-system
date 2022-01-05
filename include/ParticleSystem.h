@@ -26,9 +26,9 @@ class ParticleSystem
 {
 private:
 	cl_mem	clmem;
+public:
 	CLContext &clCtx;
 	GLContext &glCtx;
-public:
 	const size_t numParticles = 2000000;
 	glm::vec3	m_pos;
 	GLuint vao;
