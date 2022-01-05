@@ -23,45 +23,6 @@
 #include <streambuf>
 #include <sstream>
 
-class App : public glengine::Application
-{
-	private:
-	glengine::Shader *s;
-	glengine::Mesh *m;
-	glengine::Entity *e;
-
-	public:
-	App(std::string title) : glengine::Application(title, 1280, 720) {}
-
-	virtual void onAttach() override
-	{
-		s = new glengine::Shader("./res/shaders/phong.vert", "./res/shaders/phong.frag");
-		m = glengine::Mesh::makeQuad();// glengine::loadObj("./res/obj/cube.obj");
-
-		m->setVertexColors(glm::vec4(0.0, 1.0, 1.0, 1.0));
-		
-		e = new glengine::Entity(s, m);
-		e->position = glm::vec3(0.0, 0.0, 0.0);
-		e->scale = glm::vec3(10.0f, 10.0f, 10.0f);
-		addEntity(e);
-
-		camera->position = glm::vec3(0.0, 0.0, 20.0);
-		
-	}
-
-	virtual void onUpdate(float deltaTime) override
-	{
-		e->rotation.y += 45.0 * deltaTime;
-	}
-
-	virtual void onDetach() override
-	{
-		delete m;
-		delete s;
-		delete e;
-	}
-};
-
 static cl_platform_id getPlatform()
 {
 	cl_int result = CL_SUCCESS;
@@ -92,7 +53,7 @@ static cl_platform_id getPlatform()
 	char pform_vendor[40];
 	char pform_name[40];
 	clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(pform_vendor), &pform_vendor, NULL);
-	clGetPlatformInfo(platform, CL_PLATFORM_NAME, sizeof(pform_name), &pform_name, NULL);
+	clGetPlatformInfo(platform, CL_PLATFORM_VERSION, sizeof(pform_name), &pform_name, NULL);
 	std::cout << "Selected platform: " << pform_vendor << ", " << pform_name << std::endl;
 	return platform;
 }
@@ -120,15 +81,13 @@ static cl_device_id getDevice(cl_platform_id platform)
 		std::cout << "\t" << device_name << std::endl;
 	}
 
-	cl_device_id device = devices[0];
+	int dev_index = 1;
+	cl_device_id device = devices[dev_index];
 	char device_name[40];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
-	std::cout << "Selected device: " << device_name << ", " << std::endl;
+	std::cout << "Selected device [" << dev_index << "] : " << device_name << std::endl;
 	return device;
 }
-
-
-
 
 int main(void)
 {

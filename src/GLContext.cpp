@@ -107,7 +107,7 @@ void GLContext::run(ParticleSystem *ps)
 	auto entity = new glengine::Entity(s, quad);
 	entity->position = glm::vec3(0.0);
 	entity->rotation = glm::vec3(0.0);
-	entity->scale = glm::vec3(0.01);
+	entity->scale = glm::vec3(1.0);
 	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 	
 

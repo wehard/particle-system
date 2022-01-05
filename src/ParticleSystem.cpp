@@ -70,7 +70,9 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 
 	glBindVertexArray(0);
 
+	cl_int result = CL_SUCCESS;
 	clmem = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, vbo, nullptr);
+	checkCLSuccess(result, "clCreateFromGLBuffer");
 }
 
 void ParticleSystem::init()
@@ -92,7 +94,7 @@ void ParticleSystem::init()
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
 	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
 	checkCLSuccess(result, "clFinish");
 }
@@ -122,7 +124,7 @@ void ParticleSystem::update(float deltaTime)
 	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
 	checkCLSuccess(result, "clEnqueueNDRangeKernel");
 	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	// checkCLSuccess(result, "clEnqueueReleaseGLObjects");
+	checkCLSuccess(result, "clEnqueueReleaseGLObjects");
 	result = clFinish(queue);
 	checkCLSuccess(result, "clFinish");
 }
