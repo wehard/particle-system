@@ -30,6 +30,11 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Platform: %s, %s", ps.clCtx.clInfo.platformVendor, ps.clCtx.clInfo.platformName);
 	ImGui::Text("Device: %s", ps.clCtx.clInfo.deviceName);
 	ImGui::Separator();
+	ImGui::Text("Program");
+	for (auto k : ps.clProgram->clKernels)
+	{
+		ImGui::Text("%s", k->name);
+	}
 	ImGui::End();
 }
 void GUIContext::Render()

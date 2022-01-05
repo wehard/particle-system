@@ -28,8 +28,8 @@ class ParticleSystem
 {
 private:
 	cl_mem	clmem;
-	CLProgram *clProgram;
 public:
+	CLProgram *clProgram;
 	CLContext &clCtx;
 	GLContext &glCtx;
 	const size_t numParticles = 2000000;
