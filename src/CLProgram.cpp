@@ -60,34 +60,34 @@ void CLProgram::createKernels()
 
 	cl_kernel kernels[info.numKernels];
 
-	result = clCreateKernelsInProgram(this->program, info.numKernels, (cl_kernel*)&kernels, NULL);
+	result = clCreateKernelsInProgram(this->program, info.numKernels, (cl_kernel *)&kernels, NULL);
 	CLContext::CheckCLResult(result, "clCreateKernelsInProgram");
 
 	for (auto k : kernels)
 	{
-		clKernels.push_back(new CLKernel(k));
+		clKernels.push_back(new CLKernel(program, k));
 	}
 }
 
-void CLProgram::SetKernelArgs(const char *kernelName, std::vector<CLKernelArg> args)
-{
-	cl_int result = CL_SUCCESS;
+// void CLProgram::SetKernelArgs(const char *kernelName, std::vector<CLKernelArg> args)
+// {
+// 	cl_int result = CL_SUCCESS;
 
-	for (auto k : clKernels)
-	{
-		if (strcmp(kernelName, k->name) == 0)
-		{
-			cl_kernel kernel = k->kernel;
-			for (size_t i = 0; i < args.size(); i++)
-			{
-				auto arg = args[i];
-				result = clSetKernelArg(kernel, i, arg.size, arg.arg);
-				CLContext::CheckCLResult(result, "clSetKernelArg");
-			}
-			break;
-		}
-	}
-}
+// 	for (auto k : clKernels)
+// 	{
+// 		if (strcmp(kernelName, k->name) == 0)
+// 		{
+// 			cl_kernel kernel = k->kernel;
+// 			for (size_t i = 0; i < args.size(); i++)
+// 			{
+// 				auto arg = args[i];
+// 				result = clSetKernelArg(kernel, i, arg.size, arg.arg);
+// 				CLContext::CheckCLResult(result, "clSetKernelArg");
+// 			}
+// 			break;
+// 		}
+// 	}
+// }
 
 cl_kernel CLProgram::CreateKernel(const char *kernelFunc)
 {
@@ -100,4 +100,16 @@ cl_kernel CLProgram::CreateKernel(const char *kernelFunc)
 CLProgramInfo CLProgram::GetInfo()
 {
 	return this->info;
+}
+
+CLKernel *CLProgram::GetKernel(const char *kernelName)
+{
+	for (auto kernel : clKernels)
+	{
+		if (strcmp(kernelName, kernel->name) == 0)
+		{
+			return kernel;
+		}
+	}
+	throw;
 }

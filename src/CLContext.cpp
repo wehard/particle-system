@@ -141,3 +141,17 @@ void CLContext::getPlatform()
 }
 
 CLContext::~CLContext() {}
+
+void CLContext::AquireGLObject(cl_mem clMem)
+{
+	cl_int result = CL_SUCCESS;
+	result = clEnqueueAcquireGLObjects(queue, 1, &clMem, 0, NULL, NULL);
+	CLContext::CheckCLResult(result, "clEnqueueAcquireGLObjects");
+}
+
+void CLContext::ReleaseGLObject(cl_mem clMem)
+{
+	cl_int result = CL_SUCCESS;
+	result = clEnqueueReleaseGLObjects(queue, 1, &clMem, 0, NULL, NULL);
+	CLContext::CheckCLResult(result, "clEnqueueReleaseGLObjects");
+}

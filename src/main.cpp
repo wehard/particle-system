@@ -33,7 +33,7 @@ int main(void)
 	CLContext cl = CLContext();
 
 	ParticleSystem ps = ParticleSystem(gl, cl);
-	ps.init();
+	ps.init("init_particles_sphere");
 	gl.run(&ps);
 
 	return (0);

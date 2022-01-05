@@ -51,5 +51,7 @@ public:
 	cl_command_queue queue;
 	CLContext();
 	~CLContext();
+	void AquireGLObject(cl_mem clMem);
+	void ReleaseGLObject(cl_mem clMem);
 	static void CheckCLResult(cl_int result, std::string message);
 };

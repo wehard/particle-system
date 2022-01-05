@@ -63,62 +63,44 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	CLContext::CheckCLResult(result, "clCreateFromGLBuffer");
 }
 
-void ParticleSystem::init()
+void ParticleSystem::init(const char *initKernel)
 {
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
 
-	cl_kernel kernel = clProgram->CreateKernel("init_particles_sphere");
-
-	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-	result = clSetKernelArg(kernel, 1, sizeof(GLint), &numParticles);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-
+	auto k = clProgram->GetKernel(initKernel);
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &clmem},
+		{sizeof(GLint), &numParticles}
+	};
+	k->SetArgs(args, 2);
 	glFinish();
-	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueAcquireGLObjects");
-	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueNDRangeKernel");
-	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueReleaseGLObjects");
-	result = clFinish(queue);
-	CLContext::CheckCLResult(result, "clFinish");
+	clCtx.AquireGLObject(clmem);
+	k->Enqueue(clCtx.queue, numParticles);
+	clCtx.ReleaseGLObject(clmem);
+	CLContext::CheckCLResult(clFinish(queue), "clFinish");
 }
 
 void ParticleSystem::reset()
 {
-	init();
+	init("init_particles_cube");
 }
 
 void ParticleSystem::update(float deltaTime)
 {
-	cl_int result = CL_SUCCESS;
-	cl_command_queue queue = clCtx.queue;
-
-	cl_kernel kernel = clProgram->CreateKernel("update_particles");
-
-	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-
-	result = clSetKernelArg(kernel, 1, sizeof(GLfloat), &deltaTime);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-
-	// Mouse pos
-	result = clSetKernelArg(kernel, 2, sizeof(GLfloat), &m_pos.x);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-	result = clSetKernelArg(kernel, 3, sizeof(GLfloat), &m_pos.y);
-	CLContext::CheckCLResult(result, "clSetKernelArg");
-
+	auto kernel = clProgram->GetKernel("update_particles");
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &clmem},
+		{sizeof(GLfloat), &deltaTime},
+		{sizeof(GLfloat), &m_pos.x},
+		{sizeof(GLfloat), &m_pos.y}
+	};
+	kernel->SetArgs(args, 4);
 	glFinish();
-	result = clEnqueueAcquireGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueAcquireGLObjects");
-	result = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &numParticles, NULL, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueNDRangeKernel");
-	result = clEnqueueReleaseGLObjects(queue, 1, &clmem, 0, NULL, NULL);
-	CLContext::CheckCLResult(result, "clEnqueueReleaseGLObjects");
-	result = clFinish(queue);
-	CLContext::CheckCLResult(result, "clFinish");
+	clCtx.AquireGLObject(clmem);
+	kernel->Enqueue(clCtx.queue, numParticles);
+	clCtx.ReleaseGLObject(clmem);
+	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
 }
 
 ParticleSystem::~ParticleSystem()

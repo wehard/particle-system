@@ -38,7 +38,7 @@ public:
 	GLuint vbo;
 	glengine::Shader *shader;
 	ParticleSystem(GLContext &gl, CLContext &cl);
-	void init();
+	void init(const char *initKernel);
 	void update(float deltaTime);
 	void reset();
 	~ParticleSystem();

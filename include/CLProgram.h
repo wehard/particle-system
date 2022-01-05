@@ -33,7 +33,9 @@ public:
 	CLProgram(CLContext &cl, const char *kernelSource);
 	~CLProgram();
 	cl_kernel CreateKernel(const char *kernelFunc);
-	void SetKernelArgs(const char *kernelName, std::vector<CLKernelArg> args);
+	// void SetKernelArgs(const char *kernelName, std::vector<CLKernelArg> args);
+	// void RunKernel(const char *kernelName, size_t globalWorkSize);
+	CLKernel *GetKernel(const char *kernelName);
 	CLProgramInfo GetInfo();
 };
 

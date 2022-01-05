@@ -6,6 +6,8 @@
 #include "CL/opencl.hpp"
 #endif
 
+#include <vector>
+
 struct CLKernelArg
 {
 	size_t size;
@@ -19,8 +21,11 @@ public:
 	char name[64];
 	cl_uint numArgs;
 	cl_kernel kernel;
-	CLKernel(cl_kernel kernel);
+	cl_program program;
+	CLKernel(cl_program program, cl_kernel kernel);
 	~CLKernel();
+	void SetArgs(std::vector<CLKernelArg> args, size_t argc);
+	void Enqueue(cl_command_queue queue, size_t globalWorkSize);
 };
 
 
