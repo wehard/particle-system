@@ -5,6 +5,7 @@
 #include "ParticleSystem.h"
 #include "entity.h"
 #include "mesh.h"
+#include "GUIContext.h"
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
@@ -109,7 +110,9 @@ void GLContext::run(ParticleSystem *ps)
 	entity->rotation = glm::vec3(0.0);
 	entity->scale = glm::vec3(1.0);
 	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
-	
+
+	GUIContext gui;
+	gui.Init(window, NULL);
 
 	glfwSetWindowUserPointer(window, this);
 
@@ -149,6 +152,8 @@ void GLContext::run(ParticleSystem *ps)
 		// Update particles
 		ps->update(deltaTime);
 
+		gui.Update();
+
 
 		// Render here!
 		glClearColor(0.1, 0.1, 0.1, 1.0);
@@ -173,6 +178,8 @@ void GLContext::run(ParticleSystem *ps)
 		s->setVec4("obj_color", entity->color);
 		entity->draw();
 
+		gui.Render();
+
 		glfwSwapBuffers(window);
 
 		lastTime = currentTime;
@@ -180,4 +187,5 @@ void GLContext::run(ParticleSystem *ps)
 
 		glfwPollEvents();
 	}
+	gui.Shutdown();
 }

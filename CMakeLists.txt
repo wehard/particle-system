@@ -7,11 +7,22 @@ set(CMAKE_CXX_STANDARD 17)
 set(SOURCES src/main.cpp
 			src/ParticleSystem.cpp
 			src/CLContext.cpp
-			src/GLContext.cpp)
+			src/GLContext.cpp
+			src/GUIContext.cpp
+			imgui/imgui.cpp
+			imgui/imgui_demo.cpp
+			imgui/imgui_draw.cpp
+			imgui/imgui_tables.cpp
+			imgui/imgui_widgets.cpp
+			imgui/backends/imgui_impl_glfw.cpp
+			imgui/backends/imgui_impl_opengl3.cpp)
 
-include_directories(include 
+include_directories(include
+					imgui
+					imgui/backends
 					gl-engine/include
 					/usr/local/include)
+
 
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -24,10 +35,6 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-# find_library(OPENGL OpenGL)
-# if (NOT OPENGL)
-# message(FATAL_ERROR "OpenGL not found!")
-# endif()
 if (NOT APPLE)
 include_directories(
 	vendor/OpenCL-SDK/include/api
