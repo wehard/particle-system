@@ -49,10 +49,6 @@ public:
 	CLInfo clInfo;
 	cl_context ctx;
 	cl_command_queue queue;
-	std::string source;
-	cl_program program;
-	void addSource(std::string source);
-	void compileProgram();
 	CLContext();
 	~CLContext();
 	static void CheckCLResult(cl_int result, std::string message);

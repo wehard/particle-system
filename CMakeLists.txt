@@ -9,6 +9,7 @@ set(SOURCES src/main.cpp
 			src/CLContext.cpp
 			src/GLContext.cpp
 			src/GUIContext.cpp
+			src/CLProgram.cpp
 			imgui/imgui.cpp
 			imgui/imgui_demo.cpp
 			imgui/imgui_draw.cpp

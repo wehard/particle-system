@@ -41,10 +41,12 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
 
-	std::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
+	// std::string src = loadKernelSource("./res/kernel/particles.cl").c_str();
 
-	clCtx.addSource(src);
-	clCtx.compileProgram();
+	// clCtx.addSource(src);
+	// clCtx.compileProgram();
+
+	clProgram = new CLProgram(this->clCtx, "./res/kernel/particles.cl");
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -70,8 +72,11 @@ void ParticleSystem::init()
 {
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
-	cl_kernel kernel = clCreateKernel(clCtx.program, "init_particles_sphere", &result);
-	CLContext::CheckCLResult(result, "clCreateKernel");
+
+	cl_kernel kernel = clProgram->CreateKernel("init_particles_sphere");
+
+	// cl_kernel kernel = clCreateKernel(clCtx.program, "init_particles_sphere", &result);
+	// CLContext::CheckCLResult(result, "clCreateKernel");
 
 	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
 	CLContext::CheckCLResult(result, "clSetKernelArg");
@@ -97,9 +102,11 @@ void ParticleSystem::reset()
 void ParticleSystem::update(float deltaTime)
 {
 	cl_int result = CL_SUCCESS;
-	cl_kernel kernel = clCreateKernel(clCtx.program, "update_particles", &result);
+	// cl_kernel kernel = clCreateKernel(clCtx.program, "update_particles", &result);
 	cl_command_queue queue = clCtx.queue;
-	CLContext::CheckCLResult(result, "clCreateKernel");
+	// CLContext::CheckCLResult(result, "clCreateKernel");
+
+	cl_kernel kernel = clProgram->CreateKernel("update_particles");
 
 	result = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clmem);
 	CLContext::CheckCLResult(result, "clSetKernelArg");

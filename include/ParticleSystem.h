@@ -16,6 +16,8 @@
 #include "CLContext.h"
 #include "shader.h"
 
+#include "CLProgram.h"
+
 typedef struct
 {
 	cl_float4 pos;
@@ -26,6 +28,7 @@ class ParticleSystem
 {
 private:
 	cl_mem	clmem;
+	CLProgram *clProgram;
 public:
 	CLContext &clCtx;
 	GLContext &glCtx;

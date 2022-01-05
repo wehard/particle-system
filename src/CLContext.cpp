@@ -39,11 +39,6 @@ CLContext::CLContext()
 	this->createCommandQueue();
 }
 
-void CLContext::addSource(std::string source)
-{
-	this->source = source;
-}
-
 void CLContext::createContext()
 {
 	#ifdef __linux__
@@ -83,32 +78,6 @@ void CLContext::createCommandQueue()
 	CheckCLResult(result, "clCreateCommandQueue");
 
 	std::cout << "Successully created CL command queue." << std::endl;
-}
-
-void CLContext::compileProgram()
-{
-	cl_int error = CL_SUCCESS;
-	FILE *program_handle;
-	char *program_buffer, *program_log;
-	size_t program_size, log_size;
-
-	program_buffer = (char *)source.c_str();
-	program_size = source.size();
-
-	// program_handle = fopen("res/kernel/particles.cl", "r");
-	// fseek(program_handle, 0, SEEK_END);
-	// program_size = ftell(program_handle);
-	// rewind(program_handle);
-	// program_buffer = (char*)malloc(program_size + 1); program_buffer[program_size] = '\0'; fread(program_buffer, sizeof(char), program_size, program_handle);
-	// fclose(program_handle);
-
-	program = clCreateProgramWithSource(ctx, 1, (const char **)&program_buffer, NULL, &error);
-	CheckCLResult(error, "clCreateProgramWithSource");
-
-	error = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-	CheckCLResult(error, "clBuildProgram");
-
-	std::cout << "Successully compiled kernel program." << std::endl;
 }
 
 void CLContext::getDevice()
