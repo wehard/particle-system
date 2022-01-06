@@ -70,8 +70,8 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 		exit(EXIT_FAILURE);
 	}
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable( GL_BLEND );
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// glEnable( GL_BLEND );
 
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
@@ -100,7 +100,7 @@ void GLContext::run(ParticleSystem *ps)
 	auto entity = new glengine::Entity(s, quad);
 	entity->position = glm::vec3(0.0);
 	entity->rotation = glm::vec3(0.0);
-	entity->scale = glm::vec3(1.0);
+	entity->scale = glm::vec3(0.05);
 	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
 	GUIContext gui;
@@ -158,13 +158,13 @@ void GLContext::run(ParticleSystem *ps)
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
-		entity->position = glm::unProject(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
-		// entity->position = glm::vec3(0.0);
+		// entity->position = glm::unProject(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
+		entity->position = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 		s->use();
+		s->setVec4("obj_color", glm::vec4(1.0, 0.0, 0.0, 1.0));
 		s->setMat4("proj_matrix", camera->getProjectionMatrix());
 		s->setMat4("view_matrix", camera->getViewMatrix());
 		s->setMat4("model_matrix", entity->getModelMatrix());
-		s->setVec4("obj_color", entity->color);
 		entity->draw();
 
 		gui.Render();

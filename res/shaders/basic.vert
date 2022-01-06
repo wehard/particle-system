@@ -12,9 +12,11 @@ uniform vec4 obj_color;
 
 out vec4 f_col;
 out vec3 f_normal;
+out vec4 o_col;
 
 void main()
 {
+	o_col = v_col;
 	f_col = v_col;
 	f_normal = v_normal;
 	gl_Position = proj_matrix * view_matrix * model_matrix * vec4(v_pos, 1.0);
