@@ -118,6 +118,12 @@ void ParticleSystem::update(float deltaTime)
 
 void ParticleSystem::updateGp(float deltaTime)
 {
+	cl_float4 clm;
+	clm.s[0] = this->mouseInfo.world.x;
+	clm.s[1] = this->mouseInfo.world.y;
+	clm.s[2] = this->mouseInfo.world.z;
+	clm.s[3] = 1.0f;
+
 	updateGpBuffer();
 	int numGp = gravityPoints.size();
 	auto kernel = clProgram->GetKernel("update_particles_gravity_points");
@@ -125,9 +131,10 @@ void ParticleSystem::updateGp(float deltaTime)
 		{sizeof(cl_mem), &clmem},
 		{sizeof(cl_mem), &clmemgp},
 		{sizeof(int), &numGp},
+		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime}
 	};
-	kernel->SetArgs(args, 4);
+	kernel->SetArgs(args, 5);
 	glFinish();
 	clCtx.AquireGLObject(clmem);
 	kernel->Enqueue(clCtx.queue, numParticles);

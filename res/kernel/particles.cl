@@ -9,8 +9,40 @@ static float noise3D(float x, float y, float z) {
 	return fract(sin(x*112.9898f + y*179.233f + z*237.212f) * 43758.5453f, &ptr);
 }
 
+/*
+	Return a random unsigned long
+*/
+static ulong rand_ulong(__global ulong* seed)
+{
+	ulong value = *seed * 1103515245 + 12345;
+
+	*seed = value;
+	return value;
+}
+
+/*
+	Return a random float in range [0, 1]
+*/
+static float rand_float(__global ulong* seed)
+{
+	return (float)rand_ulong(seed) / ULONG_MAX;
+}
+
+/*
+	Return a random float in range [a, b]
+*/
+static float rand_float_in_range(global ulong* seed, float a, float b)
+{
+	float	x = rand_float(seed);
+
+	return (b - a) * x + a;
+}
+
+
 #define CUBE_SIZE 1.0
 #define SPHERE_RADIUS 0.5
+
+
 
 __kernel void init_particles_cube(__global t_particle * ps, int num_particles)
 {
@@ -76,16 +108,24 @@ __kernel void init_particles_rect(__global t_particle * ps, int num_particles)
 	float fgi = (float)(i) / num_particles;
 
 	ps[i].pos = (float4)(
-		noise3D(fgi, 0.0f, 0.12230f) * 2.0f - 1.0f,
-		noise3D(fgi, 30.0f, 0.134660f) * 2.0f - 1.0f,
+		noise3D(fgi, 0.0f, 0.12230f) - 0.5f,
+		noise3D(fgi, 30.0f, 0.134660f) - 0.5f,
 		0.0f,
 		1.0f
 	);
 
+	float3 rand_vel = (float3)(
+		noise3D(fgi, 0.0f, i * 0.12230f) * 2.0f - 1.0f,
+		noise3D(fgi, i, 0.134660f) * 2.0f - 1.0f,
+		noise3D(fgi, i, 0.134660f) * 2.0f - 1.0f
+	);
+
+	rand_vel = normalize(rand_vel);
+
 	ps[i].vel = (float4)(
-		0.0f,
-		0.0f,
-		0.0f,
+		0.0,
+		0.0,
+		0.0,
 		1.0f
 	);
 };
@@ -184,18 +224,46 @@ __kernel void update_particles_test(__global t_particle *ps, float dt, float mx,
 	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 0.001f;
 }
 
-__kernel void update_particles_gravity_points(__global t_particle *ps, __constant float4 *gps, int num_gp, float dt)
+// how much gravity point affects depending on distance from point
+static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
 {
-	if (num_gp == 0)
-	 return;
+	const float gravity_scale = 1.0f;
+	// const float max_vel = 50.0f;
 	
+	float3 dir = gp->xyz - p->pos.xyz;
+	float dist = length(dir);
+	float f = 9.186f * gravity_scale * (1.0f / dist * dist);
+
+	float3 vel = normalize(dir) * f;
+
+	// if (length(vel) > max_vel)
+	// {
+	// 	vel = normalize(vel) * max_vel;
+	// }
+
+	return vel;
+}
+
+__kernel void update_particles_gravity_points(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt)
+{
 	int i = get_global_id(0);
+	if (num_gp == 0)
+	{
+		return;
+	}
 
-	float dx = gps[num_gp - 1].x - ps[i].pos.x;
-	float dy = gps[num_gp - 1].y - ps[i].pos.y;
-	float dz = gps[num_gp - 1].z - ps[i].pos.z;
+	__global t_particle *p = ps + i;
 
-	float3 d = normalize((float3)(dx, dy, dz));
+	float3 vel = (float3)(0.0);
 
-	ps[i].pos.xyz += d * 1.0f * dt;
+	vel += velocity_from_gravity_point(p, (__global float4*)&m);
+
+	for (int j = 0; j < num_gp; j++)
+	{
+		__global float4 *g = gps + j;
+		vel += velocity_from_gravity_point(p, g);
+	}
+
+	ps[i].vel.xyz += vel * dt;
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.01f;
 }

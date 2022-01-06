@@ -9,6 +9,8 @@
 
 static void glfwMouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
+	if (ImGui::GetIO().WantCaptureMouse)
+		return;
 	auto ps = (ParticleSystem*)glfwGetWindowUserPointer(window);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
@@ -190,7 +192,10 @@ void GLContext::run(ParticleSystem *ps)
 		glm::mat4 proj = camera->getProjectionMatrix();
 		glm::mat4 view = camera->getViewMatrix();
 
-		ps->mouseInfo.world = GetMouseWorldCoord(); // intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
+		if (!ImGui::GetIO().WantCaptureMouse)
+		{
+			ps->mouseInfo.world = GetMouseWorldCoord(); // intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
+		}
 
 		// Update particles
 		ps->updateGp(deltaTime);
