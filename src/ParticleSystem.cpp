@@ -65,7 +65,6 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 
 void ParticleSystem::init(const char *initKernel)
 {
-	this->rotation = glm::vec3(0.0);
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
 

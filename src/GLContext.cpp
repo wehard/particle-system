@@ -72,7 +72,9 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	}
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable( GL_BLEND );
+	glEnable(GL_BLEND);
+
+	glEnable(GL_DEPTH_TEST);
 
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
@@ -210,7 +212,7 @@ void GLContext::run(ParticleSystem *ps)
 		s->setMat4("model_matrix", entity->getModelMatrix());
 		entity->draw();
 
-		s->setVec4("obj_color", glm::vec4(0.3, 1.0, 1.0, 0.1));
+		s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
 		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 		particlePlane->draw();
 

@@ -30,12 +30,14 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("World x %f, y %f, z %f", ps.mouseInfo.world.x, ps.mouseInfo.world.y, ps.mouseInfo.world.z);
 	ImGui::Separator();
 
+	if (ImGui::Button("Reset", ImVec2(50, 20)))
+		ps.rotation = glm::vec3(0.0);
 	float v[3] = {ps.rotation.x, ps.rotation.y, ps.rotation.z};
-	if (ImGui::DragFloat3("Rotation", v, 0.10, 0.0, 360.0, "%.1f", ImGuiSliderFlags_None))
+	if (ImGui::DragFloat3("Rotation", v, 0.5, -360.0, 360.0, "%.2f", ImGuiSliderFlags_None))
 	{
 		ps.rotation = glm::vec3(v[0], v[1], v[2]);
 	}
-
+	ImGui::Separator();
 	ImGui::Text("Reset");
 	if (ImGui::Button("Sphere", ImVec2(50, 20)))
 		ps.init("init_particles_sphere");
