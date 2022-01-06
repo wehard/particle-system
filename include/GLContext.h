@@ -20,6 +20,7 @@ public:
 	int width;
 	int height;
 	glm::vec3 m_pos;
+	int fps;
 	GLContext(std::string title, int width, int height);
 	~GLContext();
 	void run(ParticleSystem *ps);

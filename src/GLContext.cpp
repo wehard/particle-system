@@ -115,8 +115,7 @@ void GLContext::run(ParticleSystem *ps)
 
 		if (currentTime - lastUpdateFpsTime > 1.0)
 		{
-			int fps = frameCount / lastUpdateFpsTime;
-			glfwSetWindowTitle(window, std::to_string(fps).c_str());
+			fps = frameCount / lastUpdateFpsTime;
 			lastUpdateFpsTime = currentTime;
 		}
 		double xpos;
@@ -138,7 +137,6 @@ void GLContext::run(ParticleSystem *ps)
 
 		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 
-
 		this->m_pos = ps->m_pos;
 
 		// Update particles
@@ -154,7 +152,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setVec3("m_pos", ps->m_pos);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
-		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0)));
+		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);

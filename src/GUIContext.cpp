@@ -19,11 +19,28 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::NewFrame();
 
 	ImGui::Begin("particle-system");
+	ImGui::Text("FPS %d", ps.glCtx.fps);
 	ImGui::Text("Particles %zu", ps.numParticles);
+	ImGui::Separator();
 	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
 	ImGui::Text("Mouse x %f, y %f, z %f", ps.m_pos.x, ps.m_pos.y, ps.m_pos.z);
-	if (ImGui::Button("Reset", ImVec2(50, 20)))
-		ps.reset();
+	
+
+	float v[3] = {ps.rotation.x, ps.rotation.y, ps.rotation.z};
+	if (ImGui::DragFloat3("Rotation", v, 0.10, 0.0, 360.0, "%.1f", ImGuiSliderFlags_None))
+	{
+		ps.rotation = glm::vec3(v[0], v[1], v[2]);
+	}
+
+	ImGui::Text("Reset");
+	if (ImGui::Button("Sphere", ImVec2(50, 20)))
+		ps.init("init_particles_sphere");
+	if (ImGui::Button("Cube", ImVec2(50, 20)))
+		ps.init("init_particles_cube");
+	if (ImGui::Button("Rect", ImVec2(50, 20)))
+		ps.init("init_particles_rect");
+	if (ImGui::Button("Sine", ImVec2(50, 20)))
+		ps.init("init_particles_sine");
 	ImGui::End();
 
 	ImGui::Begin("opencl");

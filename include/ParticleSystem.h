@@ -29,6 +29,7 @@ class ParticleSystem
 private:
 	cl_mem	clmem;
 public:
+	glm::vec3 rotation = glm::vec3(0.0);
 	CLProgram *clProgram;
 	CLContext &clCtx;
 	GLContext &glCtx;

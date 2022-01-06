@@ -65,6 +65,7 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 
 void ParticleSystem::init(const char *initKernel)
 {
+	this->rotation = glm::vec3(0.0);
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
 
@@ -88,7 +89,7 @@ void ParticleSystem::reset()
 
 void ParticleSystem::update(float deltaTime)
 {
-	auto kernel = clProgram->GetKernel("update_particles");
+	auto kernel = clProgram->GetKernel("update_particles_test");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &clmem},
 		{sizeof(GLfloat), &deltaTime},
