@@ -208,6 +208,8 @@ void GLContext::run(ParticleSystem *ps)
 
 		ps->shader->use();
 		ps->shader->setVec3("m_pos", ps->mouseInfo.world);
+		ps->shader->setVec4("min_color", ps->minColor);
+		ps->shader->setVec4("max_color", ps->maxColor);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));

@@ -50,6 +50,8 @@ public:
 	GLuint vbo;
 	GLuint gpvao;
 	GLuint gpvbo;
+	glm::vec4 minColor;
+	glm::vec4 maxColor;
 	glengine::Shader *shader;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void init(const char *initKernel);

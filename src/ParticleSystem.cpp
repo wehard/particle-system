@@ -43,6 +43,9 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	
 	clProgram = new CLProgram(this->clCtx, "./res/kernel/particles.cl");
 
+	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
+	maxColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
+
 	// particles
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
