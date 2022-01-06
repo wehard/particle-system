@@ -16,8 +16,6 @@ static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 		double ypos;
 
 		glfwGetCursorPos(window, &xpos, &ypos);
-
-		printf("mouse screen: %f, %f | %f, %f, % f\n", xpos, ypos, ctx->m_pos.x, ctx->m_pos.y, ctx->m_pos.z);
 	}
 }
 
@@ -165,10 +163,9 @@ void GLContext::run(ParticleSystem *ps)
 		}
 		double xpos;
 		double ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
 
 		ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
-
-		glfwGetCursorPos(window, &xpos, &ypos);
 
 		float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
 		float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
@@ -177,16 +174,8 @@ void GLContext::run(ParticleSystem *ps)
 
 		glm::mat4 proj = camera->getProjectionMatrix();
 		glm::mat4 view = camera->getViewMatrix();
-		glm::mat4 invVP = glm::inverse(proj * view);
-		glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
-		glm::vec4 worldPos = invVP * screenPos;
-
-		glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
 
 		ps->mouseInfo.world = intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
-		ps->m_pos = ps->mouseInfo.world;// glm::vec3(worldPos.x, worldPos.y, worldPos.z);
-		this->m_pos = ps->m_pos;
-
 
 		// Update particles
 		ps->update(deltaTime);
@@ -198,7 +187,7 @@ void GLContext::run(ParticleSystem *ps)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ps->shader->use();
-		ps->shader->setVec3("m_pos", ps->m_pos);
+		ps->shader->setVec3("m_pos", ps->mouseInfo.world);
 		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
@@ -210,7 +199,7 @@ void GLContext::run(ParticleSystem *ps)
 		// entity->position = glm::unProject(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
 		entity->position = ps->mouseInfo.world;
 		s->use();
-		s->setVec4("obj_color", glm::vec4(1.0, 0.0, 0.0, 1.0));
+		s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
 		s->setMat4("proj_matrix", camera->getProjectionMatrix());
 		s->setMat4("view_matrix", camera->getViewMatrix());
 		s->setMat4("model_matrix", entity->getModelMatrix());

@@ -29,7 +29,6 @@ struct MouseInfo
 	glm::vec3 screen;
 	glm::vec3 ndc;
 	glm::vec3 world;
-	glm::vec3 world2;
 };
 
 class ParticleSystem
@@ -43,7 +42,6 @@ public:
 	CLContext &clCtx;
 	GLContext &glCtx;
 	const size_t numParticles = 2000000;
-	glm::vec3	m_pos;
 	GLuint vao;
 	GLuint vbo;
 	glengine::Shader *shader;

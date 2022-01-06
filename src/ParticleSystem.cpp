@@ -93,8 +93,8 @@ void ParticleSystem::update(float deltaTime)
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &clmem},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(GLfloat), &m_pos.x},
-		{sizeof(GLfloat), &m_pos.y}
+		{sizeof(GLfloat), &mouseInfo.world.x},
+		{sizeof(GLfloat), &mouseInfo.world.y}
 	};
 	kernel->SetArgs(args, 4);
 	glFinish();
