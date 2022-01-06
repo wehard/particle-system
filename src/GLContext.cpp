@@ -9,7 +9,7 @@
 
 static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
-	auto ctx = (GLContext*)glfwGetWindowUserPointer(window);
+	auto ctx = (GLContext *)glfwGetWindowUserPointer(window);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
 		double xpos;
@@ -21,9 +21,9 @@ static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 	}
 }
 
-static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
-	auto ctx = (GLContext*)glfwGetWindowUserPointer(window);
+	auto ctx = (GLContext *)glfwGetWindowUserPointer(window);
 	ctx->camera->position.z += yoffset * 0.1f;
 	printf("scroll x %f, y %f ", xoffset, yoffset);
 	printf("camera z %f\n", ctx->camera->position.z);
@@ -33,7 +33,7 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 {
 	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
 	glm::mat4 matTranslate = glm::translate(glm::mat4(1.0), position);
-	glm::mat4 matRotate = glm::eulerAngleXYZ( glm::radians(rotation.x),  glm::radians(rotation.y),  glm::radians(rotation.z));
+	glm::mat4 matRotate = glm::eulerAngleXYZ(glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
 	glm::mat4 m = matTranslate * matRotate * matScale;
 	return (m);
 }
@@ -65,7 +65,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	}
 
 	glfwMakeContextCurrent(window);
-	
+
 	glewExperimental = true;
 	if (glewInit() != GLEW_OK)
 	{
@@ -81,7 +81,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 
 	glfwSetMouseButtonCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scroll_callback);
-	
+
 	glfwSwapInterval(0);
 	readGLInfo();
 }
@@ -96,12 +96,43 @@ void GLContext::readGLInfo()
 	glInfo.shadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 }
 
-GLContext::~GLContext() 
+GLContext::~GLContext()
 {
 	glfwTerminate();
 }
 
-void GLContext::run(ParticleSystem *ps) 
+static glm::vec3 intersect(glm::vec3 planeP, glm::vec3 planeN, glm::vec3 rayP, glm::vec3 rayD)
+{
+	float d = glm::dot(planeP, -planeN);// Vector3.Dot(planeP, -planeN);
+	float t = -(d + rayP.z * planeN.z + rayP.y * planeN.y + rayP.x * planeN.x) / (rayD.z * planeN.z + rayD.y * planeN.y + rayD.x * planeN.x);
+	return rayP + t * rayD;
+}
+
+static glm::vec3 projectMouse(int mouseX, int mouseY, float width, float height, glm::mat4 proj, glm::mat4 view)
+{
+	float x = (2.0f * mouseX) / width - 1.0f;
+	float y = 1.0f - (2.0f * mouseY) / height;
+	float z = 1.0f;
+
+	glm::vec3 ndc = glm::vec3(x, y, z);
+
+	// homogenouse clip space
+	glm::vec4 clip = glm::vec4(ndc.x, ndc.y, -1.0, 1.0);
+
+	// eye space
+	glm::vec4 eye = glm::inverse(proj) * clip;
+
+	eye = glm::vec4(eye.x, eye.y, -1.0, 0.0);
+
+	glm::vec4 temp = glm::inverse(view) * eye;
+	glm::vec3 world = glm::vec3(temp.x, temp.y, temp.z);
+
+	world = glm::normalize(world);
+
+	return world;
+}
+
+void GLContext::run(ParticleSystem *ps)
 {
 	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
@@ -122,7 +153,7 @@ void GLContext::run(ParticleSystem *ps)
 
 	glfwSetWindowUserPointer(window, this);
 
-	while (!glfwWindowShouldClose(window )&& glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
@@ -146,17 +177,16 @@ void GLContext::run(ParticleSystem *ps)
 
 		glm::mat4 proj = camera->getProjectionMatrix();
 		glm::mat4 view = camera->getViewMatrix();
-
 		glm::mat4 invVP = glm::inverse(proj * view);
 		glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
 		glm::vec4 worldPos = invVP * screenPos;
 
 		glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
 
-		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
+		ps->mouseInfo.world = intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
+		ps->m_pos = ps->mouseInfo.world;// glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 		this->m_pos = ps->m_pos;
 
-		ps->mouseInfo.world = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 
 		// Update particles
 		ps->update(deltaTime);
@@ -178,7 +208,7 @@ void GLContext::run(ParticleSystem *ps)
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
 		// entity->position = glm::unProject(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
-		entity->position = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
+		entity->position = ps->mouseInfo.world;
 		s->use();
 		s->setVec4("obj_color", glm::vec4(1.0, 0.0, 0.0, 1.0));
 		s->setMat4("proj_matrix", camera->getProjectionMatrix());

@@ -29,6 +29,7 @@ struct MouseInfo
 	glm::vec3 screen;
 	glm::vec3 ndc;
 	glm::vec3 world;
+	glm::vec3 world2;
 };
 
 class ParticleSystem
