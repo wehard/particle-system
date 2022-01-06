@@ -37,8 +37,9 @@ class ParticleSystem
 {
 private:
 	cl_mem	clmem;
+	cl_mem	clmemgp;
 public:
-	std::vector<glm::vec3> gravityPoints;
+	std::vector<cl_float4> gravityPoints;
 	MouseInfo mouseInfo;
 	glm::vec3 rotation = glm::vec3(0.0);
 	CLProgram *clProgram;
@@ -47,10 +48,14 @@ public:
 	const size_t numParticles = 2000000;
 	GLuint vao;
 	GLuint vbo;
+	GLuint gpvao;
+	GLuint gpvbo;
 	glengine::Shader *shader;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void init(const char *initKernel);
 	void update(float deltaTime);
+	void updateGp(float deltaTime);
+	void updateGpBuffer();
 	void reset();
 	void AddGravityPoint();
 	~ParticleSystem();

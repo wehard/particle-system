@@ -52,9 +52,9 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
 	if (ImGui::Button("Clear", ImVec2(50, 20)))
 		ps.gravityPoints.clear();
-	for (glm::vec3 gp : ps.gravityPoints)
+	for (cl_float4 gp : ps.gravityPoints)
 	{
-		ImGui::Text("%f, %f, %f", gp.x, gp.y, gp.z);
+		ImGui::Text("%f, %f, %f", gp.s[0], gp.s[1], gp.s[2]);
 	}
 	
 	ImGui::End();

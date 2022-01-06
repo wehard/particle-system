@@ -193,7 +193,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->mouseInfo.world = GetMouseWorldCoord(); // intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
 
 		// Update particles
-		ps->update(deltaTime);
+		ps->updateGp(deltaTime);
 
 		gui.Update(*ps);
 

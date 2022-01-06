@@ -43,10 +43,9 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	
 	clProgram = new CLProgram(this->clCtx, "./res/kernel/particles.cl");
 
+	// particles
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-
-	// positions
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(t_particle) * numParticles, (const GLvoid *)0, GL_DYNAMIC_DRAW);
@@ -55,12 +54,26 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(t_particle), (const GLvoid *)16);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
+	// gravity points
+	glGenVertexArrays(1, &gpvao);
+	glBindVertexArray(gpvao);
+	glGenBuffers(1, &gpvbo);
+	glBindBuffer(GL_ARRAY_BUFFER, gpvbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cl_float4) * MAX_GP, (const GLvoid *)0, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cl_float4), 0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	cl_int result = CL_SUCCESS;
 	clmem = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, vbo, nullptr);
-	CLContext::CheckCLResult(result, "clCreateFromGLBuffer");
+	CLContext::CheckCLResult(result, "clCreateFromGLBuffer:ps");
+
+	clmemgp = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, gpvbo, nullptr);
+	CLContext::CheckCLResult(result, "clCreateFromGLBuffer:gps");
+
 }
 
 void ParticleSystem::init(const char *initKernel)
@@ -88,7 +101,7 @@ void ParticleSystem::reset()
 
 void ParticleSystem::update(float deltaTime)
 {
-	auto kernel = clProgram->GetKernel("update_particles");
+	auto kernel = clProgram->GetKernel("update_particles_test");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &clmem},
 		{sizeof(GLfloat), &deltaTime},
@@ -103,6 +116,32 @@ void ParticleSystem::update(float deltaTime)
 	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
 }
 
+void ParticleSystem::updateGp(float deltaTime)
+{
+	updateGpBuffer();
+	int numGp = gravityPoints.size();
+	auto kernel = clProgram->GetKernel("update_particles_gravity_points");
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &clmem},
+		{sizeof(cl_mem), &clmemgp},
+		{sizeof(int), &numGp},
+		{sizeof(GLfloat), &deltaTime}
+	};
+	kernel->SetArgs(args, 4);
+	glFinish();
+	clCtx.AquireGLObject(clmem);
+	kernel->Enqueue(clCtx.queue, numParticles);
+	clCtx.ReleaseGLObject(clmem);
+	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
+}
+
+void ParticleSystem::updateGpBuffer()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, gpvbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cl_float4) * MAX_GP, (const GLvoid *)&gravityPoints[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 ParticleSystem::~ParticleSystem()
 {
 }
@@ -111,6 +150,10 @@ void ParticleSystem::AddGravityPoint()
 {
 	if (this->gravityPoints.size() < MAX_GP)
 	{
-		this->gravityPoints.push_back(this->mouseInfo.world);
+		cl_float4 f;
+		f.s[0] = this->mouseInfo.world.x;
+		f.s[1] = this->mouseInfo.world.y;
+		f.s[2] = this->mouseInfo.world.z;
+		this->gravityPoints.push_back(f);
 	}
 }

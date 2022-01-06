@@ -153,7 +153,7 @@ __kernel void update_particles(__global t_particle* ps, float dt, float mx, floa
 
 __kernel void update_particles_test(__global t_particle *ps, float dt, float mx, float my)
 {
-    int i = get_global_id(0);
+	int i = get_global_id(0);
 
 	float dx = mx - ps[i].pos.x;
 	float dy = my - ps[i].pos.y;
@@ -182,4 +182,20 @@ __kernel void update_particles_test(__global t_particle *ps, float dt, float mx,
 	ps[i].vel.z += 1.0 * az;
 
 	ps[i].pos.xyz = ps[i].pos.xyz + ps[i].vel.xyz * dt * 0.001f;
+}
+
+__kernel void update_particles_gravity_points(__global t_particle *ps, __constant float4 *gps, int num_gp, float dt)
+{
+	if (num_gp == 0)
+	 return;
+	
+	int i = get_global_id(0);
+
+	float dx = gps[num_gp - 1].x - ps[i].pos.x;
+	float dy = gps[num_gp - 1].y - ps[i].pos.y;
+	float dz = gps[num_gp - 1].z - ps[i].pos.z;
+
+	float3 d = normalize((float3)(dx, dy, dz));
+
+	ps[i].pos.xyz += d * 1.0f * dt;
 }
