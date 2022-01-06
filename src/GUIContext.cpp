@@ -53,6 +53,13 @@ void GUIContext::Update(ParticleSystem &ps)
 		ImGui::Text("%s", k->name);
 	}
 	ImGui::End();
+
+	ImGui::Begin("opengl");
+	ImGui::Text("GL version: %d.%d", ps.glCtx.glInfo.glMajorVersion, ps.glCtx.glInfo.glMinorVersion);
+	ImGui::Text("GLSL version: %s", ps.glCtx.glInfo.shadingLanguageVersion);
+	ImGui::Text("Vendor: %s", ps.glCtx.glInfo.vendor);
+	ImGui::Text("Renderer: %s", ps.glCtx.glInfo.renderer);
+	ImGui::End();
 }
 void GUIContext::Render()
 {

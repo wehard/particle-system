@@ -48,10 +48,13 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
+	this->glslVersion = "#version 150";
 
 	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 	if (!window)
@@ -80,6 +83,17 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	glfwSetScrollCallback(window, scroll_callback);
 	
 	glfwSwapInterval(0);
+	readGLInfo();
+}
+
+void GLContext::readGLInfo()
+{
+	glGetIntegerv(GL_MAJOR_VERSION, &glInfo.glMajorVersion);
+	glGetIntegerv(GL_MINOR_VERSION, &glInfo.glMinorVersion);
+	glInfo.vendor = glGetString(GL_VENDOR);
+	glInfo.renderer = glGetString(GL_RENDERER);
+
+	glInfo.shadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 }
 
 GLContext::~GLContext() 
@@ -104,7 +118,7 @@ void GLContext::run(ParticleSystem *ps)
 	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
 	GUIContext gui;
-	gui.Init(window, NULL);
+	gui.Init(window, glslVersion);
 
 	glfwSetWindowUserPointer(window, this);
 

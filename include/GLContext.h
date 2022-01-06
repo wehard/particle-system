@@ -8,10 +8,24 @@
 
 class ParticleSystem;
 
+struct GLInfo
+{
+	GLint glMajorVersion;
+	GLint glMinorVersion;
+	GLint glslMajorVersion;
+	GLint glslMinorVersion;
+	const GLubyte *shadingLanguageVersion;
+	const GLubyte *vendor;
+	const GLubyte *renderer;
+};
+
 class GLContext
 {
 private:
+	void readGLInfo();
+	const char *glslVersion = "#version 150";
 public:
+	GLInfo glInfo;
 	GLFWwindow *window;
 	double	lastTime;
 	glm::mat4x4 projection;

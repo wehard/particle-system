@@ -46,8 +46,8 @@ int main(int argc, char **argv)
 
 	if (iss >> deviceIndex)
 	{
-		CLContext cl = CLContext(0, deviceIndex);
 		GLContext gl = GLContext("particle-system", 1280, 720);
+		CLContext cl = CLContext(0, deviceIndex);
 
 		ParticleSystem ps = ParticleSystem(gl, cl);
 		ps.init("init_particles_sphere");
