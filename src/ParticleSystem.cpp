@@ -89,7 +89,7 @@ void ParticleSystem::reset()
 
 void ParticleSystem::update(float deltaTime)
 {
-	auto kernel = clProgram->GetKernel("update_particles_test");
+	auto kernel = clProgram->GetKernel("update_particles");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &clmem},
 		{sizeof(GLfloat), &deltaTime},

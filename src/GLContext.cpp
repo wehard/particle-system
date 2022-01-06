@@ -71,8 +71,8 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 		exit(EXIT_FAILURE);
 	}
 
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// glEnable( GL_BLEND );
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable( GL_BLEND );
 
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
@@ -146,6 +146,11 @@ void GLContext::run(ParticleSystem *ps)
 	entity->scale = glm::vec3(0.05);
 	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
+	auto particlePlane = new glengine::Entity(s, quad);
+	particlePlane->position = glm::vec3(0.0);
+	particlePlane->rotation = glm::vec3(0.0);
+	particlePlane->scale = glm::vec3(1.0);
+
 	GUIContext gui;
 	gui.Init(window, glslVersion);
 
@@ -204,6 +209,11 @@ void GLContext::run(ParticleSystem *ps)
 		s->setMat4("view_matrix", camera->getViewMatrix());
 		s->setMat4("model_matrix", entity->getModelMatrix());
 		entity->draw();
+
+		s->setVec4("obj_color", glm::vec4(0.3, 1.0, 1.0, 0.1));
+		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+		particlePlane->draw();
+
 
 		gui.Render();
 
