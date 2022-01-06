@@ -6,14 +6,14 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 17:18:47 by wkorande          #+#    #+#             */
-/*   Updated: 2022/01/05 00:20:10 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/06 16:10:39 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CLContext.h"
 #include <iostream>
 #ifdef __linux__
-#include "CL/opencl.hpp"
+#include "CL/opencl.h"
 #include "GL/glx.h"
 #endif
 
@@ -31,10 +31,10 @@ void CLContext::CheckCLResult(cl_int result, std::string message)
 	}
 }
 
-CLContext::CLContext()
+CLContext::CLContext(int platformIndex, int deviceIndex)
 {
-	this->getPlatform();
-	this->getDevice();
+	platform = this->getPlatform(this->clInfo, platformIndex);
+	device = this->getDevice(this->platform, this->clInfo, deviceIndex);
 	this->createContext();
 	this->createCommandQueue();
 }
@@ -62,7 +62,7 @@ void CLContext::createContext()
 	cl_int result;
 	cl_uint num_devices;
 
-	ctx = clCreateContextFromType(properties, CL_DEVICE_TYPE_GPU, NULL, NULL, &result);
+	ctx = clCreateContextFromType(properties, CL_DEVICE_TYPE_ALL, NULL, NULL, &result);
 	CheckCLResult(result, "clCreateContext");
 	std::cout << "Successully created CL context." << std::endl;
 
@@ -80,45 +80,16 @@ void CLContext::createCommandQueue()
 	std::cout << "Successully created CL command queue." << std::endl;
 }
 
-void CLContext::getDevice()
-{
-	cl_device_id *devices;
-	cl_uint num_devices = 0;
-
-	clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_DEFAULT, 5, NULL, &num_devices);
-	devices = (cl_device_id *)malloc(sizeof(cl_device_id) * num_devices);
-	clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_DEFAULT, num_devices, devices, NULL);
-
-	if (num_devices == 0)
-	{
-		std::cout << "CLDevice::CLDevice -- Error: No devices found!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	std::cout << "Available devices:" << std::endl;
-	for (int i = 0; i < num_devices; i++)
-	{
-		char device_name[40];
-		clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
-		std::cout << "\t" << device_name << std::endl;
-	}
-
-	int dev_index = 1;
-	this->device = devices[dev_index];
-	clGetDeviceInfo(this->device, CL_DEVICE_NAME, sizeof(clInfo.deviceName), &clInfo.deviceName, NULL);
-	std::cout << "Selected device [" << dev_index << "] : " << clInfo.deviceName << std::endl;
-}
-
-void CLContext::getPlatform()
+cl_platform_id CLContext::getPlatform(CLInfo &outInfo, int plaformIndex)
 {
 	cl_int result = CL_SUCCESS;
 	cl_platform_id *platforms;
 	
-	clGetPlatformIDs(5, NULL, &clInfo.numPlatforms);
-	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * clInfo.numPlatforms);
-	clGetPlatformIDs(clInfo.numPlatforms, platforms, NULL);
+	clGetPlatformIDs(5, NULL, &outInfo.numPlatforms);
+	platforms = (cl_platform_id*) malloc(sizeof(cl_platform_id) * outInfo.numPlatforms);
+	clGetPlatformIDs(outInfo.numPlatforms, platforms, NULL);
 
-	if (clInfo.numPlatforms == 0)
+	if (outInfo.numPlatforms == 0)
 	{
 		std::cout << "CLPlatform::CLPlatform -- Error: No OpenCL platforms found!" << std::endl;
 		exit(EXIT_FAILURE);
@@ -126,7 +97,7 @@ void CLContext::getPlatform()
 
 	std::cout << "Available platforms:" << std::endl;
 
-	for (int i = 0; i < clInfo.numPlatforms; i++)
+	for (int i = 0; i < outInfo.numPlatforms; i++)
 	{
 		char pform_vendor[40];
 
@@ -134,10 +105,50 @@ void CLContext::getPlatform()
 		std::cout << "\t" << pform_vendor << std::endl;
 	}
 
-	this->platform = platforms[0];
-	clGetPlatformInfo(this->platform, CL_PLATFORM_VENDOR, sizeof(clInfo.platformVendor), &clInfo.platformVendor, NULL);
-	clGetPlatformInfo(this->platform, CL_PLATFORM_VERSION, sizeof(clInfo.platformName), &clInfo.platformName, NULL);
-	std::cout << "Selected platform: " << clInfo.platformVendor << ", " << clInfo.platformName << std::endl;
+	if (plaformIndex < 0)
+	{
+		return NULL;
+	}
+
+	cl_platform_id platform = platforms[0];
+	clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(clInfo.platformVendor), &outInfo.platformVendor, NULL);
+	clGetPlatformInfo(platform, CL_PLATFORM_VERSION, sizeof(clInfo.platformName), &outInfo.platformName, NULL);
+	std::cout << "Selected platform: " << outInfo.platformVendor << ", " << outInfo.platformName << std::endl;
+	return platform;
+}
+
+cl_device_id CLContext::getDevice(cl_platform_id platform, CLInfo &outInfo, int deviceIndex)
+{
+	cl_device_id *devices;
+	// cl_uint num_devices = 0;
+
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, 5, NULL, &outInfo.numDevices);
+	devices = (cl_device_id *)malloc(sizeof(cl_device_id) * outInfo.numDevices);
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, outInfo.numDevices, devices, NULL);
+
+	if (outInfo.numDevices == 0)
+	{
+		std::cout << "CLDevice::CLDevice -- Error: No devices found!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	std::cout << "Available devices:" << std::endl;
+	for (int i = 0; i < outInfo.numDevices; i++)
+	{
+		char device_name[64];
+		clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
+		std::cout << "\t" << i << ": " << device_name << std::endl;
+	}
+
+	if (deviceIndex < 0)
+	{
+		return NULL;
+	}
+
+	cl_device_id device = devices[deviceIndex];
+	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(outInfo.deviceName), &outInfo.deviceName, NULL);
+	std::cout << "Selected device [" << deviceIndex << "] : " << outInfo.deviceName << std::endl;
+	return device;
 }
 
 CLContext::~CLContext() {}
@@ -154,4 +165,12 @@ void CLContext::ReleaseGLObject(cl_mem clMem)
 	cl_int result = CL_SUCCESS;
 	result = clEnqueueReleaseGLObjects(queue, 1, &clMem, 0, NULL, NULL);
 	CLContext::CheckCLResult(result, "clEnqueueReleaseGLObjects");
+}
+
+void CLContext::LogPlatformDeviceInfo()
+{
+	CLInfo info;
+
+	cl_platform_id platform = CLContext::getPlatform(info, 0);
+	cl_device_id device = CLContext::getDevice(platform, info, -1);
 }

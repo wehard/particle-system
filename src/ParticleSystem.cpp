@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2022/01/05 00:29:03 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/01/06 14:47:20 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 static float randfrom(float min, float max)
 {
 	float range = (max - min);
-	float div = RAND_MAX / range;
+	float div = (float)RAND_MAX / range;
 	return min + (rand() / div);
 }
 

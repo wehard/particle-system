@@ -5,6 +5,7 @@
 #include <fstream>
 #include <streambuf>
 #include <sstream>
+#include <string.h>
 
 CLProgram::CLProgram(CLContext &cl, const char *kernelSource) : cl(cl)
 {

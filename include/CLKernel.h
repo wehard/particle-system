@@ -1,11 +1,6 @@
 #pragma once
 
-#ifdef __APPLE__
-#include "OpenCL/opencl.h"
-#else
-#include "CL/opencl.hpp"
-#endif
-
+#include "CLContext.h"
 #include <vector>
 
 struct CLKernelArg
