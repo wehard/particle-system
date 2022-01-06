@@ -247,16 +247,16 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 __kernel void update_particles_gravity_points(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt)
 {
 	int i = get_global_id(0);
-	if (num_gp == 0)
-	{
-		return;
-	}
-
+	
 	__global t_particle *p = ps + i;
 
 	float3 vel = (float3)(0.0);
 
-	vel += velocity_from_gravity_point(p, (__global float4*)&m);
+	// if (num_gp == 0)
+	// {
+	// 	vel += velocity_from_gravity_point(p, (__global float4*)&m);
+	// }
+
 
 	for (int j = 0; j < num_gp; j++)
 	{
@@ -264,6 +264,6 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 		vel += velocity_from_gravity_point(p, g);
 	}
 
-	ps[i].vel.xyz += vel * dt;
-	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.01f;
+	ps[i].vel.xyz += vel;
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
