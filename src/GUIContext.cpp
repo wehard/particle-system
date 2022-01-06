@@ -23,8 +23,12 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Particles %zu", ps.numParticles);
 	ImGui::Separator();
 	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
-	ImGui::Text("Mouse x %f, y %f, z %f", ps.m_pos.x, ps.m_pos.y, ps.m_pos.z);
-	
+	ImGui::Separator();
+	ImGui::Text("Mouse");
+	ImGui::Text("Screen x %f, y %f, z %f", ps.mouseInfo.screen.x, ps.mouseInfo.screen.y, ps.mouseInfo.screen.z);
+	ImGui::Text("NDC x %f, y %f, z %f", ps.mouseInfo.ndc.x, ps.mouseInfo.ndc.y, ps.mouseInfo.ndc.z);
+	ImGui::Text("World x %f, y %f, z %f", ps.mouseInfo.world.x, ps.mouseInfo.world.y, ps.mouseInfo.world.z);
+	ImGui::Separator();
 
 	float v[3] = {ps.rotation.x, ps.rotation.y, ps.rotation.z};
 	if (ImGui::DragFloat3("Rotation", v, 0.10, 0.0, 360.0, "%.1f", ImGuiSliderFlags_None))

@@ -135,10 +135,14 @@ void GLContext::run(ParticleSystem *ps)
 		double xpos;
 		double ypos;
 
+		ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
+
 		glfwGetCursorPos(window, &xpos, &ypos);
 
 		float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
 		float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
+
+		ps->mouseInfo.ndc = glm::vec3(mouseX, mouseY, 0.0);
 
 		glm::mat4 proj = camera->getProjectionMatrix();
 		glm::mat4 view = camera->getViewMatrix();
@@ -150,8 +154,9 @@ void GLContext::run(ParticleSystem *ps)
 		glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
 
 		ps->m_pos = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
-
 		this->m_pos = ps->m_pos;
+
+		ps->mouseInfo.world = glm::vec3(worldPos.x, worldPos.y, worldPos.z);
 
 		// Update particles
 		ps->update(deltaTime);

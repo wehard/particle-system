@@ -24,11 +24,19 @@ typedef struct
 	cl_float4 vel;
 }		t_particle;
 
+struct MouseInfo
+{
+	glm::vec3 screen;
+	glm::vec3 ndc;
+	glm::vec3 world;
+};
+
 class ParticleSystem
 {
 private:
 	cl_mem	clmem;
 public:
+	MouseInfo mouseInfo;
 	glm::vec3 rotation = glm::vec3(0.0);
 	CLProgram *clProgram;
 	CLContext &clCtx;
