@@ -47,6 +47,16 @@ void GUIContext::Update(ParticleSystem &ps)
 		ps.init("init_particles_rect");
 	if (ImGui::Button("Sine", ImVec2(50, 20)))
 		ps.init("init_particles_sine");
+
+	ImGui::Separator();
+	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
+	if (ImGui::Button("Clear", ImVec2(50, 20)))
+		ps.gravityPoints.clear();
+	for (glm::vec3 gp : ps.gravityPoints)
+	{
+		ImGui::Text("%f, %f, %f", gp.x, gp.y, gp.z);
+	}
+	
 	ImGui::End();
 
 	ImGui::Begin("opencl");

@@ -106,3 +106,11 @@ void ParticleSystem::update(float deltaTime)
 ParticleSystem::~ParticleSystem()
 {
 }
+
+void ParticleSystem::AddGravityPoint()
+{
+	if (this->gravityPoints.size() < MAX_GP)
+	{
+		this->gravityPoints.push_back(this->mouseInfo.world);
+	}
+}

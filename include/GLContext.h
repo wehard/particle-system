@@ -37,5 +37,6 @@ public:
 	GLContext(std::string title, int width, int height);
 	~GLContext();
 	void run(ParticleSystem *ps);
+	glm::vec3 GetMouseWorldCoord();
 };
 

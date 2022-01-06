@@ -18,6 +18,8 @@
 
 #include "CLProgram.h"
 
+#define MAX_GP 10
+
 typedef struct
 {
 	cl_float4 pos;
@@ -36,6 +38,7 @@ class ParticleSystem
 private:
 	cl_mem	clmem;
 public:
+	std::vector<glm::vec3> gravityPoints;
 	MouseInfo mouseInfo;
 	glm::vec3 rotation = glm::vec3(0.0);
 	CLProgram *clProgram;
@@ -49,6 +52,7 @@ public:
 	void init(const char *initKernel);
 	void update(float deltaTime);
 	void reset();
+	void AddGravityPoint();
 	~ParticleSystem();
 };
 

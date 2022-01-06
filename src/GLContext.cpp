@@ -7,24 +7,21 @@
 #include "mesh.h"
 #include "GUIContext.h"
 
-static void mouseCallback(GLFWwindow *window, int button, int action, int mods)
+static void glfwMouseCallback(GLFWwindow *window, int button, int action, int mods)
 {
-	auto ctx = (GLContext *)glfwGetWindowUserPointer(window);
+	auto ps = (ParticleSystem*)glfwGetWindowUserPointer(window);
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		double xpos;
-		double ypos;
-
-		glfwGetCursorPos(window, &xpos, &ypos);
+		ps->AddGravityPoint();
 	}
 }
 
 static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
-	auto ctx = (GLContext *)glfwGetWindowUserPointer(window);
-	ctx->camera->position.z += yoffset * 0.1f;
+	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
+	ps->glCtx.camera->position.z += yoffset * 0.1f;
 	printf("scroll x %f, y %f ", xoffset, yoffset);
-	printf("camera z %f\n", ctx->camera->position.z);
+	printf("camera z %f\n", ps->glCtx.camera->position.z);
 }
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
@@ -79,7 +76,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
 
-	glfwSetMouseButtonCallback(window, mouseCallback);
+	glfwSetMouseButtonCallback(window, glfwMouseCallback);
 	glfwSetScrollCallback(window, scroll_callback);
 
 	glfwSwapInterval(0);
@@ -132,6 +129,17 @@ static glm::vec3 projectMouse(int mouseX, int mouseY, float width, float height,
 	return world;
 }
 
+glm::vec3 GLContext::GetMouseWorldCoord()
+{
+	glm::vec3 world;
+	double xpos;
+	double ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	world = intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, camera->getProjectionMatrix(), camera->getViewMatrix()));
+	return world;
+}
+
 void GLContext::run(ParticleSystem *ps)
 {
 	lastTime = glfwGetTime();
@@ -156,7 +164,7 @@ void GLContext::run(ParticleSystem *ps)
 	GUIContext gui;
 	gui.Init(window, glslVersion);
 
-	glfwSetWindowUserPointer(window, this);
+	glfwSetWindowUserPointer(window, ps);
 
 	while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
@@ -182,7 +190,7 @@ void GLContext::run(ParticleSystem *ps)
 		glm::mat4 proj = camera->getProjectionMatrix();
 		glm::mat4 view = camera->getViewMatrix();
 
-		ps->mouseInfo.world = intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
+		ps->mouseInfo.world = GetMouseWorldCoord(); // intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
 
 		// Update particles
 		ps->update(deltaTime);
