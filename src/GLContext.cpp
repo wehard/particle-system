@@ -163,6 +163,27 @@ void GLContext::run(ParticleSystem *ps)
 	particlePlane->rotation = glm::vec3(0.0);
 	particlePlane->scale = glm::vec3(1.0);
 
+	// debug axis
+	float adata[] = {
+		0.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,
+		0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0,
+		0.0, 0.0, 1.0
+	};
+	GLuint avao;
+	GLuint avbo;
+	glGenVertexArrays(1, &avao);
+	glBindVertexArray(avao);
+	glGenBuffers(1, &avbo);
+	glBindBuffer(GL_ARRAY_BUFFER, avbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 	GUIContext gui;
 	gui.Init(window, glslVersion);
 
@@ -214,11 +235,24 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
+		glPointSize(1.0f);
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
-		// entity->position = glm::unProject(glm::vec3(xpos, ypos, 0.1), camera->getViewMatrix(), camera->getProjectionMatrix(), glm::vec4(0, 0, width, height));
+		if (ps->renderGravityPoints && ps->gravityPoints.size() > 0)
+		{
+			glPointSize(10.0f);
+			s->use();
+			s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+			s->setMat4("proj_matrix", camera->getProjectionMatrix());
+			s->setMat4("view_matrix", camera->getViewMatrix());
+			s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+			glBindVertexArray(ps->gpvao);
+			glBindBuffer(GL_ARRAY_BUFFER, ps->gpvbo);
+			glDrawArrays(GL_POINTS, 0, ps->gravityPoints.size());
+		}
+
 		entity->position = ps->mouseInfo.world;
 		s->use();
 		s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
@@ -227,9 +261,21 @@ void GLContext::run(ParticleSystem *ps)
 		s->setMat4("model_matrix", entity->getModelMatrix());
 		entity->draw();
 
+
 		s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
 		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 		particlePlane->draw();
+
+		s->use();
+		s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
+		s->setMat4("proj_matrix", camera->getProjectionMatrix());
+		s->setMat4("view_matrix", camera->getViewMatrix());
+		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
+		glBindVertexArray(avao);
+		glBindBuffer(GL_ARRAY_BUFFER, avbo);
+		glDrawArrays(GL_LINES, 0, 3*6);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 
 
 		gui.Render();

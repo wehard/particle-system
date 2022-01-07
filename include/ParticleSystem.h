@@ -50,6 +50,7 @@ public:
 	GLuint vbo;
 	GLuint gpvao;
 	GLuint gpvbo;
+	bool renderGravityPoints = true;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
 	glengine::Shader *shader;
