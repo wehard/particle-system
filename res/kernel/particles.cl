@@ -38,6 +38,14 @@ static float rand_float_in_range(global ulong* seed, float a, float b)
 	return (b - a) * x + a;
 }
 
+float	random(int n)
+{
+	ulong	seed;
+
+	seed = (n * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
+	return ((float)(uint)(seed >> 16) / 4294967296.0);
+}
+
 
 #define CUBE_SIZE 1.0
 #define SPHERE_RADIUS 0.5
@@ -58,9 +66,9 @@ __kernel void init_particles_cube(__global t_particle * ps, int num_particles)
 	float	sub_div_half = sub_div / 2.0f;
 
 	ps[i].pos = (float4)(
-		x * sub_div - 0.5 + sub_div_half,
-		y * sub_div - 0.5 + sub_div_half,
-		z * sub_div - 0.5 + sub_div_half,
+		random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0 - 0.5,
+		random(((i * 124322) >> 2) ^ i) * (float)M_PI / 3.0 - 0.5,
+		random(((i * 124322) >> 1) ^ i) * (float)M_PI / 3.0 - 0.5,
 		1.0f
 	);
 
@@ -108,8 +116,8 @@ __kernel void init_particles_rect(__global t_particle * ps, int num_particles)
 	float fgi = (float)(i) / num_particles;
 
 	ps[i].pos = (float4)(
-		noise3D(fgi, 0.0f, 0.12230f) - 0.5f,
-		noise3D(fgi, 30.0f, 0.134660f) - 0.5f,
+		random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0 - 0.5,
+		random(((i * 124322) >> 2) ^ i) * (float)M_PI / 3.0 - 0.5,
 		0.0f,
 		1.0f
 	);
