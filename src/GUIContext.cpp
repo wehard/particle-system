@@ -30,6 +30,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Screen x %f, y %f, z %f", ps.mouseInfo.screen.x, ps.mouseInfo.screen.y, ps.mouseInfo.screen.z);
 	ImGui::Text("NDC x %f, y %f, z %f", ps.mouseInfo.ndc.x, ps.mouseInfo.ndc.y, ps.mouseInfo.ndc.z);
 	ImGui::Text("World x %f, y %f, z %f", ps.mouseInfo.world.x, ps.mouseInfo.world.y, ps.mouseInfo.world.z);
+	ImGui::Checkbox("Gravity", (bool*)&ps.mouseGravity);
 	ImGui::Separator();
 
 	if (ImGui::Button("Reset", ImVec2(50, 20)))

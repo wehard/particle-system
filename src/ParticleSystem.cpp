@@ -135,9 +135,10 @@ void ParticleSystem::updateGp(float deltaTime)
 		{sizeof(cl_mem), &clmemgp},
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
-		{sizeof(GLfloat), &deltaTime}
+		{sizeof(GLfloat), &deltaTime},
+		{sizeof(int), &mouseGravity}
 	};
-	kernel->SetArgs(args, 5);
+	kernel->SetArgs(args, 6);
 	glFinish();
 	clCtx.AquireGLObject(clmem);
 	kernel->Enqueue(clCtx.queue, numParticles);
