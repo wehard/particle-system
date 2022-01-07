@@ -94,10 +94,21 @@ __kernel void init_particles_sphere(__global t_particle * ps, int num_particles)
 	float phi = 2.0 * M_PI_F * lon / subd;
 	float theta = M_PI_F * lat / subd;
 
+	// ps[i].pos = (float4)(
+	// 	SPHERE_RADIUS * sin(theta) * cos(phi),
+	// 	SPHERE_RADIUS * sign * cos(theta),
+	// 	SPHERE_RADIUS * sin(theta) * sin(phi),
+	// 	1.0f
+	// );
+
+	float radius = random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0;
+
+	radius /= 2.0;
+
 	ps[i].pos = (float4)(
-		SPHERE_RADIUS * sin(theta) * cos(phi),
-		SPHERE_RADIUS * sign * cos(theta),
-		SPHERE_RADIUS * sin(theta) * sin(phi),
+		radius * sin(theta) * cos(phi),
+		radius * sign * cos(theta),
+		radius * sin(theta) * sin(phi),
 		1.0f
 	);
 
