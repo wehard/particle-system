@@ -25,6 +25,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Particles %zu", ps.numParticles);
 	ImGui::Separator();
 	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
+	ImGui::ColorEdit4("Clear color", &ps.glCtx.clearColor.r);
 	ImGui::Separator();
 	ImGui::Text("Mouse");
 	ImGui::Text("Screen x %f, y %f, z %f", ps.mouseInfo.screen.x, ps.mouseInfo.screen.y, ps.mouseInfo.screen.z);

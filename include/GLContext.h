@@ -25,6 +25,7 @@ private:
 	void readGLInfo();
 	const char *glslVersion = "#version 150";
 public:
+	glm::vec4 clearColor = glm::vec4(0.1, 0.1, 0.1, 1.0);
 	GLInfo glInfo;
 	GLFWwindow *window;
 	double	lastTime;

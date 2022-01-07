@@ -224,7 +224,7 @@ void GLContext::run(ParticleSystem *ps)
 		gui.Update(*ps);
 
 		// Render here!
-		glClearColor(0.1, 0.1, 0.1, 1.0);
+		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		ps->shader->use();
@@ -235,7 +235,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
-		glPointSize(1.0f);
+		glPointSize(2.0f);
 		glBindVertexArray(ps->vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
