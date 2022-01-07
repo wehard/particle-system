@@ -1,5 +1,7 @@
 #include "GUIContext.h"
 
+#include <string>
+
 GUIContext::GUIContext() {}
 
 void GUIContext::Init(GLFWwindow *window, const char *glslVersion)
@@ -55,9 +57,17 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Show", &ps.renderGravityPoints);
 	if (ImGui::Button("Clear", ImVec2(50, 20)))
 		ps.gravityPoints.clear();
-	for (cl_float4 gp : ps.gravityPoints)
+
+	for (size_t i = 0; i < ps.gravityPoints.size(); i++)
 	{
-		ImGui::Text("%f, %f, %f", gp.s[0], gp.s[1], gp.s[2]);
+		cl_float4 p = ps.gravityPoints[i];
+		float v[3] = {p.s[0], p.s[1], p.s[2]};
+		if (ImGui::DragFloat3(std::to_string(i).c_str(), v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		{
+			ps.gravityPoints[i].s[0] = v[0];
+			ps.gravityPoints[i].s[1] = v[1];
+			ps.gravityPoints[i].s[2] = v[2];
+		}
 	}
 	
 	ImGui::End();

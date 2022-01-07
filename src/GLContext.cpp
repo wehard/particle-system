@@ -273,7 +273,7 @@ void GLContext::run(ParticleSystem *ps)
 		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
 		glBindVertexArray(avao);
 		glBindBuffer(GL_ARRAY_BUFFER, avbo);
-		glDrawArrays(GL_LINES, 0, 3*6);
+		glDrawArrays(GL_LINES, 0, 3 * 6);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
