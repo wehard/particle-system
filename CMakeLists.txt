@@ -68,9 +68,9 @@ endif()
 
 if (APPLE)
 target_link_libraries(${PROJECT_NAME} "-framework Cocoa -framework OpenGL -framework OpenCL -framework IOKit -framework CoreVideo")
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/include)
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/libglfw3.a)
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/gl-engine/lib/libGLEW.a)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/include)
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/lib/libglfw3.a)
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${CMAKE_CURRENT_SOURCE_DIR}/lib/libGLEW.a)
 endif()
 
 
