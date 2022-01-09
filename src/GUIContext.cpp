@@ -23,6 +23,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Begin("particle-system");
 	ImGui::Text("FPS %d", ps.glCtx.fps);
 	ImGui::Text("Particles %zu", ps.numParticles);
+	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::Separator();
 	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
 	ImGui::ColorEdit4("Clear color", &ps.glCtx.clearColor.r);

@@ -7,7 +7,7 @@
 #include "mesh.h"
 #include "GUIContext.h"
 
-static void glfwMouseCallback(GLFWwindow *window, int button, int action, int mods)
+static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
 	if (ImGui::GetIO().WantCaptureMouse)
 		return;
@@ -18,7 +18,7 @@ static void glfwMouseCallback(GLFWwindow *window, int button, int action, int mo
 	}
 }
 
-static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
 	ps->glCtx.camera->position.z += yoffset * 0.1f;
@@ -78,8 +78,8 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	camera = new glengine::Camera(45.0f, (float)width / (float)height);
 	camera->position = glm::vec3(0.0, 0.0, 1.0);
 
-	glfwSetMouseButtonCallback(window, glfwMouseCallback);
-	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
+	glfwSetScrollCallback(window, glfwMouseScrollCallback);
 
 	glfwSwapInterval(0);
 	readGLInfo();
@@ -235,7 +235,7 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
-		glPointSize(2.0f);
+		glPointSize(ps->particleSize);
 		glBindVertexArray(ps->pBuffer.vao);
 		glBindBuffer(GL_ARRAY_BUFFER, ps->pBuffer.vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);

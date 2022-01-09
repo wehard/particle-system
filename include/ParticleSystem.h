@@ -62,10 +62,7 @@ public:
 	CLContext &clCtx;
 	GLContext &glCtx;
 	const size_t numParticles = 2000000;
-	// GLuint vao;
-	// GLuint vbo;
-	// GLuint gpvao;
-	// GLuint gpvbo;
+	float particleSize = 1.0f;
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	bool renderGravityPoints = true;
