@@ -1,9 +1,6 @@
 [submodule "vendor/OpenCL-SDK"]
 	path = vendor/OpenCL-SDK
 	url = https://github.com/KhronosGroup/OpenCL-SDK.git
-[submodule "gl-engine"]
-	path = gl-engine
-	url = git@github.com:wehard/gl-engine
 [submodule "imgui"]
 	path = imgui
 	url = https://github.com/ocornut/imgui.git
