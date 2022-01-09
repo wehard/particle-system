@@ -77,7 +77,7 @@ public:
 	Camera camera;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void InitParticles(const char *initKernel);
-	void Update(float deltaTime);
+	void UpdateParticles(float deltaTime);
 	void UpdateGpBuffer();
 	void Reset();
 	void AddGravityPoint();

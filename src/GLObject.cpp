@@ -16,6 +16,8 @@ GLObject::GLObject(std::vector<float> vertexPositions)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	vertexCount = vertexPositions.size();
 }
 
 GLObject::~GLObject()
@@ -40,7 +42,9 @@ GLObject GLObject::Plane()
 		-0.5f, -0.5f, 0.0f,
 		-0.5f, 0.5f, 0.0f,
 		0.5f, 0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
+		0.5f, 0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f
 		});
 	return plane;
 }
