@@ -21,21 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static float randfrom(float min, float max)
-{
-	float range = (max - min);
-	float div = (float)RAND_MAX / range;
-	return min + (rand() / div);
-}
-
-static std::string loadKernelSource(std::string path)
-{
-	std::ifstream t(path);
-	std::stringstream buffer;
-	buffer << t.rdbuf();
-	return buffer.str();
-}
-
 ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx), clCtx(clCtx)
 {
 	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
