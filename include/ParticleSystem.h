@@ -27,6 +27,12 @@ typedef struct
 	cl_float life;
 }		t_particle;
 
+struct Emitter
+{
+	cl_float4 position;
+	cl_float4 direction;
+};
+
 struct MouseInfo
 {
 	glm::vec3 screen;
@@ -34,11 +40,19 @@ struct MouseInfo
 	glm::vec3 world;
 };
 
+struct GLBuffer
+{
+	GLuint vbo;
+	GLuint vao;
+};
+
 class ParticleSystem
 {
 private:
 	cl_mem	clmem;
 	cl_mem	clmemgp;
+	void createParticleBuffer();
+	void createGravityPointBuffer();
 public:
 	int mouseGravity = 0;
 	std::vector<cl_float4> gravityPoints;
@@ -48,10 +62,12 @@ public:
 	CLContext &clCtx;
 	GLContext &glCtx;
 	const size_t numParticles = 2000000;
-	GLuint vao;
-	GLuint vbo;
-	GLuint gpvao;
-	GLuint gpvbo;
+	// GLuint vao;
+	// GLuint vbo;
+	// GLuint gpvao;
+	// GLuint gpvbo;
+	GLBuffer pBuffer;
+	GLBuffer gpBuffer;
 	bool renderGravityPoints = true;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;

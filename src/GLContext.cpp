@@ -236,8 +236,8 @@ void GLContext::run(ParticleSystem *ps)
 		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
 		glPointSize(2.0f);
-		glBindVertexArray(ps->vao);
-		glBindBuffer(GL_ARRAY_BUFFER, ps->vbo);
+		glBindVertexArray(ps->pBuffer.vao);
+		glBindBuffer(GL_ARRAY_BUFFER, ps->pBuffer.vbo);
 		glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
 		if (ps->renderGravityPoints && ps->gravityPoints.size() > 0)
@@ -248,8 +248,8 @@ void GLContext::run(ParticleSystem *ps)
 			s->setMat4("proj_matrix", camera->getProjectionMatrix());
 			s->setMat4("view_matrix", camera->getViewMatrix());
 			s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-			glBindVertexArray(ps->gpvao);
-			glBindBuffer(GL_ARRAY_BUFFER, ps->gpvbo);
+			glBindVertexArray(ps->gpBuffer.vao);
+			glBindBuffer(GL_ARRAY_BUFFER, ps->gpBuffer.vbo);
 			glDrawArrays(GL_POINTS, 0, ps->gravityPoints.size());
 		}
 
