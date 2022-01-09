@@ -42,8 +42,8 @@ void GUIContext::Update(ParticleSystem &ps)
 	{
 		ps.rotation = glm::vec3(v[0], v[1], v[2]);
 	}
-	ImGui::ColorEdit3("Min color", &ps.minColor.x);
-	ImGui::ColorEdit3("Max color", &ps.maxColor.x);
+	ImGui::ColorEdit4("Min color", &ps.minColor.x);
+	ImGui::ColorEdit4("Max color", &ps.maxColor.x);
 	ImGui::Separator();
 	ImGui::Text("Reset");
 	if (ImGui::Button("Sphere", ImVec2(50, 20)))
