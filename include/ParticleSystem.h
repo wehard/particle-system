@@ -24,6 +24,7 @@ typedef struct
 {
 	cl_float4 pos;
 	cl_float4 vel;
+	cl_float life;
 }		t_particle;
 
 struct MouseInfo
