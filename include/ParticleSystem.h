@@ -51,8 +51,8 @@ class ParticleSystem
 private:
 	cl_mem	clmem;
 	cl_mem	clmemgp;
-	void createParticleBuffer();
-	void createGravityPointBuffer();
+	void CreateParticleBuffer();
+	void CreateGravityPointBuffer();
 public:
 	int mouseGravity = 0;
 	std::vector<cl_float4> gravityPoints;
@@ -70,11 +70,10 @@ public:
 	glm::vec4 maxColor;
 	glengine::Shader *shader;
 	ParticleSystem(GLContext &gl, CLContext &cl);
-	void init(const char *initKernel);
-	void update(float deltaTime);
-	void updateGp(float deltaTime);
-	void updateGpBuffer();
-	void reset();
+	void InitParticles(const char *initKernel);
+	void Update(float deltaTime);
+	void UpdateGpBuffer();
+	void Reset();
 	void AddGravityPoint();
 	~ParticleSystem();
 };

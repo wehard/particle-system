@@ -102,7 +102,7 @@ GLContext::~GLContext()
 
 static glm::vec3 intersect(glm::vec3 planeP, glm::vec3 planeN, glm::vec3 rayP, glm::vec3 rayD)
 {
-	float d = glm::dot(planeP, -planeN);// Vector3.Dot(planeP, -planeN);
+	float d = glm::dot(planeP, -planeN);
 	float t = -(d + rayP.z * planeN.z + rayP.y * planeN.y + rayP.x * planeN.x) / (rayD.z * planeN.z + rayD.y * planeN.y + rayD.x * planeN.x);
 	return rayP + t * rayD;
 }
@@ -115,7 +115,7 @@ static glm::vec3 projectMouse(int mouseX, int mouseY, float width, float height,
 
 	glm::vec3 ndc = glm::vec3(x, y, z);
 
-	// homogenouse clip space
+	// homogenous clip space
 	glm::vec4 clip = glm::vec4(ndc.x, ndc.y, -1.0, 1.0);
 
 	// eye space
@@ -142,7 +142,7 @@ glm::vec3 GLContext::GetMouseWorldCoord()
 	return world;
 }
 
-void GLContext::run(ParticleSystem *ps)
+void GLContext::Run(ParticleSystem *ps)
 {
 	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
@@ -215,11 +215,11 @@ void GLContext::run(ParticleSystem *ps)
 
 		if (!ImGui::GetIO().WantCaptureMouse)
 		{
-			ps->mouseInfo.world = GetMouseWorldCoord(); // intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, proj, view));
+			ps->mouseInfo.world = GetMouseWorldCoord();
 		}
 
 		// Update particles
-		ps->updateGp(deltaTime);
+		ps->Update(deltaTime);
 
 		gui.Update(*ps);
 

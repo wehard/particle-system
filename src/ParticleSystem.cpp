@@ -31,11 +31,15 @@ ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
 
-	createParticleBuffer();
-	createGravityPointBuffer();
+	CreateParticleBuffer();
+	CreateGravityPointBuffer();
 }
 
-void ParticleSystem::init(const char *initKernel)
+ParticleSystem::~ParticleSystem()
+{
+}
+
+void ParticleSystem::InitParticles(const char *initKernel)
 {
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = clCtx.queue;
@@ -52,7 +56,7 @@ void ParticleSystem::init(const char *initKernel)
 	CLContext::CheckCLResult(clFinish(queue), "clFinish");
 }
 
-void ParticleSystem::createParticleBuffer()
+void ParticleSystem::CreateParticleBuffer()
 {
 	glGenVertexArrays(1, &pBuffer.vao);
 	glBindVertexArray(pBuffer.vao);
@@ -71,7 +75,7 @@ void ParticleSystem::createParticleBuffer()
 	CLContext::CheckCLResult(result, "ParticleSystem::createParticleBuffer");
 }
 
-void ParticleSystem::createGravityPointBuffer()
+void ParticleSystem::CreateGravityPointBuffer()
 {
 	glGenVertexArrays(1, &gpBuffer.vao);
 	glBindVertexArray(gpBuffer.vao);
@@ -88,28 +92,12 @@ void ParticleSystem::createGravityPointBuffer()
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
 }
 
-void ParticleSystem::reset()
+void ParticleSystem::Reset()
 {
-	init("init_particles_cube");
+	InitParticles("init_particles_cube");
 }
 
-void ParticleSystem::update(float deltaTime)
-{
-	auto kernel = clProgram->GetKernel("update_particles_test");
-	std::vector<CLKernelArg> args = {
-		{sizeof(cl_mem), &clmem},
-		{sizeof(GLfloat), &deltaTime},
-		{sizeof(GLfloat), &mouseInfo.world.x},
-		{sizeof(GLfloat), &mouseInfo.world.y}};
-	kernel->SetArgs(args, 4);
-	glFinish();
-	clCtx.AquireGLObject(clmem);
-	kernel->Enqueue(clCtx.queue, numParticles);
-	clCtx.ReleaseGLObject(clmem);
-	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
-}
-
-void ParticleSystem::updateGp(float deltaTime)
+void ParticleSystem::Update(float deltaTime)
 {
 	cl_float4 clm;
 	clm.s[0] = this->mouseInfo.world.x;
@@ -117,7 +105,7 @@ void ParticleSystem::updateGp(float deltaTime)
 	clm.s[2] = this->mouseInfo.world.z;
 	clm.s[3] = 1.0f;
 
-	updateGpBuffer();
+	UpdateGpBuffer();
 	int numGp = gravityPoints.size();
 	auto kernel = clProgram->GetKernel("update_particles_gravity_points");
 	std::vector<CLKernelArg> args = {
@@ -135,15 +123,11 @@ void ParticleSystem::updateGp(float deltaTime)
 	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
 }
 
-void ParticleSystem::updateGpBuffer()
+void ParticleSystem::UpdateGpBuffer()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cl_float4) * MAX_GP, (const GLvoid *)&gravityPoints[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-ParticleSystem::~ParticleSystem()
-{
 }
 
 void ParticleSystem::AddGravityPoint()

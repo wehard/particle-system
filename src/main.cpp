@@ -50,8 +50,8 @@ int main(int argc, char **argv)
 		CLContext cl = CLContext(0, deviceIndex);
 
 		ParticleSystem ps = ParticleSystem(gl, cl);
-		ps.init("init_particles_rect");
-		gl.run(&ps);
+		ps.InitParticles("init_particles_rect");
+		gl.Run(&ps);
 	}
 
 	return (0);

@@ -37,7 +37,7 @@ public:
 	int fps;
 	GLContext(std::string title, int width, int height);
 	~GLContext();
-	void run(ParticleSystem *ps);
+	void Run(ParticleSystem *ps);
 	glm::vec3 GetMouseWorldCoord();
 };
 

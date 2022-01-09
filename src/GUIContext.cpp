@@ -47,13 +47,13 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Separator();
 	ImGui::Text("Reset");
 	if (ImGui::Button("Sphere", ImVec2(50, 20)))
-		ps.init("init_particles_sphere");
+		ps.InitParticles("init_particles_sphere");
 	if (ImGui::Button("Cube", ImVec2(50, 20)))
-		ps.init("init_particles_cube");
+		ps.InitParticles("init_particles_cube");
 	if (ImGui::Button("Rect", ImVec2(50, 20)))
-		ps.init("init_particles_rect");
+		ps.InitParticles("init_particles_rect");
 	if (ImGui::Button("Sine", ImVec2(50, 20)))
-		ps.init("init_particles_sine");
+		ps.InitParticles("init_particles_sine");
 
 	ImGui::Separator();
 	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
