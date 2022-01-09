@@ -3,9 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include "ParticleSystem.h"
-#include "entity.h"
-#include "mesh.h"
 #include "GUIContext.h"
+#include "GLObject.h"
 
 static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
@@ -21,9 +20,9 @@ static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, 
 static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-	ps->glCtx.camera->position.z += yoffset * 0.1f;
+	ps->camera.position.z += yoffset * 0.1f;
 	printf("scroll x %f, y %f ", xoffset, yoffset);
-	printf("camera z %f\n", ps->glCtx.camera->position.z);
+	printf("camera z %f\n", ps->camera.position.z);
 }
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
@@ -75,8 +74,8 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 
 	glEnable(GL_DEPTH_TEST);
 
-	camera = new glengine::Camera(45.0f, (float)width / (float)height);
-	camera->position = glm::vec3(0.0, 0.0, 1.0);
+	// camera = new glengine::Camera(45.0f, (float)width / (float)height);
+	// camera->position = glm::vec3(0.0, 0.0, 1.0);
 
 	glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
 	glfwSetScrollCallback(window, glfwMouseScrollCallback);
@@ -131,7 +130,7 @@ static glm::vec3 projectMouse(int mouseX, int mouseY, float width, float height,
 	return world;
 }
 
-glm::vec3 GLContext::GetMouseWorldCoord()
+glm::vec3 GLContext::GetMouseWorldCoord(Camera *camera)
 {
 	glm::vec3 world;
 	double xpos;
@@ -144,148 +143,158 @@ glm::vec3 GLContext::GetMouseWorldCoord()
 
 void GLContext::Run(ParticleSystem *ps)
 {
-	lastTime = glfwGetTime();
-	double lastUpdateFpsTime = lastTime;
-	int frameCount = 0;
+	// lastTime = glfwGetTime();
+	// double lastUpdateFpsTime = lastTime;
+	// int frameCount = 0;
 
-	auto s = new glengine::Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
-	auto quad = glengine::Mesh::makeQuad();
-	// quad->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
+	// auto s = new glengine::Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+	// auto quad = glengine::Mesh::makeQuad();
+	// // quad->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
 
-	auto entity = new glengine::Entity(s, quad);
-	entity->position = glm::vec3(0.0);
-	entity->rotation = glm::vec3(0.0);
-	entity->scale = glm::vec3(0.05);
-	entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	// auto plane = GLObject(std::vector<float>
+	// {
+	// 	-0.5f, -0.5f, 0.0f,
+	// 	-0.5f, 0.5f, 0.0f,
+	// 	0.5f, 0.5f, 0.0f,
+	// 	0.5f, -0.5f, 0.0f
+	// 	});
+	
 
-	auto particlePlane = new glengine::Entity(s, quad);
-	particlePlane->position = glm::vec3(0.0);
-	particlePlane->rotation = glm::vec3(0.0);
-	particlePlane->scale = glm::vec3(1.0);
+	// auto entity = new glengine::Entity(s, quad);
+	// entity->position = glm::vec3(0.0);
+	// entity->rotation = glm::vec3(0.0);
+	// entity->scale = glm::vec3(0.05);
+	// entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
-	// debug axis
-	float adata[] = {
-		0.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,
-		0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,
-		0.0, 0.0, 0.0,
-		0.0, 0.0, 1.0
-	};
-	GLuint avao;
-	GLuint avbo;
-	glGenVertexArrays(1, &avao);
-	glBindVertexArray(avao);
-	glGenBuffers(1, &avbo);
-	glBindBuffer(GL_ARRAY_BUFFER, avbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// auto particlePlane = new glengine::Entity(s, quad);
+	// particlePlane->position = glm::vec3(0.0);
+	// particlePlane->rotation = glm::vec3(0.0);
+	// particlePlane->scale = glm::vec3(1.0);
 
-	GUIContext gui;
-	gui.Init(window, glslVersion);
+	// // debug axis
+	// float adata[] = {
+	// 	0.0, 0.0, 0.0,
+	// 	1.0, 0.0, 0.0,
+	// 	0.0, 0.0, 0.0,
+	// 	0.0, 1.0, 0.0,
+	// 	0.0, 0.0, 0.0,
+	// 	0.0, 0.0, 1.0
+	// };
+	// GLuint avao;
+	// GLuint avbo;
+	// glGenVertexArrays(1, &avao);
+	// glBindVertexArray(avao);
+	// glGenBuffers(1, &avbo);
+	// glBindBuffer(GL_ARRAY_BUFFER, avbo);
+	// glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
+	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
+	// glEnableVertexAttribArray(0);
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// glBindVertexArray(0);
 
-	glfwSetWindowUserPointer(window, ps);
+	// GUIContext gui;
+	// gui.Init(window, glslVersion);
 
-	while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
-	{
-		double currentTime = glfwGetTime();
-		double deltaTime = currentTime - lastTime;
+	// glfwSetWindowUserPointer(window, ps);
 
-		if (currentTime - lastUpdateFpsTime > 1.0)
-		{
-			fps = frameCount / lastUpdateFpsTime;
-			lastUpdateFpsTime = currentTime;
-		}
-		double xpos;
-		double ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
+	// while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	// {
+	// 	double currentTime = glfwGetTime();
+	// 	double deltaTime = currentTime - lastTime;
 
-		ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
+	// 	if (currentTime - lastUpdateFpsTime > 1.0)
+	// 	{
+	// 		fps = frameCount / lastUpdateFpsTime;
+	// 		lastUpdateFpsTime = currentTime;
+	// 	}
+	// 	double xpos;
+	// 	double ypos;
+	// 	glfwGetCursorPos(window, &xpos, &ypos);
 
-		float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
-		float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
+	// 	ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
 
-		ps->mouseInfo.ndc = glm::vec3(mouseX, mouseY, 0.0);
+	// 	float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
+	// 	float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
 
-		glm::mat4 proj = camera->getProjectionMatrix();
-		glm::mat4 view = camera->getViewMatrix();
+	// 	ps->mouseInfo.ndc = glm::vec3(mouseX, mouseY, 0.0);
 
-		if (!ImGui::GetIO().WantCaptureMouse)
-		{
-			ps->mouseInfo.world = GetMouseWorldCoord();
-		}
+	// 	glm::mat4 proj = camera->getProjectionMatrix();
+	// 	glm::mat4 view = camera->getViewMatrix();
 
-		// Update particles
-		ps->Update(deltaTime);
+	// 	if (!ImGui::GetIO().WantCaptureMouse)
+	// 	{
+	// 		ps->mouseInfo.world = GetMouseWorldCoord();
+	// 	}
 
-		gui.Update(*ps);
+	// 	// Update particles
+	// 	ps->Update(deltaTime);
 
-		// Render here!
-		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// 	gui.Update(*ps);
 
-		ps->shader->use();
-		ps->shader->setVec3("m_pos", ps->mouseInfo.world);
-		ps->shader->setVec4("min_color", ps->minColor);
-		ps->shader->setVec4("max_color", ps->maxColor);
-		ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
-		ps->shader->setMat4("view_matrix", camera->getViewMatrix());
-		ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+	// 	// Render here!
+	// 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glPointSize(ps->particleSize);
-		glBindVertexArray(ps->pBuffer.vao);
-		glBindBuffer(GL_ARRAY_BUFFER, ps->pBuffer.vbo);
-		glDrawArrays(GL_POINTS, 0, ps->numParticles);
+	// 	ps->shader->use();
+	// 	ps->shader->setVec3("m_pos", ps->mouseInfo.world);
+	// 	ps->shader->setVec4("min_color", ps->minColor);
+	// 	ps->shader->setVec4("max_color", ps->maxColor);
+	// 	ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
+	// 	ps->shader->setMat4("view_matrix", camera->getViewMatrix());
+	// 	ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
 
-		if (ps->renderGravityPoints && ps->gravityPoints.size() > 0)
-		{
-			glPointSize(10.0f);
-			s->use();
-			s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-			s->setMat4("proj_matrix", camera->getProjectionMatrix());
-			s->setMat4("view_matrix", camera->getViewMatrix());
-			s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-			glBindVertexArray(ps->gpBuffer.vao);
-			glBindBuffer(GL_ARRAY_BUFFER, ps->gpBuffer.vbo);
-			glDrawArrays(GL_POINTS, 0, ps->gravityPoints.size());
-		}
+	// 	glPointSize(ps->particleSize);
+	// 	glBindVertexArray(ps->pBuffer.vao);
+	// 	glBindBuffer(GL_ARRAY_BUFFER, ps->pBuffer.vbo);
+	// 	glDrawArrays(GL_POINTS, 0, ps->numParticles);
 
-		entity->position = ps->mouseInfo.world;
-		s->use();
-		s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-		s->setMat4("proj_matrix", camera->getProjectionMatrix());
-		s->setMat4("view_matrix", camera->getViewMatrix());
-		s->setMat4("model_matrix", entity->getModelMatrix());
-		entity->draw();
+	// 	if (ps->renderGravityPoints && ps->gravityPoints.size() > 0)
+	// 	{
+	// 		glPointSize(10.0f);
+	// 		s->use();
+	// 		s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+	// 		s->setMat4("proj_matrix", camera->getProjectionMatrix());
+	// 		s->setMat4("view_matrix", camera->getViewMatrix());
+	// 		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+	// 		glBindVertexArray(ps->gpBuffer.vao);
+	// 		glBindBuffer(GL_ARRAY_BUFFER, ps->gpBuffer.vbo);
+	// 		glDrawArrays(GL_POINTS, 0, ps->gravityPoints.size());
+	// 	}
 
-
-		s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
-		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-		particlePlane->draw();
-
-		s->use();
-		s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
-		s->setMat4("proj_matrix", camera->getProjectionMatrix());
-		s->setMat4("view_matrix", camera->getViewMatrix());
-		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
-		glBindVertexArray(avao);
-		glBindBuffer(GL_ARRAY_BUFFER, avbo);
-		glDrawArrays(GL_LINES, 0, 3 * 6);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+	// 	// plane.position = ps->mouseInfo.world;
+	// 	entity->position = ps->mouseInfo.world;
+	// 	s->use();
+	// 	s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+	// 	s->setMat4("proj_matrix", camera->getProjectionMatrix());
+	// 	s->setMat4("view_matrix", camera->getViewMatrix());
+	// 	s->setMat4("model_matrix", entity->getModelMatrix());
+	// 	entity->draw();
 
 
-		gui.Render();
+	// 	s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
+	// 	s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+	// 	particlePlane->draw();
 
-		glfwSwapBuffers(window);
+	// 	s->use();
+	// 	s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
+	// 	s->setMat4("proj_matrix", camera->getProjectionMatrix());
+	// 	s->setMat4("view_matrix", camera->getViewMatrix());
+	// 	s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
+	// 	glBindVertexArray(avao);
+	// 	glBindBuffer(GL_ARRAY_BUFFER, avbo);
+	// 	glDrawArrays(GL_LINES, 0, 3 * 6);
+	// 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// 	glBindVertexArray(0);
 
-		lastTime = currentTime;
-		frameCount++;
 
-		glfwPollEvents();
-	}
-	gui.Shutdown();
+	// 	gui.Render();
+
+	// 	glfwSwapBuffers(window);
+
+	// 	lastTime = currentTime;
+	// 	frameCount++;
+
+	// 	glfwPollEvents();
+	// }
+	// gui.Shutdown();
 }

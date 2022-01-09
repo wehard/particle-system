@@ -14,9 +14,12 @@
 
 #include "GLContext.h"
 #include "CLContext.h"
-#include "shader.h"
 
 #include "CLProgram.h"
+#include "GLRenderer.h"
+
+#include "Shader.h"
+#include "Camera.h"
 
 #define MAX_GP 10
 
@@ -49,18 +52,21 @@ struct GLBuffer
 class ParticleSystem
 {
 private:
+	GLRenderer renderer;
 	cl_mem	clmem;
 	cl_mem	clmemgp;
+	Shader *particleShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 public:
+	int fps;
 	int mouseGravity = 0;
 	std::vector<cl_float4> gravityPoints;
 	MouseInfo mouseInfo;
 	glm::vec3 rotation = glm::vec3(0.0);
 	CLProgram *clProgram;
-	CLContext &clCtx;
-	GLContext &glCtx;
+	CLContext &cl;
+	GLContext &gl;
 	const size_t numParticles = 2000000;
 	float particleSize = 1.0f;
 	GLBuffer pBuffer;
@@ -68,13 +74,15 @@ public:
 	bool renderGravityPoints = true;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
-	glengine::Shader *shader;
+	Camera camera;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void InitParticles(const char *initKernel);
 	void Update(float deltaTime);
 	void UpdateGpBuffer();
 	void Reset();
 	void AddGravityPoint();
+
+	void Run();
 	~ParticleSystem();
 };
 

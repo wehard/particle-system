@@ -19,12 +19,10 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "gl-engine.h"
-
 #include <stdlib.h>
+#include "ParticleSystem.h"
 #include "CLContext.h"
 #include "GLContext.h"
-#include "ParticleSystem.h"
 
 #include <iostream>
 #include <string>
@@ -51,7 +49,7 @@ int main(int argc, char **argv)
 
 		ParticleSystem ps = ParticleSystem(gl, cl);
 		ps.InitParticles("init_particles_rect");
-		gl.Run(&ps);
+		ps.Run();
 	}
 
 	return (0);

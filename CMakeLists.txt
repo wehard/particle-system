@@ -12,6 +12,9 @@ set(SOURCES src/main.cpp
 			src/CLProgram.cpp
 			src/CLKernel.cpp
 			src/GLObject.cpp
+			src/GLRenderer.cpp
+			src/Camera.cpp
+			src/Shader.cpp
 			imgui/imgui.cpp
 			imgui/imgui_demo.cpp
 			imgui/imgui_draw.cpp
@@ -23,14 +26,14 @@ set(SOURCES src/main.cpp
 include_directories(include
 					imgui
 					imgui/backends
-					gl-engine/include
+					# gl-engine/include
 					/usr/local/include)
 
 
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-add_subdirectory(gl-engine)
+# add_subdirectory(gl-engine)
 
 if (NOT APPLE)
 add_subdirectory(vendor/OpenCL-SDK)
@@ -53,7 +56,7 @@ endif()
 endif()
 
 
-target_link_libraries(${PROJECT_NAME} gl-engine)
+# target_link_libraries(${PROJECT_NAME} gl-engine)
 
 if (NOT APPLE)
 target_link_libraries(${PROJECT_NAME} OpenCL)

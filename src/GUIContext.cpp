@@ -1,5 +1,4 @@
 #include "GUIContext.h"
-
 #include <string>
 
 GUIContext::GUIContext() {}
@@ -21,12 +20,12 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::NewFrame();
 
 	ImGui::Begin("particle-system");
-	ImGui::Text("FPS %d", ps.glCtx.fps);
+	ImGui::Text("FPS %d", ps.gl.fps);
 	ImGui::Text("Particles %zu", ps.numParticles);
 	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::Separator();
-	ImGui::Text("Camera x %f, y %f, z %f", ps.glCtx.camera->position.x, ps.glCtx.camera->position.y, ps.glCtx.camera->position.z);
-	ImGui::ColorEdit4("Clear color", &ps.glCtx.clearColor.r);
+	ImGui::Text("Camera x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
+	ImGui::ColorEdit4("Clear color", &ps.gl.clearColor.r);
 	ImGui::Separator();
 	ImGui::Text("Mouse");
 	ImGui::Text("Screen x %f, y %f, z %f", ps.mouseInfo.screen.x, ps.mouseInfo.screen.y, ps.mouseInfo.screen.z);
@@ -48,10 +47,13 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Reset");
 	if (ImGui::Button("Sphere", ImVec2(50, 20)))
 		ps.InitParticles("init_particles_sphere");
+	ImGui::SameLine();
 	if (ImGui::Button("Cube", ImVec2(50, 20)))
 		ps.InitParticles("init_particles_cube");
+	ImGui::SameLine();
 	if (ImGui::Button("Rect", ImVec2(50, 20)))
 		ps.InitParticles("init_particles_rect");
+	ImGui::SameLine();
 	if (ImGui::Button("Sine", ImVec2(50, 20)))
 		ps.InitParticles("init_particles_sine");
 
@@ -76,8 +78,8 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::End();
 
 	ImGui::Begin("opencl");
-	ImGui::Text("Platform: %s, %s", ps.clCtx.clInfo.platformVendor, ps.clCtx.clInfo.platformName);
-	ImGui::Text("Device: %s", ps.clCtx.clInfo.deviceName);
+	ImGui::Text("Platform: %s, %s", ps.cl.clInfo.platformVendor, ps.cl.clInfo.platformName);
+	ImGui::Text("Device: %s", ps.cl.clInfo.deviceName);
 	ImGui::Separator();
 	ImGui::Text("Program");
 	for (auto k : ps.clProgram->clKernels)
@@ -87,10 +89,10 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::End();
 
 	ImGui::Begin("opengl");
-	ImGui::Text("GL version: %d.%d", ps.glCtx.glInfo.glMajorVersion, ps.glCtx.glInfo.glMinorVersion);
-	ImGui::Text("GLSL version: %s", ps.glCtx.glInfo.shadingLanguageVersion);
-	ImGui::Text("Vendor: %s", ps.glCtx.glInfo.vendor);
-	ImGui::Text("Renderer: %s", ps.glCtx.glInfo.renderer);
+	ImGui::Text("GL version: %d.%d", ps.gl.glInfo.glMajorVersion, ps.gl.glInfo.glMinorVersion);
+	ImGui::Text("GLSL version: %s", ps.gl.glInfo.shadingLanguageVersion);
+	ImGui::Text("Vendor: %s", ps.gl.glInfo.vendor);
+	ImGui::Text("Renderer: %s", ps.gl.glInfo.renderer);
 	ImGui::End();
 }
 void GUIContext::Render()

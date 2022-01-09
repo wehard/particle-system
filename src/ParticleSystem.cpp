@@ -11,7 +11,9 @@
 /* ************************************************************************** */
 
 #include "ParticleSystem.h"
-
+#include "GUIContext.h"
+#include "Shader.h"
+#include <glm/gtx/euler_angles.hpp>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -21,12 +23,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ParticleSystem::ParticleSystem(GLContext &glCtx, CLContext &clCtx) : glCtx(glCtx), clCtx(clCtx)
+static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
-	shader = new glengine::Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
-	shader->setVec2("m_pos", glm::vec2(0.5, 0.0));
+	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
+	glm::mat4 matTranslate = glm::translate(glm::mat4(1.0), position);
+	glm::mat4 matRotate = glm::eulerAngleXYZ(glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
+	glm::mat4 m = matTranslate * matRotate * matScale;
+	return (m);
+}
 
-	clProgram = new CLProgram(this->clCtx, "./res/kernel/particles.cl");
+ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
+{
+	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
+	particleShader->setVec2("m_pos", glm::vec2(0.5, 0.0));
+
+	clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
 
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
@@ -42,7 +53,7 @@ ParticleSystem::~ParticleSystem()
 void ParticleSystem::InitParticles(const char *initKernel)
 {
 	cl_int result = CL_SUCCESS;
-	cl_command_queue queue = clCtx.queue;
+	cl_command_queue queue = cl.queue;
 
 	auto k = clProgram->GetKernel(initKernel);
 	std::vector<CLKernelArg> args = {
@@ -50,9 +61,9 @@ void ParticleSystem::InitParticles(const char *initKernel)
 		{sizeof(GLint), &numParticles}};
 	k->SetArgs(args, 2);
 	glFinish();
-	clCtx.AquireGLObject(clmem);
-	k->Enqueue(clCtx.queue, numParticles);
-	clCtx.ReleaseGLObject(clmem);
+	cl.AquireGLObject(clmem);
+	k->Enqueue(cl.queue, numParticles);
+	cl.ReleaseGLObject(clmem);
 	CLContext::CheckCLResult(clFinish(queue), "clFinish");
 }
 
@@ -71,7 +82,7 @@ void ParticleSystem::CreateParticleBuffer()
 	glBindVertexArray(0);
 
 	cl_int result = CL_SUCCESS;
-	clmem = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, pBuffer.vbo, &result);
+	clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, pBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createParticleBuffer");
 }
 
@@ -88,13 +99,32 @@ void ParticleSystem::CreateGravityPointBuffer()
 	glBindVertexArray(0);
 
 	cl_int result = CL_SUCCESS;
-	clmemgp = clCreateFromGLBuffer(clCtx.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
+	clmemgp = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
+}
+
+void ParticleSystem::AddGravityPoint()
+{
+	if (this->gravityPoints.size() < MAX_GP)
+	{
+		cl_float4 f;
+		f.s[0] = this->mouseInfo.world.x;
+		f.s[1] = this->mouseInfo.world.y;
+		f.s[2] = this->mouseInfo.world.z;
+		this->gravityPoints.push_back(f);
+	}
 }
 
 void ParticleSystem::Reset()
 {
 	InitParticles("init_particles_cube");
+}
+
+void ParticleSystem::UpdateGpBuffer()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cl_float4) * MAX_GP, (const GLvoid *)&gravityPoints[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleSystem::Update(float deltaTime)
@@ -117,27 +147,164 @@ void ParticleSystem::Update(float deltaTime)
 		{sizeof(int), &mouseGravity}};
 	kernel->SetArgs(args, 6);
 	glFinish();
-	clCtx.AquireGLObject(clmem);
-	kernel->Enqueue(clCtx.queue, numParticles);
-	clCtx.ReleaseGLObject(clmem);
-	CLContext::CheckCLResult(clFinish(clCtx.queue), "clFinish");
+	cl.AquireGLObject(clmem);
+	kernel->Enqueue(cl.queue, numParticles);
+	cl.ReleaseGLObject(clmem);
+	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
 }
 
-void ParticleSystem::UpdateGpBuffer()
+void ParticleSystem::Run()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cl_float4) * MAX_GP, (const GLvoid *)&gravityPoints[0], GL_DYNAMIC_DRAW);
+	double lastTime = glfwGetTime();
+	double lastUpdateFpsTime = lastTime;
+	int frameCount = 0;
+
+	camera = Camera(45.0f, (float)gl.width / (float)gl.height);
+	camera.position = glm::vec3(0.0, 0.0, 1.0);
+
+	auto s = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+	// auto quad = glengine::Mesh::makeQuad();
+	// quad->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
+
+	auto plane = GLObject::Plane();
+	
+
+	// auto entity = new glengine::Entity(s, quad);
+	// entity->position = glm::vec3(0.0);
+	// entity->rotation = glm::vec3(0.0);
+	// entity->scale = glm::vec3(0.05);
+	// entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+
+	// auto particlePlane = new glengine::Entity(s, quad);
+	// particlePlane->position = glm::vec3(0.0);
+	// particlePlane->rotation = glm::vec3(0.0);
+	// particlePlane->scale = glm::vec3(1.0);
+
+	// debug axis
+	float adata[] = {
+		0.0, 0.0, 0.0,
+		1.0, 0.0, 0.0,
+		0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0,
+		0.0, 0.0, 1.0
+	};
+	GLuint avao;
+	GLuint avbo;
+	glGenVertexArrays(1, &avao);
+	glBindVertexArray(avao);
+	glGenBuffers(1, &avbo);
+	glBindBuffer(GL_ARRAY_BUFFER, avbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
+	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	GUIContext gui;
+	gui.Init(gl.window, gl.glslVersion);
+
+	glfwSetWindowUserPointer(gl.window, this);
+
+	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	{
+		double currentTime = glfwGetTime();
+		double deltaTime = currentTime - lastTime;
+
+		if (currentTime - lastUpdateFpsTime > 1.0)
+		{
+			fps = frameCount / lastUpdateFpsTime;
+			lastUpdateFpsTime = currentTime;
+		}
+		double xpos;
+		double ypos;
+		glfwGetCursorPos(gl.window, &xpos, &ypos);
+
+		mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
+
+		float mouseX = (float)xpos / ((float)gl.width * 0.5f) - 1.0f;
+		float mouseY = (float)ypos / ((float)gl.height * 0.5f) - 1.0f;
+
+		mouseInfo.ndc = glm::vec3(mouseX, mouseY, 0.0);
+
+		glm::mat4 proj = camera.getProjectionMatrix();
+		glm::mat4 view = camera.getViewMatrix();
+
+		if (!ImGui::GetIO().WantCaptureMouse)
+		{
+			this->mouseInfo.world = gl.GetMouseWorldCoord(&this->camera);
+		}
+
+		// Update particles
+		this->Update(deltaTime);
+
+		gui.Update(*this);
+
+		// Render here!
+		glClearColor(gl.clearColor.x, gl.clearColor.y, gl.clearColor.z, gl.clearColor.w);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		particleShader->use();
+		particleShader->setVec3("m_pos", mouseInfo.world);
+		particleShader->setVec4("min_color", minColor);
+		particleShader->setVec4("max_color", maxColor);
+		particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
+		particleShader->setMat4("view_matrix", camera.getViewMatrix());
+		particleShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
+
+		glPointSize(particleSize);
+		glBindVertexArray(pBuffer.vao);
+		glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
+		glDrawArrays(GL_POINTS, 0, numParticles);
+
+		if (renderGravityPoints && gravityPoints.size() > 0)
+		{
+			glPointSize(10.0f);
+			s->use();
+			s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+			s->setMat4("proj_matrix", camera.getProjectionMatrix());
+			s->setMat4("view_matrix", camera.getViewMatrix());
+			s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
+			glBindVertexArray(gpBuffer.vao);
+			glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
+			glDrawArrays(GL_POINTS, 0, gravityPoints.size());
+		}
+
+		// plane.position = ps->mouseInfo.world;
+		// entity->position = ps->mouseInfo.world;
+		// s->use();
+		// s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+		// s->setMat4("proj_matrix", camera->getProjectionMatrix());
+		// s->setMat4("view_matrix", camera->getViewMatrix());
+		// s->setMat4("model_matrix", entity->getModelMatrix());
+		// entity->draw();
+
+
+		// s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
+		// s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
+		// particlePlane->draw();
+
+		// s->use();
+		// s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
+		// s->setMat4("proj_matrix", camera->getProjectionMatrix());
+		// s->setMat4("view_matrix", camera->getViewMatrix());
+		// s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
+		// glBindVertexArray(avao);
+		// glBindBuffer(GL_ARRAY_BUFFER, avbo);
+		// glDrawArrays(GL_LINES, 0, 3 * 6);
+		// glBindBuffer(GL_ARRAY_BUFFER, 0);
+		// glBindVertexArray(0);
+
+
+		gui.Render();
+
+		glfwSwapBuffers(gl.window);
+
+		lastTime = currentTime;
+		frameCount++;
+
+		glfwPollEvents();
+	}
+	gui.Shutdown();
 }
 
-void ParticleSystem::AddGravityPoint()
-{
-	if (this->gravityPoints.size() < MAX_GP)
-	{
-		cl_float4 f;
-		f.s[0] = this->mouseInfo.world.x;
-		f.s[1] = this->mouseInfo.world.y;
-		f.s[2] = this->mouseInfo.world.z;
-		this->gravityPoints.push_back(f);
-	}
-}

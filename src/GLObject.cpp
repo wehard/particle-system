@@ -32,3 +32,15 @@ glm::mat4 GLObject::getModelMatrix()
 	glm::mat4 m = matTranslate * matRotate * matScale;
 	return (m);
 }
+
+GLObject GLObject::Plane()
+{
+	auto plane = GLObject(std::vector<float>
+	{
+		-0.5f, -0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f
+		});
+	return plane;
+}
