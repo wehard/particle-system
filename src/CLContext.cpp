@@ -60,7 +60,6 @@ void CLContext::createContext()
 #endif
 
 	cl_int result;
-	cl_uint num_devices;
 
 	ctx = clCreateContextFromType(properties, CL_DEVICE_TYPE_ALL, NULL, NULL, &result);
 	CheckCLResult(result, "clCreateContext");

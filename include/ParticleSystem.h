@@ -47,15 +47,18 @@ struct GLBuffer
 {
 	GLuint vbo;
 	GLuint vao;
+	cl_mem clmem;
 };
 
 class ParticleSystem
 {
 private:
 	GLRenderer renderer;
-	cl_mem	clmem;
-	cl_mem	clmemgp;
+	// cl_mem	clmem;
+	// cl_mem	clmemgp;
 	Shader *particleShader;
+	Shader *basicShader;
+	Shader *vertexColorShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 	double lastTime = 0.0;

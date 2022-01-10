@@ -37,7 +37,12 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 {
 	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
-	particleShader->setVec2("m_pos", glm::vec2(0.5, 0.0));
+	basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+	vertexColorShader = new Shader("res/shaders/vertex_color.vert", "res/shaders/vertex_color.frag");
+	particleShader->setVec2("m_pos", glm::vec2(0.0, 0.0));
+
+	camera = Camera(45.0f, (float)gl.width / (float)gl.height);
+	camera.position = glm::vec3(0.0, 0.0, 1.0);
 
 	clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
 
@@ -50,6 +55,13 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 
 ParticleSystem::~ParticleSystem()
 {
+	delete particleShader;
+	delete basicShader;
+
+	glDeleteBuffers(1, &pBuffer.vbo);
+	glDeleteVertexArrays(1, &pBuffer.vao);
+	glDeleteBuffers(1, &gpBuffer.vbo);
+	glDeleteVertexArrays(1, &gpBuffer.vao);
 }
 
 void ParticleSystem::InitParticles(const char *initKernel)
@@ -59,13 +71,13 @@ void ParticleSystem::InitParticles(const char *initKernel)
 
 	auto k = clProgram->GetKernel(initKernel);
 	std::vector<CLKernelArg> args = {
-		{sizeof(cl_mem), &clmem},
+		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(GLint), &numParticles}};
 	k->SetArgs(args, 2);
 	glFinish();
-	cl.AquireGLObject(clmem);
+	cl.AquireGLObject(pBuffer.clmem);
 	k->Enqueue(cl.queue, numParticles);
-	cl.ReleaseGLObject(clmem);
+	cl.ReleaseGLObject(pBuffer.clmem);
 	CLContext::CheckCLResult(clFinish(queue), "clFinish");
 }
 
@@ -84,7 +96,7 @@ void ParticleSystem::CreateParticleBuffer()
 	glBindVertexArray(0);
 
 	cl_int result = CL_SUCCESS;
-	clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, pBuffer.vbo, &result);
+	pBuffer.clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, pBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createParticleBuffer");
 }
 
@@ -101,7 +113,7 @@ void ParticleSystem::CreateGravityPointBuffer()
 	glBindVertexArray(0);
 
 	cl_int result = CL_SUCCESS;
-	clmemgp = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
+	gpBuffer.clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
 }
 
@@ -141,17 +153,19 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 	int numGp = gravityPoints.size();
 	auto kernel = clProgram->GetKernel("update_particles_gravity_points");
 	std::vector<CLKernelArg> args = {
-		{sizeof(cl_mem), &clmem},
-		{sizeof(cl_mem), &clmemgp},
+		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(cl_mem), &gpBuffer.clmem},
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
 		{sizeof(int), &mouseGravity}};
 	kernel->SetArgs(args, 6);
 	glFinish();
-	cl.AquireGLObject(clmem);
+	cl.AquireGLObject(pBuffer.clmem);
+	cl.AquireGLObject(gpBuffer.clmem);
 	kernel->Enqueue(cl.queue, numParticles);
-	cl.ReleaseGLObject(clmem);
+	cl.ReleaseGLObject(pBuffer.clmem);
+	cl.ReleaseGLObject(gpBuffer.clmem);
 	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
 }
 
@@ -160,49 +174,16 @@ void ParticleSystem::Run()
 	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
-
-	camera = Camera(45.0f, (float)gl.width / (float)gl.height);
-	camera.position = glm::vec3(0.0, 0.0, 1.0);
-
-	auto basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
+	
 	auto plane = GLObject::Plane();
 	auto gp = GLObject::Triangle();
-	gp.color = glm::vec4(0.2, 0.2, 0.5, 1.0);
+	gp.color = glm::vec4(0.0, 0.8, 0.8, 1.0);
 
 	auto renderer = GLRenderer();
-	
 
-	// auto entity = new glengine::Entity(s, quad);
-	// entity->position = glm::vec3(0.0);
-	// entity->rotation = glm::vec3(0.0);
-	// entity->scale = glm::vec3(0.05);
-	// entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
-	// auto particlePlane = new glengine::Entity(s, quad);
-	// particlePlane->position = glm::vec3(0.0);
-	// particlePlane->rotation = glm::vec3(0.0);
-	// particlePlane->scale = glm::vec3(1.0);
-
-	// debug axis
-	float adata[] = {
-		0.0, 0.0, 0.0,
-		1.0, 0.0, 0.0,
-		0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0,
-		0.0, 0.0, 0.0,
-		0.0, 0.0, 1.0
-	};
-	GLuint avao;
-	GLuint avbo;
-	glGenVertexArrays(1, &avao);
-	glBindVertexArray(avao);
-	glGenBuffers(1, &avbo);
-	glBindBuffer(GL_ARRAY_BUFFER, avbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	auto wAxis = GLObject::Axis();
+	auto pAxis = GLObject::Axis();
 
 	GUIContext gui;
 	gui.Init(gl.window, gl.glslVersion);
@@ -252,16 +233,6 @@ void ParticleSystem::Run()
 
 		if (renderGravityPoints && gravityPoints.size() > 0)
 		{
-			// glPointSize(10.0f);
-			// basicShader->use();
-			// basicShader->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-			// basicShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-			// basicShader->setMat4("view_matrix", camera.getViewMatrix());
-			// basicShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
-			// glBindVertexArray(gpBuffer.vao);
-			// glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
-			// glDrawArrays(GL_POINTS, 0, gravityPoints.size());
-
 			for (auto a : gravityPoints)
 			{
 				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
@@ -271,39 +242,9 @@ void ParticleSystem::Run()
 
 		}
 
-		// plane.position = ps->mouseInfo.world;
-		// entity->position = ps->mouseInfo.world;
-		// s->use();
-		// s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-		// s->setMat4("proj_matrix", camera->getProjectionMatrix());
-		// s->setMat4("view_matrix", camera->getViewMatrix());
-		// s->setMat4("model_matrix", entity->getModelMatrix());
-		// entity->draw();
-
-		plane.position = mouseInfo.world;
-		basicShader->use();
-		basicShader->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
-		basicShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-		basicShader->setMat4("view_matrix", camera.getViewMatrix());
-		basicShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
-		renderer.Draw(plane);
-
-
-		// s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
-		// s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-		// particlePlane->draw();
-
-		// s->use();
-		// s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
-		// s->setMat4("proj_matrix", camera->getProjectionMatrix());
-		// s->setMat4("view_matrix", camera->getViewMatrix());
-		// s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
-		// glBindVertexArray(avao);
-		// glBindBuffer(GL_ARRAY_BUFFER, avbo);
-		// glDrawArrays(GL_LINES, 0, 3 * 6);
-		// glBindBuffer(GL_ARRAY_BUFFER, 0);
-		// glBindVertexArray(0);
-
+		pAxis.rotation = rotation;
+		renderer.DrawLines(pAxis, *vertexColorShader);
+		renderer.DrawLines(wAxis, *vertexColorShader);
 
 		gui.Render();
 

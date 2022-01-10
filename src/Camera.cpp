@@ -24,10 +24,7 @@ Camera::Camera(float fovy, float aspect)
 
 Camera::Camera() {}
 
-Camera::~Camera()
-{
-	printf("destroyed camera\n");
-}
+Camera::~Camera() {}
 
 glm::mat4x4 Camera::getViewMatrix()
 {

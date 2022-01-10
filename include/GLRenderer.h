@@ -14,4 +14,5 @@ public:
 	void Begin(Camera &camera);
 	void Draw(GLObject &object);
 	void Draw(GLObject &object, Shader &shader);
+	void DrawLines(GLObject &object, Shader &shader);
 };
