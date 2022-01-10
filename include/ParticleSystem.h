@@ -58,6 +58,7 @@ private:
 	Shader *particleShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
+	double lastTime = 0.0;
 public:
 	int fps;
 	int mouseGravity = 0;

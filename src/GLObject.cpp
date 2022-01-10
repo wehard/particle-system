@@ -48,3 +48,14 @@ GLObject GLObject::Plane()
 		});
 	return plane;
 }
+
+GLObject GLObject::Triangle()
+{
+	auto triangle = GLObject(std::vector<float>
+	{
+		-0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f
+		});
+	return triangle;
+}

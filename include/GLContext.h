@@ -29,12 +29,10 @@ public:
 	glm::vec4 clearColor = glm::vec4(0.1, 0.1, 0.1, 1.0);
 	GLInfo glInfo;
 	GLFWwindow *window;
-	double	lastTime;
 	glm::mat4x4 projection;
 	glm::mat4x4 view;
 	int width;
 	int height;
-	int fps;
 	GLContext(std::string title, int width, int height);
 	~GLContext();
 	void Run(ParticleSystem *ps);

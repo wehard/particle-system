@@ -20,6 +20,7 @@ public:
 	~GLObject();
 	glm::mat4 getModelMatrix();
 	static GLObject Plane();
+	static GLObject Triangle();
 };
 
 

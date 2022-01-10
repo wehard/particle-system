@@ -20,7 +20,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::NewFrame();
 
 	ImGui::Begin("particle-system");
-	ImGui::Text("FPS %d", ps.gl.fps);
+	ImGui::Text("FPS %d", ps.fps);
 	ImGui::Text("Particles %zu", ps.numParticles);
 	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::Separator();

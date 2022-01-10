@@ -156,7 +156,7 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 
 void ParticleSystem::Run()
 {
-	double lastTime = glfwGetTime();
+	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
 
@@ -165,6 +165,7 @@ void ParticleSystem::Run()
 
 	auto basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
 	auto plane = GLObject::Plane();
+	auto gp = GLObject::Triangle();
 
 	auto renderer = GLRenderer();
 	
@@ -230,6 +231,7 @@ void ParticleSystem::Run()
 		gui.Update(*this);
 
 		// Render here!
+		renderer.Begin(camera);
 		glClearColor(gl.clearColor.x, gl.clearColor.y, gl.clearColor.z, gl.clearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -248,15 +250,23 @@ void ParticleSystem::Run()
 
 		if (renderGravityPoints && gravityPoints.size() > 0)
 		{
-			glPointSize(10.0f);
-			basicShader->use();
-			basicShader->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-			basicShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-			basicShader->setMat4("view_matrix", camera.getViewMatrix());
-			basicShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
-			glBindVertexArray(gpBuffer.vao);
-			glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
-			glDrawArrays(GL_POINTS, 0, gravityPoints.size());
+			// glPointSize(10.0f);
+			// basicShader->use();
+			// basicShader->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+			// basicShader->setMat4("proj_matrix", camera.getProjectionMatrix());
+			// basicShader->setMat4("view_matrix", camera.getViewMatrix());
+			// basicShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
+			// glBindVertexArray(gpBuffer.vao);
+			// glBindBuffer(GL_ARRAY_BUFFER, gpBuffer.vbo);
+			// glDrawArrays(GL_POINTS, 0, gravityPoints.size());
+
+			for (auto a : gravityPoints)
+			{
+				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
+				gp.scale = glm::vec3(0.05);
+				renderer.Draw(gp, *basicShader);
+			}
+
 		}
 
 		// plane.position = ps->mouseInfo.world;
