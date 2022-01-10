@@ -39,13 +39,12 @@ GLObject::GLObject(std::vector<float> vertexPositions, std::vector<float> vertex
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-
 }
 
 GLObject::~GLObject()
 {
 	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &cbo);
 	glDeleteVertexArrays(1, &vao);
 }
 

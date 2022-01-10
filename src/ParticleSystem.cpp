@@ -57,11 +57,16 @@ ParticleSystem::~ParticleSystem()
 {
 	delete particleShader;
 	delete basicShader;
+	delete vertexColorShader;
 
 	glDeleteBuffers(1, &pBuffer.vbo);
 	glDeleteVertexArrays(1, &pBuffer.vao);
 	glDeleteBuffers(1, &gpBuffer.vbo);
 	glDeleteVertexArrays(1, &gpBuffer.vao);
+
+	CLContext::CheckCLResult(clReleaseMemObject(pBuffer.clmem), "clReleaseMemObject::pBuffer");
+	CLContext::CheckCLResult(clReleaseMemObject(gpBuffer.clmem), "clReleaseMemObject::gpBuffer");
+
 }
 
 void ParticleSystem::InitParticles(const char *initKernel)

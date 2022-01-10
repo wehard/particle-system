@@ -16,6 +16,7 @@ CLProgram::CLProgram(CLContext &cl, const char *kernelSource) : cl(cl)
 
 CLProgram::~CLProgram()
 {
+	CLContext::CheckCLResult(clReleaseProgram(program), "clReleaseProgram");
 }
 
 std::string CLProgram::loadKernelSource(const char *source)
