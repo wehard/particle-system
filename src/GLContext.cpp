@@ -71,11 +71,7 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-
 	glEnable(GL_DEPTH_TEST);
-
-	// camera = new glengine::Camera(45.0f, (float)width / (float)height);
-	// camera->position = glm::vec3(0.0, 0.0, 1.0);
 
 	glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
 	glfwSetScrollCallback(window, glfwMouseScrollCallback);
@@ -90,7 +86,6 @@ void GLContext::readGLInfo()
 	glGetIntegerv(GL_MINOR_VERSION, &glInfo.glMinorVersion);
 	glInfo.vendor = glGetString(GL_VENDOR);
 	glInfo.renderer = glGetString(GL_RENDERER);
-
 	glInfo.shadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 }
 
@@ -139,162 +134,4 @@ glm::vec3 GLContext::GetMouseWorldCoord(Camera *camera)
 
 	world = intersect(glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0), camera->position, projectMouse(xpos, ypos, width, height, camera->getProjectionMatrix(), camera->getViewMatrix()));
 	return world;
-}
-
-void GLContext::Run(ParticleSystem *ps)
-{
-	// lastTime = glfwGetTime();
-	// double lastUpdateFpsTime = lastTime;
-	// int frameCount = 0;
-
-	// auto s = new glengine::Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
-	// auto quad = glengine::Mesh::makeQuad();
-	// // quad->setVertexColors(glm::vec4(1.0, 1.0, 1.0, 1.0));
-
-	// auto plane = GLObject(std::vector<float>
-	// {
-	// 	-0.5f, -0.5f, 0.0f,
-	// 	-0.5f, 0.5f, 0.0f,
-	// 	0.5f, 0.5f, 0.0f,
-	// 	0.5f, -0.5f, 0.0f
-	// 	});
-	
-
-	// auto entity = new glengine::Entity(s, quad);
-	// entity->position = glm::vec3(0.0);
-	// entity->rotation = glm::vec3(0.0);
-	// entity->scale = glm::vec3(0.05);
-	// entity->color = glm::vec4(1.0, 1.0, 1.0, 1.0);
-
-	// auto particlePlane = new glengine::Entity(s, quad);
-	// particlePlane->position = glm::vec3(0.0);
-	// particlePlane->rotation = glm::vec3(0.0);
-	// particlePlane->scale = glm::vec3(1.0);
-
-	// // debug axis
-	// float adata[] = {
-	// 	0.0, 0.0, 0.0,
-	// 	1.0, 0.0, 0.0,
-	// 	0.0, 0.0, 0.0,
-	// 	0.0, 1.0, 0.0,
-	// 	0.0, 0.0, 0.0,
-	// 	0.0, 0.0, 1.0
-	// };
-	// GLuint avao;
-	// GLuint avbo;
-	// glGenVertexArrays(1, &avao);
-	// glBindVertexArray(avao);
-	// glGenBuffers(1, &avbo);
-	// glBindBuffer(GL_ARRAY_BUFFER, avbo);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 3 * 6, &adata[0], GL_DYNAMIC_DRAW);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, 0);
-	// glEnableVertexAttribArray(0);
-	// glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// glBindVertexArray(0);
-
-	// GUIContext gui;
-	// gui.Init(window, glslVersion);
-
-	// glfwSetWindowUserPointer(window, ps);
-
-	// while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
-	// {
-	// 	double currentTime = glfwGetTime();
-	// 	double deltaTime = currentTime - lastTime;
-
-	// 	if (currentTime - lastUpdateFpsTime > 1.0)
-	// 	{
-	// 		fps = frameCount / lastUpdateFpsTime;
-	// 		lastUpdateFpsTime = currentTime;
-	// 	}
-	// 	double xpos;
-	// 	double ypos;
-	// 	glfwGetCursorPos(window, &xpos, &ypos);
-
-	// 	ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
-
-	// 	float mouseX = (float)xpos / ((float)width * 0.5f) - 1.0f;
-	// 	float mouseY = (float)ypos / ((float)height * 0.5f) - 1.0f;
-
-	// 	ps->mouseInfo.ndc = glm::vec3(mouseX, mouseY, 0.0);
-
-	// 	glm::mat4 proj = camera->getProjectionMatrix();
-	// 	glm::mat4 view = camera->getViewMatrix();
-
-	// 	if (!ImGui::GetIO().WantCaptureMouse)
-	// 	{
-	// 		ps->mouseInfo.world = GetMouseWorldCoord();
-	// 	}
-
-	// 	// Update particles
-	// 	ps->Update(deltaTime);
-
-	// 	gui.Update(*ps);
-
-	// 	// Render here!
-	// 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-	// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// 	ps->shader->use();
-	// 	ps->shader->setVec3("m_pos", ps->mouseInfo.world);
-	// 	ps->shader->setVec4("min_color", ps->minColor);
-	// 	ps->shader->setVec4("max_color", ps->maxColor);
-	// 	ps->shader->setMat4("proj_matrix", camera->getProjectionMatrix());
-	// 	ps->shader->setMat4("view_matrix", camera->getViewMatrix());
-	// 	ps->shader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-
-	// 	glPointSize(ps->particleSize);
-	// 	glBindVertexArray(ps->pBuffer.vao);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, ps->pBuffer.vbo);
-	// 	glDrawArrays(GL_POINTS, 0, ps->numParticles);
-
-	// 	if (ps->renderGravityPoints && ps->gravityPoints.size() > 0)
-	// 	{
-	// 		glPointSize(10.0f);
-	// 		s->use();
-	// 		s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-	// 		s->setMat4("proj_matrix", camera->getProjectionMatrix());
-	// 		s->setMat4("view_matrix", camera->getViewMatrix());
-	// 		s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-	// 		glBindVertexArray(ps->gpBuffer.vao);
-	// 		glBindBuffer(GL_ARRAY_BUFFER, ps->gpBuffer.vbo);
-	// 		glDrawArrays(GL_POINTS, 0, ps->gravityPoints.size());
-	// 	}
-
-	// 	// plane.position = ps->mouseInfo.world;
-	// 	entity->position = ps->mouseInfo.world;
-	// 	s->use();
-	// 	s->setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
-	// 	s->setMat4("proj_matrix", camera->getProjectionMatrix());
-	// 	s->setMat4("view_matrix", camera->getViewMatrix());
-	// 	s->setMat4("model_matrix", entity->getModelMatrix());
-	// 	entity->draw();
-
-
-	// 	s->setVec4("obj_color", glm::vec4(0.2, 0.3, 0.6, 0.5));
-	// 	s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), ps->rotation, glm::vec3(1.0)));
-	// 	particlePlane->draw();
-
-	// 	s->use();
-	// 	s->setVec4("obj_color", glm::vec4(0.0, 1.0, 0.0, 1.0));
-	// 	s->setMat4("proj_matrix", camera->getProjectionMatrix());
-	// 	s->setMat4("view_matrix", camera->getViewMatrix());
-	// 	s->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0), ps->rotation, glm::vec3(1.0)));
-	// 	glBindVertexArray(avao);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, avbo);
-	// 	glDrawArrays(GL_LINES, 0, 3 * 6);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// 	glBindVertexArray(0);
-
-
-	// 	gui.Render();
-
-	// 	glfwSwapBuffers(window);
-
-	// 	lastTime = currentTime;
-	// 	frameCount++;
-
-	// 	glfwPollEvents();
-	// }
-	// gui.Shutdown();
 }

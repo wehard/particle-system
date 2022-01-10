@@ -114,13 +114,13 @@ cl_platform_id CLContext::getPlatform(CLInfo &outInfo, int plaformIndex)
 	clGetPlatformInfo(platform, CL_PLATFORM_VENDOR, sizeof(clInfo.platformVendor), &outInfo.platformVendor, NULL);
 	clGetPlatformInfo(platform, CL_PLATFORM_VERSION, sizeof(clInfo.platformName), &outInfo.platformName, NULL);
 	std::cout << "Selected platform: " << outInfo.platformVendor << ", " << outInfo.platformName << std::endl;
+	free(platforms);
 	return platform;
 }
 
 cl_device_id CLContext::getDevice(cl_platform_id platform, CLInfo &outInfo, int deviceIndex)
 {
 	cl_device_id *devices;
-	// cl_uint num_devices = 0;
 
 	clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, 5, NULL, &outInfo.numDevices);
 	devices = (cl_device_id *)malloc(sizeof(cl_device_id) * outInfo.numDevices);
@@ -142,12 +142,14 @@ cl_device_id CLContext::getDevice(cl_platform_id platform, CLInfo &outInfo, int 
 
 	if (deviceIndex < 0)
 	{
+		free(devices);
 		return NULL;
 	}
 
 	cl_device_id device = devices[deviceIndex];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(outInfo.deviceName), &outInfo.deviceName, NULL);
 	std::cout << "Selected device [" << deviceIndex << "] : " << outInfo.deviceName << std::endl;
+	free(devices);
 	return device;
 }
 

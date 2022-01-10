@@ -35,7 +35,6 @@ public:
 	int height;
 	GLContext(std::string title, int width, int height);
 	~GLContext();
-	void Run(ParticleSystem *ps);
 	glm::vec3 GetMouseWorldCoord(Camera *camera);
 };
 

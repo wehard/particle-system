@@ -12,7 +12,6 @@
 
 #include "ParticleSystem.h"
 #include "GUIContext.h"
-#include "Shader.h"
 #include "GLRenderer.h"
 #include <glm/gtx/euler_angles.hpp>
 #include <iostream>
@@ -23,6 +22,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "Shader.h"
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
@@ -166,6 +167,7 @@ void ParticleSystem::Run()
 	auto basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
 	auto plane = GLObject::Plane();
 	auto gp = GLObject::Triangle();
+	gp.color = glm::vec4(0.2, 0.2, 0.5, 1.0);
 
 	auto renderer = GLRenderer();
 	

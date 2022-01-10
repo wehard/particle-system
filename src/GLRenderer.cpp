@@ -22,7 +22,7 @@ void GLRenderer::Draw(GLObject &object)
 
 void GLRenderer::Draw(GLObject &object, Shader &shader)
 {
-	shader.setVec4("obj_color", glm::vec4(1.0, 1.0, 1.0, 1.0));
+	shader.setVec4("obj_color", object.color);
 	shader.setMat4("proj_matrix", camera->getProjectionMatrix());
 	shader.setMat4("view_matrix", camera->getViewMatrix());
 	shader.setMat4("model_matrix", object.getModelMatrix());
