@@ -183,7 +183,8 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(int), &mouseGravity}};
+		{sizeof(int), &mouseGravity}
+	};
 	kernel->SetArgs(args, 6);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -196,7 +197,34 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 
 void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 {
+	cl_float4 clm;
+	clm.s[0] = this->mouseInfo.world.x;
+	clm.s[1] = this->mouseInfo.world.y;
+	clm.s[2] = this->mouseInfo.world.z;
+	clm.s[3] = 1.0f;
 
+	t_emitter e = emitter.CLType();
+
+	UpdateGpBuffer();
+	int numGp = gravityPoints.size();
+	auto kernel = clProgram->GetKernel("update_particles_emitter");
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(cl_mem), &gpBuffer.clmem},
+		{sizeof(int), &numGp},
+		{sizeof(cl_float4), &clm},
+		{sizeof(GLfloat), &deltaTime},
+		{sizeof(int), &mouseGravity},
+		{sizeof(t_emitter), &e}
+	};
+	kernel->SetArgs(args, 7);
+	glFinish();
+	cl.AquireGLObject(pBuffer.clmem);
+	cl.AquireGLObject(gpBuffer.clmem);
+	kernel->Enqueue(cl.queue, numParticles);
+	cl.ReleaseGLObject(pBuffer.clmem);
+	cl.ReleaseGLObject(gpBuffer.clmem);
+	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
 }
 
 void ParticleSystem::Run()

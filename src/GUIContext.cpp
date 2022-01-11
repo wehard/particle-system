@@ -66,10 +66,18 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
+		ImGui::DragFloat("Rate", &ps.emitter.rate);
+		ImGui::DragFloat("Life", &ps.emitter.life);
+		ImGui::DragFloat("Speed", &ps.emitter.velocity);
 		float v[3] = {ps.emitter.position.x, ps.emitter.position.y, ps.emitter.position.z};
 		if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
 		{
 			ps.emitter.position = glm::vec3(v[0], v[1], v[2]);
+		}
+		float v2[3] = {ps.emitter.direction.x, ps.emitter.direction.y, ps.emitter.direction.z};
+		if (ImGui::DragFloat3("Direction", v2, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		{
+			ps.emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
 		}
 	}
 	ImGui::Separator();

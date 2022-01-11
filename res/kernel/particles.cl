@@ -178,8 +178,8 @@ __kernel void init_particles_emitter(__global t_particle *ps, int num_particles,
 	int i = get_global_id(0);
 
 	ps[i].pos = e.pos;
-	ps[i].vel = e.dir * e.vel * 1000.0f;
-	ps[i].life = 0.001f * i;;
+	ps[i].vel = e.dir * e.vel;
+	ps[i].life = 0.001f * i;
 }
 
 float3 lerp(float3 v1, float3 v2, float amount)
@@ -224,14 +224,42 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 		vel += velocity_from_gravity_point(p, g);
 	}
 
-	// ps[i].life -= dt;
-	// if (ps[i].life <= 0.0)
-	// {
-	// 	ps[i].pos.xyz = (float3)(0.0, 0.0, 0.0);
-	// 	ps[i].vel.xyz = (float3)(0.0, 1.0, 0.0) * 10000.0f;
- 	// 	ps[i].life = 200.0;
-	// 	return;
-	// }
+	ps[i].vel.xyz += vel;
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
+}
+
+static void reset_particle_emitter()
+{
+
+}
+
+__kernel void update_particles_emitter(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, t_emitter e)
+{
+	int i = get_global_id(0);
+	
+	__global t_particle *p = ps + i;
+
+	float3 vel = (float3)(0.0);
+
+	if (mg == 1)
+	{
+		vel += velocity_from_gravity_point(p, (__global float4*)&m);
+	}
+
+	for (int j = 0; j < num_gp; j++)
+	{
+		__global float4 *g = gps + j;
+		vel += velocity_from_gravity_point(p, g);
+	}
+
+	ps[i].life -= dt;
+	if (ps[i].life <= 0.0)
+	{
+		ps[i].pos = e.pos;
+		ps[i].vel = e.dir * e.vel;
+		ps[i].life = 0.001f * i;
+		return;
+	}
 
 	ps[i].vel.xyz += vel;
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
