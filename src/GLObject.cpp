@@ -79,7 +79,23 @@ GLObject GLObject::Triangle()
 		0.0f, 0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f
 		});
+	triangle.color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 	return triangle;
+}
+
+GLObject GLObject::Star()
+{
+	auto star = GLObject(std::vector<float>
+	{
+		-0.5f, -0.25f, 0.0f,
+		0.0f, 0.5f, 0.0f,
+		0.5f, -0.25f, 0.0f,
+		0.0f, -0.5f, 0.0f,
+		-0.5f, 0.25f, 0.0f,
+		0.5f, 0.25f, 0.0f
+		});
+	star.color = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	return star;
 }
 
 GLObject GLObject::Axis()
@@ -100,5 +116,6 @@ GLObject GLObject::Axis()
 		0.0, 0.0, 1.0, 1.0,
 		0.0, 0.0, 1.0, 1.0
 	});
+	axis.color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 	return axis;
 }

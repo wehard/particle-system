@@ -233,18 +233,20 @@ void ParticleSystem::Run()
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
 	
+	auto renderer = GLRenderer();
+	GUIContext gui;
+	gui.Init(gl.window, gl.glslVersion);
+
 	auto plane = GLObject::Plane();
 	auto gp = GLObject::Triangle();
 	gp.color = glm::vec4(0.0, 0.8, 0.8, 1.0);
-
-	auto renderer = GLRenderer();
-
+	gp.scale = glm::vec3(0.05);
 
 	auto wAxis = GLObject::Axis();
 	auto pAxis = GLObject::Axis();
 
-	GUIContext gui;
-	gui.Init(gl.window, gl.glslVersion);
+	auto eStar = GLObject::Star();
+	eStar.scale = glm::vec3(0.05);
 
 	glfwSetWindowUserPointer(gl.window, this);
 
@@ -300,15 +302,19 @@ void ParticleSystem::Run()
 			for (auto a : gravityPoints)
 			{
 				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
-				gp.scale = glm::vec3(0.05);
 				renderer.Draw(gp, *basicShader);
 			}
-
 		}
 
 		pAxis.rotation = rotation;
 		renderer.DrawLines(pAxis, *vertexColorShader);
 		renderer.DrawLines(wAxis, *vertexColorShader);
+
+		if (useEmitter)
+		{
+			eStar.position = emitter.position;
+			renderer.Draw(eStar, *basicShader);
+		}
 
 		gui.Render();
 

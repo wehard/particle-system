@@ -51,7 +51,7 @@ struct Emitter
 	{
 		position = glm::vec3(0.0, 0.0, 0.0);
 		direction = glm::vec3(0.0, 1.0, 0.0);
-		velocity = 1.0;
+		velocity = 10000.0;
 		rate = 100.0;
 		life = 2.0;
 	}

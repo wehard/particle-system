@@ -24,6 +24,7 @@ public:
 	static GLObject Plane();
 	static GLObject Triangle();
 	static GLObject Axis();
+	static GLObject Star();
 };
 
 
