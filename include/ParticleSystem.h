@@ -30,10 +30,42 @@ typedef struct
 	cl_float life;
 }		t_particle;
 
+typedef struct
+{
+	cl_float4 pos;
+	cl_float4 dir;
+	cl_float vel;
+	cl_float rate;
+	cl_float life;
+}		t_emitter;
+
 struct Emitter
 {
-	cl_float4 position;
-	cl_float4 direction;
+	glm::vec3 position;
+	glm::vec3 direction;
+	float velocity;
+	float rate;
+	float life;
+
+	Emitter()
+	{
+		position = glm::vec3(0.0, 0.0, 0.0);
+		direction = glm::vec3(0.0, 1.0, 0.0);
+		velocity = 1.0;
+		rate = 100.0;
+		life = 2.0;
+	}
+
+	t_emitter CLType()
+	{
+		t_emitter e;
+		e.pos = {position.x, position.y, position.z, 1.0};
+		e.dir = {direction.x, direction.y, direction.z, 1.0};
+		e.vel = velocity;
+		e.rate = rate;
+		e.life = life;
+		return e;
+	}
 };
 
 struct MouseInfo
@@ -76,12 +108,16 @@ public:
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	bool renderGravityPoints = true;
+	bool useEmitter = false;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
 	Camera camera;
+	Emitter emitter;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void InitParticles(const char *initKernel);
+	void InitParticlesEmitter();
 	void UpdateParticles(float deltaTime);
+	void UpdateParticlesEmitter(float deltaTime);
 	void UpdateGpBuffer();
 	void Reset();
 	void AddGravityPoint();

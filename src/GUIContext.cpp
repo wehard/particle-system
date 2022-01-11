@@ -56,7 +56,22 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::SameLine();
 	if (ImGui::Button("Sine", ImVec2(50, 20)))
 		ps.InitParticles("init_particles_sine");
+	ImGui::SameLine();
+	if (ImGui::Button("Emitter", ImVec2(50, 20)))
+		ps.InitParticlesEmitter();
 
+
+	ImGui::Separator();
+	ImGui::Text("Emitter");
+	ImGui::Checkbox("Active", &ps.useEmitter);
+	if (ps.useEmitter)
+	{
+		float v[3] = {ps.emitter.position.x, ps.emitter.position.y, ps.emitter.position.z};
+		if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		{
+			ps.emitter.position = glm::vec3(v[0], v[1], v[2]);
+		}
+	}
 	ImGui::Separator();
 	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
 	ImGui::Checkbox("Show", &ps.renderGravityPoints);

@@ -69,23 +69,6 @@ ParticleSystem::~ParticleSystem()
 
 }
 
-void ParticleSystem::InitParticles(const char *initKernel)
-{
-	cl_int result = CL_SUCCESS;
-	cl_command_queue queue = cl.queue;
-
-	auto k = clProgram->GetKernel(initKernel);
-	std::vector<CLKernelArg> args = {
-		{sizeof(cl_mem), &pBuffer.clmem},
-		{sizeof(GLint), &numParticles}};
-	k->SetArgs(args, 2);
-	glFinish();
-	cl.AquireGLObject(pBuffer.clmem);
-	k->Enqueue(cl.queue, numParticles);
-	cl.ReleaseGLObject(pBuffer.clmem);
-	CLContext::CheckCLResult(clFinish(queue), "clFinish");
-}
-
 void ParticleSystem::CreateParticleBuffer()
 {
 	glGenVertexArrays(1, &pBuffer.vao);
@@ -134,6 +117,43 @@ void ParticleSystem::AddGravityPoint()
 	}
 }
 
+void ParticleSystem::InitParticles(const char *initKernel)
+{
+	cl_int result = CL_SUCCESS;
+	cl_command_queue queue = cl.queue;
+
+	auto k = clProgram->GetKernel(initKernel);
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(GLint), &numParticles}};
+	k->SetArgs(args, 2);
+	glFinish();
+	cl.AquireGLObject(pBuffer.clmem);
+	k->Enqueue(cl.queue, numParticles);
+	cl.ReleaseGLObject(pBuffer.clmem);
+	CLContext::CheckCLResult(clFinish(queue), "clFinish");
+}
+
+void ParticleSystem::InitParticlesEmitter()
+{
+	cl_int result = CL_SUCCESS;
+
+	t_emitter e = emitter.CLType();
+
+	auto kernel = clProgram->GetKernel("init_particles_emitter");
+	std::vector<CLKernelArg> args = {
+		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(GLint), &numParticles},
+		{sizeof(t_emitter), &e}
+	};
+	kernel->SetArgs(args, 3);
+	glFinish();
+	cl.AquireGLObject(pBuffer.clmem);
+	kernel->Enqueue(cl.queue, numParticles);
+	cl.ReleaseGLObject(pBuffer.clmem);
+	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
+}
+
 void ParticleSystem::Reset()
 {
 	InitParticles("init_particles_cube");
@@ -172,6 +192,11 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 	cl.ReleaseGLObject(pBuffer.clmem);
 	cl.ReleaseGLObject(gpBuffer.clmem);
 	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
+}
+
+void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
+{
+
 }
 
 void ParticleSystem::Run()
@@ -215,7 +240,13 @@ void ParticleSystem::Run()
 			mouseInfo.world = gl.GetMouseWorldCoord(&this->camera);
 		}
 
-		this->UpdateParticles(deltaTime);
+		if (useEmitter)
+		{
+			this->UpdateParticlesEmitter(deltaTime);
+		}
+		else
+			this->UpdateParticles(deltaTime);
+		
 		gui.Update(*this);
 
 		// Render here!

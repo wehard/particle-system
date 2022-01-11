@@ -5,6 +5,15 @@ typedef struct
 	float life;
 }		t_particle;
 
+typedef struct
+{
+	float4 pos;
+	float4 dir;
+	float vel;
+	float rate;
+	float life;
+}		t_emitter;
+
 static float noise3D(float x, float y, float z) {
 	float ptr = 0.0f;
 	return fract(sin(x*112.9898f + y*179.233f + z*237.212f) * 43758.5453f, &ptr);
@@ -164,6 +173,15 @@ __kernel void init_particles_sine(__global t_particle * ps, int num_particles)
 	);
 };
 
+__kernel void init_particles_emitter(__global t_particle *ps, int num_particles, t_emitter e)
+{
+	int i = get_global_id(0);
+
+	ps[i].pos = e.pos;
+	ps[i].vel = e.dir * e.vel * 1000.0f;
+	ps[i].life = 0.001f * i;;
+}
+
 float3 lerp(float3 v1, float3 v2, float amount)
 {
 	float3 v;
@@ -206,14 +224,14 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 		vel += velocity_from_gravity_point(p, g);
 	}
 
-	ps[i].life -= dt;
-	if (ps[i].life <= 0.0)
-	{
-		ps[i].pos = m;
-		ps[i].vel.xyz = (float3)(0.0, 0.0, 0.0);
-		ps[i].life = 20.0;
-		return;
-	}
+	// ps[i].life -= dt;
+	// if (ps[i].life <= 0.0)
+	// {
+	// 	ps[i].pos.xyz = (float3)(0.0, 0.0, 0.0);
+	// 	ps[i].vel.xyz = (float3)(0.0, 1.0, 0.0) * 10000.0f;
+ 	// 	ps[i].life = 200.0;
+	// 	return;
+	// }
 
 	ps[i].vel.xyz += vel;
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
