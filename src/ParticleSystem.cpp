@@ -66,7 +66,6 @@ ParticleSystem::~ParticleSystem()
 
 	CLContext::CheckCLResult(clReleaseMemObject(pBuffer.clmem), "clReleaseMemObject::pBuffer");
 	CLContext::CheckCLResult(clReleaseMemObject(gpBuffer.clmem), "clReleaseMemObject::gpBuffer");
-
 }
 
 void ParticleSystem::CreateParticleBuffer()
@@ -145,8 +144,7 @@ void ParticleSystem::InitParticlesEmitter()
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(GLint), &numParticles},
-		{sizeof(t_emitter), &e}
-	};
+		{sizeof(t_emitter), &e}};
 	kernel->SetArgs(args, 3);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -184,8 +182,7 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(int), &mouseGravity}
-	};
+		{sizeof(int), &mouseGravity}};
 	kernel->SetArgs(args, 6);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -199,11 +196,6 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 {
 	cl_float4 clm = this->mouseInfo.CLTypeWorld();
-	// clm.s[0] = this->mouseInfo.world.x;
-	// clm.s[1] = this->mouseInfo.world.y;
-	// clm.s[2] = this->mouseInfo.world.z;
-	// clm.s[3] = 1.0f;
-
 	t_emitter e = emitter.CLType();
 
 	UpdateGpBuffer();
@@ -216,8 +208,7 @@ void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
 		{sizeof(int), &mouseGravity},
-		{sizeof(t_emitter), &e}
-	};
+		{sizeof(t_emitter), &e}};
 	kernel->SetArgs(args, 7);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -233,7 +224,7 @@ void ParticleSystem::Run()
 	lastTime = glfwGetTime();
 	double lastUpdateFpsTime = lastTime;
 	int frameCount = 0;
-	
+
 	auto renderer = GLRenderer();
 	GUIContext gui;
 	gui.Init(gl.window, gl.glslVersion);
@@ -277,7 +268,7 @@ void ParticleSystem::Run()
 		}
 		else
 			this->UpdateParticles(deltaTime);
-		
+
 		gui.Update(*this);
 
 		// Render here!
@@ -334,4 +325,3 @@ void ParticleSystem::Run()
 	}
 	gui.Shutdown();
 }
-
