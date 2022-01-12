@@ -23,6 +23,14 @@
 
 #define MAX_GP 10
 
+typedef enum e_init_shape
+{
+	CUBE,
+	SPHERE,
+	RECT,
+	SINE
+} t_init_shape;
+
 typedef struct
 {
 	cl_float4 pos;
@@ -73,6 +81,16 @@ struct MouseInfo
 	glm::vec3 screen;
 	glm::vec3 ndc;
 	glm::vec3 world;
+
+	cl_float4 CLTypeWorld()
+	{
+		cl_float4 m;
+		m.s[0] = world.x;
+		m.s[1] = world.y;
+		m.s[2] = world.z;
+		m.s[3] = 1.0f;
+		return m;
+	}
 };
 
 struct GLBuffer
@@ -114,7 +132,7 @@ public:
 	Camera camera;
 	Emitter emitter;
 	ParticleSystem(GLContext &gl, CLContext &cl);
-	void InitParticles(const char *initKernel);
+	void InitParticles(t_init_shape shape);
 	void InitParticlesEmitter();
 	void UpdateParticles(float deltaTime);
 	void UpdateParticlesEmitter(float deltaTime);

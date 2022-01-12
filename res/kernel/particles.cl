@@ -1,3 +1,6 @@
+#define CUBE_SIZE 1.0
+#define SPHERE_RADIUS 0.5
+
 typedef struct
 {
 	float4 pos;
@@ -13,6 +16,14 @@ typedef struct
 	float rate;
 	float life;
 }		t_emitter;
+
+typedef enum e_init_shape
+{
+	CUBE,
+	SPHERE,
+	RECT,
+	SINE
+} t_init_shape;
 
 static float noise3D(float x, float y, float z) {
 	float ptr = 0.0f;
@@ -57,12 +68,9 @@ float	random(int n)
 }
 
 
-#define CUBE_SIZE 1.0
-#define SPHERE_RADIUS 0.5
 
 
-
-__kernel void init_particles_cube(__global t_particle * ps, int num_particles)
+static void init_cube(__global t_particle * ps, int num_particles)
 {
 	int				i = get_global_id(0);
 
@@ -91,7 +99,7 @@ __kernel void init_particles_cube(__global t_particle * ps, int num_particles)
 	);
 };
 
-__kernel void init_particles_sphere(__global t_particle * ps, int num_particles)
+static void init_sphere(__global t_particle * ps, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -123,7 +131,7 @@ __kernel void init_particles_sphere(__global t_particle * ps, int num_particles)
 	);
 };
 
-__kernel void init_particles_rect(__global t_particle * ps, int num_particles)
+static void init_rect(__global t_particle * ps, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -154,7 +162,7 @@ __kernel void init_particles_rect(__global t_particle * ps, int num_particles)
 	ps[i].life = 0.1f * i;
 };
 
-__kernel void init_particles_sine(__global t_particle * ps, int num_particles)
+static void init_sine(__global t_particle * ps, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -172,6 +180,27 @@ __kernel void init_particles_sine(__global t_particle * ps, int num_particles)
 		1.0f
 	);
 };
+
+__kernel void init_particles(__global t_particle * ps, int num_particles, t_init_shape shape)
+{
+	switch (shape)
+	{
+		case CUBE:
+			init_cube(ps, num_particles);
+			break;
+		case SPHERE:
+			init_sphere(ps, num_particles);
+			break;
+		case RECT:
+			init_rect(ps, num_particles);
+			break;
+		case SINE:
+			init_sine(ps, num_particles);
+			break;
+		default:
+			break;
+	}
+}
 
 __kernel void init_particles_emitter(__global t_particle *ps, int num_particles, t_emitter e)
 {
@@ -256,8 +285,8 @@ __kernel void update_particles_emitter(__global t_particle *ps, __global float4 
 	if (ps[i].life <= 0.0)
 	{
 		ps[i].pos = e.pos;
-		ps[i].vel = e.dir * e.vel;
-		ps[i].life = 0.001f * i;
+		ps[i].vel = normalize(e.dir) * e.vel;
+		ps[i].life = e.life;
 		return;
 	}
 

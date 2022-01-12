@@ -46,16 +46,16 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Separator();
 	ImGui::Text("Reset");
 	if (ImGui::Button("Sphere", ImVec2(50, 20)))
-		ps.InitParticles("init_particles_sphere");
+		ps.InitParticles(SPHERE);
 	ImGui::SameLine();
 	if (ImGui::Button("Cube", ImVec2(50, 20)))
-		ps.InitParticles("init_particles_cube");
+		ps.InitParticles(CUBE);
 	ImGui::SameLine();
 	if (ImGui::Button("Rect", ImVec2(50, 20)))
-		ps.InitParticles("init_particles_rect");
+		ps.InitParticles(RECT);
 	ImGui::SameLine();
 	if (ImGui::Button("Sine", ImVec2(50, 20)))
-		ps.InitParticles("init_particles_sine");
+		ps.InitParticles(SINE);
 	ImGui::SameLine();
 	if (ImGui::Button("Emitter", ImVec2(50, 20)))
 		ps.InitParticlesEmitter();

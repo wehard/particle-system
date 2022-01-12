@@ -117,16 +117,17 @@ void ParticleSystem::AddGravityPoint()
 	}
 }
 
-void ParticleSystem::InitParticles(const char *initKernel)
+void ParticleSystem::InitParticles(t_init_shape shape)
 {
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = cl.queue;
 
-	auto k = clProgram->GetKernel(initKernel);
+	auto k = clProgram->GetKernel("init_particles");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
-		{sizeof(GLint), &numParticles}};
-	k->SetArgs(args, 2);
+		{sizeof(GLint), &numParticles},
+		{sizeof(t_init_shape), &shape}};
+	k->SetArgs(args, 3);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	k->Enqueue(cl.queue, numParticles);
@@ -156,7 +157,7 @@ void ParticleSystem::InitParticlesEmitter()
 
 void ParticleSystem::Reset()
 {
-	InitParticles("init_particles_cube");
+	InitParticles(RECT);
 }
 
 void ParticleSystem::UpdateGpBuffer()
@@ -197,11 +198,11 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 
 void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 {
-	cl_float4 clm;
-	clm.s[0] = this->mouseInfo.world.x;
-	clm.s[1] = this->mouseInfo.world.y;
-	clm.s[2] = this->mouseInfo.world.z;
-	clm.s[3] = 1.0f;
+	cl_float4 clm = this->mouseInfo.CLTypeWorld();
+	// clm.s[0] = this->mouseInfo.world.x;
+	// clm.s[1] = this->mouseInfo.world.y;
+	// clm.s[2] = this->mouseInfo.world.z;
+	// clm.s[3] = 1.0f;
 
 	t_emitter e = emitter.CLType();
 
@@ -304,6 +305,12 @@ void ParticleSystem::Run()
 				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
 				renderer.Draw(gp, *basicShader);
 			}
+		}
+
+		if (mouseGravity)
+		{
+			gp.position = mouseInfo.world;
+			renderer.Draw(gp, *basicShader);
 		}
 
 		pAxis.rotation = rotation;
