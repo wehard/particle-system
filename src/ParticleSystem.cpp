@@ -41,8 +41,8 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	vertexColorShader = new Shader("res/shaders/vertex_color.vert", "res/shaders/vertex_color.frag");
 	particleShader->setVec2("m_pos", glm::vec2(0.0, 0.0));
 
-	camera = Camera(45.0f, (float)gl.width / (float)gl.height);
-	camera.position = glm::vec3(0.0, 0.0, 1.0);
+	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
+	// camera.position = glm::vec3(0.0, 0.0, 1.0);
 
 	clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
 
@@ -251,15 +251,6 @@ void ParticleSystem::Run()
 		{
 			fps = frameCount / lastUpdateFpsTime;
 			lastUpdateFpsTime = currentTime;
-		}
-
-		if (!ImGui::GetIO().WantCaptureMouse)
-		{
-			double xpos, ypos;
-			glfwGetCursorPos(gl.window, &xpos, &ypos);
-			mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
-			mouseInfo.ndc = glm::vec3((float)xpos / ((float)gl.width * 0.5f) - 1.0f, (float)ypos / ((float)gl.height * 0.5f) - 1.0f, 0.0);
-			mouseInfo.world = gl.GetMouseWorldCoord(&this->camera);
 		}
 
 		if (useEmitter)

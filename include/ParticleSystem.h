@@ -131,6 +131,7 @@ public:
 	glm::vec4 maxColor;
 	Camera camera;
 	Emitter emitter;
+	bool mouseMovement = false;
 	ParticleSystem(GLContext &gl, CLContext &cl);
 	void InitParticles(t_init_shape shape);
 	void InitParticlesEmitter();

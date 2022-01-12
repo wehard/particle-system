@@ -24,7 +24,10 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Particles %zu", ps.numParticles);
 	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::Separator();
-	ImGui::Text("Camera x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
+	ImGui::Text("Camera");
+	ImGui::Text("Position x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
+	ImGui::Text("Yaw %f, Pitch %f", ps.camera.yaw, ps.camera.pitch);
+	ImGui::Checkbox("Movement", &ps.mouseMovement);
 	ImGui::ColorEdit4("Clear color", &ps.gl.clearColor.r);
 	ImGui::Separator();
 	ImGui::Text("Mouse");
