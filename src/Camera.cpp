@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <stdio.h>
 
-Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM)
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : forward(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM)
 {
 	float fovy = 45.0;
 	float aspect = 1.777;
@@ -24,15 +24,14 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : front
 	this->worldUp = up;
 	this->yaw = yaw;
 	this->pitch = pitch;
-	updateCameraVectors();
+	update();
 }
-
 
 Camera::~Camera() {}
 
 glm::mat4x4 Camera::getViewMatrix()
 {
-	return glm::lookAt(position, position + front, up);
+	return glm::lookAt(position, position + forward, up);
 }
 
 glm::mat4x4 Camera::getProjectionMatrix()
@@ -40,13 +39,13 @@ glm::mat4x4 Camera::getProjectionMatrix()
 	return (projection_matrix);
 }
 
-void Camera::Move(Camera_Movement direction, float deltaTime)
+void Camera::Move(CameraDirection direction, float deltaTime)
 {
 	float velocity = movementSpeed * deltaTime;
 	if (direction == FORWARD)
-		position += front * velocity;
+		position += forward * velocity;
 	if (direction == BACKWARD)
-		position -= front * velocity;
+		position -= forward * velocity;
 	if (direction == LEFT)
 		position -= right * velocity;
 	if (direction == RIGHT)
@@ -61,7 +60,6 @@ void Camera::Rotate(float xoffset, float yoffset, bool constrainPitch)
 	yaw += xoffset;
 	pitch += yoffset;
 
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (constrainPitch)
 	{
 		if (pitch > 89.0f)
@@ -69,20 +67,16 @@ void Camera::Rotate(float xoffset, float yoffset, bool constrainPitch)
 		if (pitch < -89.0f)
 			pitch = -89.0f;
 	}
-
-	// update Front, Right and Up Vectors using the updated Euler angles
-	updateCameraVectors();
+	update();
 }
 
-void Camera::updateCameraVectors()
+void Camera::update()
 {
 	glm::vec3 temp;
 	temp.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	temp.y = sin(glm::radians(pitch));
 	temp.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front = glm::normalize(temp);
-	
-	// also re-calculate the Right and Up vector
-	right = glm::normalize(glm::cross(front, worldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-	up = glm::normalize(glm::cross(right, front));
+	forward = glm::normalize(temp);
+	right = glm::normalize(glm::cross(forward, worldUp));
+	up = glm::normalize(glm::cross(right, forward));
 }

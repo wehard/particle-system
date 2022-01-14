@@ -5,11 +5,11 @@
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 0.5f;
+const float SPEED = 10.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
-enum Camera_Movement
+enum CameraDirection
 {
 	FORWARD,
 	BACKWARD,
@@ -22,11 +22,11 @@ class Camera
 private:
 	float fov;
 	glm::mat4x4 projection_matrix;
-	void updateCameraVectors();
+	void update();
 
 public:
 	glm::vec3 position;
-	glm::vec3 front;
+	glm::vec3 forward;
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::vec3 worldUp;
@@ -42,6 +42,6 @@ public:
 	~Camera();
 	glm::mat4x4 getViewMatrix();
 	glm::mat4x4 getProjectionMatrix();
-	void Move(Camera_Movement direction, float deltaTime);
+	void Move(CameraDirection direction, float deltaTime);
 	void Rotate(float xoffset, float yoffset, bool constrainPitch = true);
 };

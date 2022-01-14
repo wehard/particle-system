@@ -104,8 +104,6 @@ class ParticleSystem
 {
 private:
 	GLRenderer renderer;
-	// cl_mem	clmem;
-	// cl_mem	clmemgp;
 	Shader *particleShader;
 	Shader *basicShader;
 	Shader *vertexColorShader;
@@ -114,6 +112,7 @@ private:
 	double lastTime = 0.0;
 public:
 	int fps;
+	double deltaTime;
 	int mouseGravity = 0;
 	std::vector<cl_float4> gravityPoints;
 	MouseInfo mouseInfo;

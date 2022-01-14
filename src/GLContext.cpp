@@ -57,19 +57,19 @@ static void glfwKeyCallback(GLFWwindow *window, int key, int scancode, int actio
 
 	if (key == GLFW_KEY_W)
 	{
-		ps->camera.Move(FORWARD, 0.25);
+		ps->camera.Move(FORWARD, ps->deltaTime);
 	}
 	if (key == GLFW_KEY_S)
 	{
-		ps->camera.Move(BACKWARD, 0.25);
+		ps->camera.Move(BACKWARD, ps->deltaTime);
 	}
 	if (key == GLFW_KEY_A)
 	{
-		ps->camera.Move(LEFT, 0.25);
+		ps->camera.Move(LEFT, ps->deltaTime);
 	}
 	if (key == GLFW_KEY_D)
 	{
-		ps->camera.Move(RIGHT, 0.25);
+		ps->camera.Move(RIGHT, ps->deltaTime);
 	}
 }
 

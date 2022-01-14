@@ -245,7 +245,7 @@ void ParticleSystem::Run()
 	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		double currentTime = glfwGetTime();
-		double deltaTime = currentTime - lastTime;
+		deltaTime = currentTime - lastTime;
 
 		if (currentTime - lastUpdateFpsTime > 1.0)
 		{
