@@ -107,6 +107,7 @@ private:
 	Shader *particleShader;
 	Shader *basicShader;
 	Shader *vertexColorShader;
+	Shader *billboardShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 	double lastTime = 0.0;

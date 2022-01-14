@@ -39,6 +39,8 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
 	vertexColorShader = new Shader("res/shaders/vertex_color.vert", "res/shaders/vertex_color.frag");
+	billboardShader = new Shader("res/shaders/billboard.vert", "res/shaders/billboard.frag");
+
 	particleShader->setVec2("m_pos", glm::vec2(0.0, 0.0));
 
 	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
@@ -285,7 +287,7 @@ void ParticleSystem::Run()
 			for (auto a : gravityPoints)
 			{
 				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
-				renderer.Draw(gp, *basicShader);
+				renderer.DrawBillboard(gp, *billboardShader);
 			}
 		}
 
