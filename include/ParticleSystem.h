@@ -115,6 +115,7 @@ public:
 	int fps;
 	double deltaTime;
 	int mouseGravity = 0;
+	float mouseGravityScale = 1.0f;
 	std::vector<cl_float4> gravityPoints;
 	MouseInfo mouseInfo;
 	glm::vec3 rotation = glm::vec3(0.0);

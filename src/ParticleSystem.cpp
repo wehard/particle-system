@@ -295,7 +295,7 @@ void ParticleSystem::Run()
 		if (mouseGravity)
 		{
 			gp.position = mouseInfo.world;
-			renderer.DrawBillboard(gp, 0.05, *billboardShader);
+			renderer.DrawBillboard(gp, 0.05 + (mouseGravityScale * 0.001), *billboardShader);
 		}
 
 		pAxis.rotation = rotation;
