@@ -60,6 +60,7 @@ ParticleSystem::~ParticleSystem()
 	delete particleShader;
 	delete basicShader;
 	delete vertexColorShader;
+	delete billboardShader;
 
 	glDeleteBuffers(1, &pBuffer.vbo);
 	glDeleteVertexArrays(1, &pBuffer.vao);
