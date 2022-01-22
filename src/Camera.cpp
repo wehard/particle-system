@@ -58,7 +58,7 @@ void Camera::Rotate(float xoffset, float yoffset, bool constrainPitch)
 	yoffset *= mouseSensitivity;
 
 	yaw += xoffset;
-	pitch += yoffset;
+	pitch -= yoffset;
 
 	if (constrainPitch)
 	{

@@ -55,22 +55,22 @@ static void glfwKeyCallback(GLFWwindow *window, int key, int scancode, int actio
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
-	if (key == GLFW_KEY_W)
-	{
-		ps->camera.Move(FORWARD, ps->deltaTime);
-	}
-	if (key == GLFW_KEY_S)
-	{
-		ps->camera.Move(BACKWARD, ps->deltaTime);
-	}
-	if (key == GLFW_KEY_A)
-	{
-		ps->camera.Move(LEFT, ps->deltaTime);
-	}
-	if (key == GLFW_KEY_D)
-	{
-		ps->camera.Move(RIGHT, ps->deltaTime);
-	}
+	// if (key == GLFW_KEY_W)
+	// {
+	// 	ps->camera.Move(FORWARD, ps->deltaTime);
+	// }
+	// if (key == GLFW_KEY_S)
+	// {
+	// 	ps->camera.Move(BACKWARD, ps->deltaTime);
+	// }
+	// if (key == GLFW_KEY_A)
+	// {
+	// 	ps->camera.Move(LEFT, ps->deltaTime);
+	// }
+	// if (key == GLFW_KEY_D)
+	// {
+	// 	ps->camera.Move(RIGHT, ps->deltaTime);
+	// }
 }
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)

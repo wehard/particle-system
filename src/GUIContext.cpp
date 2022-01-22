@@ -36,7 +36,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("World x %f, y %f, z %f", ps.mouseInfo.world.x, ps.mouseInfo.world.y, ps.mouseInfo.world.z);
 	ImGui::Checkbox("Gravity", (bool*)&ps.mouseGravity);
 	ImGui::SameLine();
-	ImGui::SliderFloat("Mass", &ps.mouseGravityScale, 1.0, 1000.0, "%.2f", ImGuiSliderFlags_None);
+	ImGui::SliderFloat("Mass", &ps.mouseGravityScale, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
 	if (ImGui::Button("Reset", ImVec2(50, 20)))

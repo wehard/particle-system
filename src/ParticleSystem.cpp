@@ -185,8 +185,10 @@ void ParticleSystem::UpdateParticles(float deltaTime)
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(int), &mouseGravity}};
-	kernel->SetArgs(args, 6);
+		{sizeof(int), &mouseGravity},
+		{sizeof(float), &mouseGravityScale}
+		};
+	kernel->SetArgs(args, 7);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	cl.AquireGLObject(gpBuffer.clmem);
@@ -254,6 +256,23 @@ void ParticleSystem::Run()
 		{
 			fps = frameCount / lastUpdateFpsTime;
 			lastUpdateFpsTime = currentTime;
+		}
+
+		if (glfwGetKey(gl.window, GLFW_KEY_W))
+		{
+			camera.Move(FORWARD, deltaTime);
+		}
+		if (glfwGetKey(gl.window, GLFW_KEY_S))
+		{
+			camera.Move(BACKWARD, deltaTime);
+		}
+		if (glfwGetKey(gl.window, GLFW_KEY_A))
+		{
+			camera.Move(LEFT, deltaTime);
+		}
+		if (glfwGetKey(gl.window, GLFW_KEY_D))
+		{
+			camera.Move(RIGHT, deltaTime);
 		}
 
 		if (useEmitter)
