@@ -9,6 +9,7 @@ uniform mat4 view_matrix;
 uniform mat4 proj_matrix;
 
 uniform vec4 obj_color;
+uniform float b_scale;
 
 out vec4 f_col;
 out vec3 f_normal;
@@ -16,22 +17,9 @@ out vec4 o_col;
 
 void main()
 {
-	mat4 model = model_matrix;
-
-	model[0][0] = 1.0;
-	model[0][1] = 0.0;
-	model[0][2] = 0.0;
-
-	model[1][0] = 0.0;
-	model[1][1] = 1.0;
-	model[1][2] = 0.0;
-
-	model[2][0] = 0.0;
-	model[2][1] = 0.0;
-	model[2][2] = 1.0;
-
 	o_col = v_col;
 	f_col = v_col;
 	f_normal = v_normal;
-	gl_Position = proj_matrix * view_matrix * model_matrix * vec4(v_pos, 1.0);
+	mat4 model_view = view_matrix * model_matrix;
+	gl_Position = proj_matrix * (model_view * vec4(0.0, 0.0, 0.0, 1.0) + vec4(v_pos.x * b_scale, v_pos.y * b_scale, 0.0, 0.0));
 }

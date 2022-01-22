@@ -288,14 +288,14 @@ void ParticleSystem::Run()
 			for (auto a : gravityPoints)
 			{
 				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
-				renderer.DrawBillboard(gp, *billboardShader);
+				renderer.DrawBillboard(gp, 0.05, *billboardShader);
 			}
 		}
 
 		if (mouseGravity)
 		{
 			gp.position = mouseInfo.world;
-			renderer.Draw(gp, *basicShader);
+			renderer.DrawBillboard(gp, 0.05, *billboardShader);
 		}
 
 		pAxis.rotation = rotation;
@@ -305,7 +305,7 @@ void ParticleSystem::Run()
 		if (useEmitter)
 		{
 			eStar.position = emitter.position;
-			renderer.Draw(eStar, *basicShader);
+			renderer.DrawBillboard(eStar, 0.05, *billboardShader);
 		}
 
 		gui.Render();

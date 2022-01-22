@@ -14,6 +14,6 @@ public:
 	void Begin(Camera &camera);
 	void Draw(GLObject &object);
 	void Draw(GLObject &object, Shader &shader);
-	void DrawBillboard(GLObject &object, Shader &shader);
+	void DrawBillboard(GLObject &object, float scale, Shader &shader);
 	void DrawLines(GLObject &object, Shader &shader);
 };
