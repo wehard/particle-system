@@ -119,3 +119,39 @@ GLObject GLObject::Axis()
 	axis.color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 	return axis;
 }
+
+GLObject GLObject::Grid(int xs, int ys)
+{
+	std::vector<float> vertices;
+
+	float xi = 1.0 / (float)xs;
+	float yi = 1.0 / (float)ys;
+
+	for (size_t x = 0; x <= xs; x++)
+	{
+		float cx = x * xi;
+		vertices.push_back(cx - 0.5);
+		vertices.push_back(-0.5);
+		vertices.push_back(0.0);
+
+		vertices.push_back(cx - 0.5);
+		vertices.push_back(0.5);
+		vertices.push_back(0.0);
+	}
+	for (size_t y = 0; y <= ys; y++)
+	{
+		float cy = y * yi;
+		vertices.push_back(-0.5);
+		vertices.push_back(cy - 0.5);
+		vertices.push_back(0.0);
+
+		vertices.push_back(0.5);
+		vertices.push_back(cy - 0.5);
+		vertices.push_back(0.0);
+	}
+
+	auto grid = GLObject(vertices);
+	grid.color = glm::vec4(1.0, 1.0, 1.0, 0.3);
+
+	return grid;
+}

@@ -245,6 +245,21 @@ void ParticleSystem::Run()
 	auto eStar = GLObject::Star();
 	eStar.scale = glm::vec3(0.05);
 
+	auto grid = GLObject::Grid(20, 20);
+	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
+	// grid.color = glm::vec4(0.0, 0.0, 1.0, 1.0);
+
+	auto grid2 = GLObject::Grid(20, 20);
+	grid2.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
+	grid2.rotation = glm::vec3(90.0, 0.0, 0.0);
+	grid2.color = glm::vec4(0.0, 1.0, 0.0, 1.0);
+
+	auto grid3 = GLObject::Grid(20, 20);
+	grid3.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
+	grid3.rotation = glm::vec3(0.0, 90.0, 0.0);
+	grid3.color = glm::vec4(1.0, 0.0, 0.0, 1.0);
+
+
 	glfwSetWindowUserPointer(gl.window, this);
 
 	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
@@ -326,6 +341,17 @@ void ParticleSystem::Run()
 			eStar.position = emitter.position;
 			renderer.DrawBillboard(eStar, 0.05, *billboardShader);
 		}
+
+		basicShader->use();
+		basicShader->setVec4("obj_color", grid.color);
+		renderer.DrawLines(grid, *basicShader);
+		// basicShader->setVec4("obj_color", grid2.color);
+		// renderer.DrawLines(grid2, *basicShader);
+		// basicShader->setVec4("obj_color", grid3.color);
+		// renderer.DrawLines(grid3, *basicShader);
+
+		// basicShader->use();
+		// basicShader->setVec4("obj_color", grid.color);
 
 		gui.Render();
 
