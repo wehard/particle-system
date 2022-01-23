@@ -139,6 +139,10 @@ public:
 	void UpdateParticles(float deltaTime);
 	void UpdateParticlesEmitter(float deltaTime);
 	void UpdateGpBuffer();
+
+	void Update();
+	void Render();
+	
 	void Reset();
 	void AddGravityPoint();
 

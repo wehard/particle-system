@@ -36,21 +36,17 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 {
-	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
+	clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
+
 	basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
 	vertexColorShader = new Shader("res/shaders/vertex_color.vert", "res/shaders/vertex_color.frag");
 	billboardShader = new Shader("res/shaders/billboard.vert", "res/shaders/billboard.frag");
-
-	particleShader->setVec2("m_pos", glm::vec2(0.0, 0.0));
-
-	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
-	// camera.position = glm::vec3(0.0, 0.0, 1.0);
-
-	clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
+	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
 
+	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
 	CreateParticleBuffer();
 	CreateGravityPointBuffer();
 }
@@ -73,6 +69,8 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::CreateParticleBuffer()
 {
+	cl_int result = CL_SUCCESS;
+
 	glGenVertexArrays(1, &pBuffer.vao);
 	glBindVertexArray(pBuffer.vao);
 	glGenBuffers(1, &pBuffer.vbo);
@@ -85,13 +83,14 @@ void ParticleSystem::CreateParticleBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	cl_int result = CL_SUCCESS;
 	pBuffer.clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, pBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createParticleBuffer");
 }
 
 void ParticleSystem::CreateGravityPointBuffer()
 {
+	cl_int result = CL_SUCCESS;
+	
 	glGenVertexArrays(1, &gpBuffer.vao);
 	glBindVertexArray(gpBuffer.vao);
 	glGenBuffers(1, &gpBuffer.vbo);
@@ -102,7 +101,6 @@ void ParticleSystem::CreateGravityPointBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	cl_int result = CL_SUCCESS;
 	gpBuffer.clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
 }
@@ -247,18 +245,6 @@ void ParticleSystem::Run()
 
 	auto grid = GLObject::Grid(20, 20);
 	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
-	// grid.color = glm::vec4(0.0, 0.0, 1.0, 1.0);
-
-	auto grid2 = GLObject::Grid(20, 20);
-	grid2.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
-	grid2.rotation = glm::vec3(90.0, 0.0, 0.0);
-	grid2.color = glm::vec4(0.0, 1.0, 0.0, 1.0);
-
-	auto grid3 = GLObject::Grid(20, 20);
-	grid3.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
-	grid3.rotation = glm::vec3(0.0, 90.0, 0.0);
-	grid3.color = glm::vec4(1.0, 0.0, 0.0, 1.0);
-
 
 	glfwSetWindowUserPointer(gl.window, this);
 
@@ -345,13 +331,6 @@ void ParticleSystem::Run()
 		basicShader->use();
 		basicShader->setVec4("obj_color", grid.color);
 		renderer.DrawLines(grid, *basicShader);
-		// basicShader->setVec4("obj_color", grid2.color);
-		// renderer.DrawLines(grid2, *basicShader);
-		// basicShader->setVec4("obj_color", grid3.color);
-		// renderer.DrawLines(grid3, *basicShader);
-
-		// basicShader->use();
-		// basicShader->setVec4("obj_color", grid.color);
 
 		gui.Render();
 
