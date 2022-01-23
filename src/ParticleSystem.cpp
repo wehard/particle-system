@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <random>
+
 #include "Shader.h"
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
@@ -49,6 +51,27 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
 	CreateParticleBuffer();
 	CreateGravityPointBuffer();
+	CreateSeedBuffer();	
+}
+
+void ParticleSystem::CreateSeedBuffer()
+{
+	cl_int result = CL_SUCCESS;
+
+
+	std::default_random_engine generator;
+	std::uniform_int_distribution<u_long> distribution(0, ULONG_MAX);
+
+	u_long *hostseed = (u_long*)malloc(sizeof(u_long) * numParticles);
+	for (size_t i = 0; i < numParticles; i++)
+	{
+		hostseed[i] = distribution(generator);
+	}
+	
+	seedBuffer.clmem = clCreateBuffer(cl.ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, numParticles * 8, hostseed, &result);
+	free(hostseed);
+
+	CLContext::CheckCLResult(result, "CreateSeedBuffer::clCreateBuffer");
 }
 
 ParticleSystem::~ParticleSystem()
@@ -65,6 +88,7 @@ ParticleSystem::~ParticleSystem()
 
 	CLContext::CheckCLResult(clReleaseMemObject(pBuffer.clmem), "clReleaseMemObject::pBuffer");
 	CLContext::CheckCLResult(clReleaseMemObject(gpBuffer.clmem), "clReleaseMemObject::gpBuffer");
+	CLContext::CheckCLResult(clReleaseMemObject(seedBuffer.clmem), "clReleaseMemObject::seedBuffer");
 }
 
 void ParticleSystem::CreateParticleBuffer()
@@ -125,9 +149,10 @@ void ParticleSystem::InitParticles(t_init_shape shape)
 	auto k = clProgram->GetKernel("init_particles");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(GLint), &numParticles},
 		{sizeof(t_init_shape), &shape}};
-	k->SetArgs(args, 3);
+	k->SetArgs(args, 4);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	k->Enqueue(cl.queue, numParticles);

@@ -100,6 +100,11 @@ struct GLBuffer
 	cl_mem clmem;
 };
 
+struct CLBuffer
+{
+	cl_mem clmem;
+};
+
 class ParticleSystem
 {
 private:
@@ -110,6 +115,7 @@ private:
 	Shader *billboardShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
+	void CreateSeedBuffer();
 	double lastTime = 0.0;
 public:
 	int fps;
@@ -126,6 +132,7 @@ public:
 	float particleSize = 1.0f;
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
+	CLBuffer seedBuffer;
 	bool renderGravityPoints = true;
 	bool useEmitter = false;
 	glm::vec4 minColor;
@@ -142,7 +149,7 @@ public:
 
 	void Update();
 	void Render();
-	
+
 	void Reset();
 	void AddGravityPoint();
 

@@ -67,29 +67,16 @@ float	random(int n)
 	return ((float)(uint)(seed >> 16) / 4294967296.0);
 }
 
-
-
-
-static void init_cube(__global t_particle * ps, int num_particles)
+static void init_cube(__global t_particle * ps, __global ulong *sb, int num_particles)
 {
 	int				i = get_global_id(0);
 
-	uint	cube_root = cbrt((float)num_particles);
-
-	uint	x = fmod((float)i, (float)cube_root);
-	uint	y = fmod((float)i / cube_root, (float)cube_root);
-	uint	z = i / (cube_root * cube_root);
-
-	float	sub_div = CUBE_SIZE / cube_root;
-	float	sub_div_half = sub_div / 2.0f;
-
 	ps[i].pos = (float4)(
-		random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0 - 0.5,
-		random(((i * 124322) >> 2) ^ i) * (float)M_PI / 3.0 - 0.5,
-		random(((i * 124322) >> 1) ^ i) * (float)M_PI / 3.0 - 0.5,
+		rand_float_in_range(sb, -0.5, 0.5),
+		rand_float_in_range(sb, -0.5, 0.5),
+		rand_float_in_range(sb, -0.5, 0.5),
 		1.0f
 	);
-
 
 	ps[i].vel = (float4)(
 		0.0f,
@@ -99,7 +86,7 @@ static void init_cube(__global t_particle * ps, int num_particles)
 	);
 };
 
-static void init_sphere(__global t_particle * ps, int num_particles)
+static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_particles)
 {
 	int i = get_global_id(0);
 
@@ -112,9 +99,7 @@ static void init_sphere(__global t_particle * ps, int num_particles)
 	float phi = 2.0 * M_PI_F * lon / subd;
 	float theta = M_PI_F * lat / subd;
 
-	float radius = random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0;
-
-	radius /= 2.0;
+	float radius = rand_float_in_range(sb, 0.0, 0.5);
 
 	ps[i].pos = (float4)(
 		radius * sin(theta) * cos(phi),
@@ -131,26 +116,16 @@ static void init_sphere(__global t_particle * ps, int num_particles)
 	);
 };
 
-static void init_rect(__global t_particle * ps, int num_particles)
+static void init_rect(__global t_particle * ps, __global ulong *sb, int num_particles)
 {
 	int i = get_global_id(0);
 
-	float fgi = (float)(i) / num_particles;
-
 	ps[i].pos = (float4)(
-		random(((i * 124322) >> 3) ^ i) * (float)M_PI / 3.0 - 0.5,
-		random(((i * 124322) >> 2) ^ i) * (float)M_PI / 3.0 - 0.5,
+		rand_float_in_range(sb, -0.5, 0.5),
+		rand_float_in_range(sb, -0.5, 0.5),
 		0.0f,
 		1.0f
 	);
-
-	float3 rand_vel = (float3)(
-		noise3D(fgi, 0.0f, i * 0.12230f) * 2.0f - 1.0f,
-		noise3D(fgi, i, 0.134660f) * 2.0f - 1.0f,
-		noise3D(fgi, i, 0.134660f) * 2.0f - 1.0f
-	);
-
-	rand_vel = normalize(rand_vel);
 
 	ps[i].vel = (float4)(
 		0.0,
@@ -181,18 +156,19 @@ static void init_sine(__global t_particle * ps, int num_particles)
 	);
 };
 
-__kernel void init_particles(__global t_particle * ps, int num_particles, t_init_shape shape)
+__kernel void init_particles(__global t_particle * ps, __global ulong *sb, int num_particles, t_init_shape shape)
 {
+	int i = get_global_id(0);
 	switch (shape)
 	{
 		case CUBE:
-			init_cube(ps, num_particles);
+			init_cube(ps, &sb[i], num_particles);
 			break;
 		case SPHERE:
-			init_sphere(ps, num_particles);
+			init_sphere(ps, &sb[i], num_particles);
 			break;
 		case RECT:
-			init_rect(ps, num_particles);
+			init_rect(ps, &sb[i], num_particles);
 			break;
 		case SINE:
 			init_sine(ps, num_particles);
