@@ -264,7 +264,6 @@ void ParticleSystem::Run()
 	gp.scale = glm::vec3(0.05);
 
 	auto wAxis = GLObject::Axis();
-	auto pAxis = GLObject::Axis();
 
 	auto eStar = GLObject::Star();
 	eStar.scale = glm::vec3(0.05);
@@ -322,7 +321,7 @@ void ParticleSystem::Run()
 		particleShader->setVec4("max_color", maxColor);
 		particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
 		particleShader->setMat4("view_matrix", camera.getViewMatrix());
-		particleShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), rotation, glm::vec3(1.0)));
+		particleShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0), glm::vec3(1.0)));
 
 		glPointSize(particleSize);
 		glBindVertexArray(pBuffer.vao);
@@ -344,8 +343,6 @@ void ParticleSystem::Run()
 			renderer.DrawBillboard(gp, 0.05 + (mouseGravityScale * 0.001), *billboardShader);
 		}
 
-		pAxis.rotation = rotation;
-		renderer.DrawLines(pAxis, *vertexColorShader);
 		renderer.DrawLines(wAxis, *vertexColorShader);
 
 		if (useEmitter)

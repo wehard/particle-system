@@ -39,13 +39,6 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::SliderFloat("Mass", &ps.mouseGravityScale, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
-	if (ImGui::Button("Reset", ImVec2(50, 20)))
-		ps.rotation = glm::vec3(0.0);
-	float v[3] = {ps.rotation.x, ps.rotation.y, ps.rotation.z};
-	if (ImGui::DragFloat3("Rotation", v, 0.5, -360.0, 360.0, "%.2f", ImGuiSliderFlags_None))
-	{
-		ps.rotation = glm::vec3(v[0], v[1], v[2]);
-	}
 	ImGui::ColorEdit4("Min color", &ps.minColor.x);
 	ImGui::ColorEdit4("Max color", &ps.maxColor.x);
 	ImGui::Separator();
