@@ -77,43 +77,35 @@ static void init_cube(__global t_particle * ps, __global ulong *sb, int num_part
 		rand_float_in_range(sb, -0.5, 0.5),
 		1.0f
 	);
-
-	ps[i].vel = (float4)(
-		0.0f,
-		0.0f,
-		0.0f,
-		1.0f
-	);
 };
+
+static float4 random_point_inside_unit_sphere(__global ulong *sb)
+{
+	float u = rand_float_in_range(sb, 0.0, 1.0);
+	float v = rand_float_in_range(sb, 0.0, 1.0);
+
+	float theta = u * 2.0 * M_PI;
+	float phi = acos(2.0 * v - 1.0);
+	float r = cbrt(rand_float_in_range(sb, 0.0, 1.0));
+	float sinTheta = sin(theta);
+	float cosTheta = cos(theta);
+	float sinPhi = sin(phi);
+	float cosPhi = cos(phi);
+
+
+	float4 p = (float4)(
+		r * sinPhi * cosTheta * 0.5,
+		r * sinPhi * sinTheta * 0.5,
+		r * cosPhi * 0.5,
+		1.0
+	);
+	return p;
+}
 
 static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_particles)
 {
 	int i = get_global_id(0);
-
-	int subd = 360;
-
-	int lon = i / subd;
-	int lat = i % subd;
-
-	float sign = -2.0f * (lon % 2) + 1.0f;
-	float phi = 2.0 * M_PI_F * lon / subd;
-	float theta = M_PI_F * lat / subd;
-
-	float radius = rand_float_in_range(sb, 0.0, 0.5);
-
-	ps[i].pos = (float4)(
-		radius * sin(theta) * cos(phi),
-		radius * sign * cos(theta),
-		radius * sin(theta) * sin(phi),
-		1.0f
-	);
-
-	ps[i].vel = (float4)(
-		0.0f,
-		0.0f,
-		0.0f,
-		1.0f
-	);
+	ps[i].pos = random_point_inside_unit_sphere(sb);
 };
 
 static void init_rect(__global t_particle * ps, __global ulong *sb, int num_particles)
@@ -126,15 +118,6 @@ static void init_rect(__global t_particle * ps, __global ulong *sb, int num_part
 		0.0f,
 		1.0f
 	);
-
-	ps[i].vel = (float4)(
-		0.0,
-		0.0,
-		0.0,
-		1.0f
-	);
-
-	ps[i].life = 0.1f * i;
 };
 
 static void init_sine(__global t_particle * ps, int num_particles)
@@ -144,13 +127,6 @@ static void init_sine(__global t_particle * ps, int num_particles)
 	ps[i].pos = (float4)(
 		(i / (float)num_particles) * 2.0 - 1.0,
 		sin(2.0 * M_PI * i / num_particles),
-		0.0f,
-		1.0f
-	);
-
-	ps[i].vel = (float4)(
-		0.0f,
-		0.0f,
 		0.0f,
 		1.0f
 	);
@@ -176,14 +152,26 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 		default:
 			break;
 	}
+
+	float init_mag = 1000.0;
+	float4 init_vel = (float4)(
+		rand_float_in_range(sb, -1.0, 1.0),
+		rand_float_in_range(sb, -1.0, 1.0),
+		rand_float_in_range(sb, -1.0, 1.0),
+		1.0f
+	);
+
+	ps[i].vel = normalize(init_vel) * init_mag;
+	ps[i].life = 0.1f * i;
+
 }
 
-__kernel void init_particles_emitter(__global t_particle *ps, int num_particles, t_emitter e)
+__kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb, int num_particles, t_emitter e)
 {
 	int i = get_global_id(0);
 
 	ps[i].pos = e.pos;
-	ps[i].vel = e.dir * e.vel;
+	ps[i].vel = random_point_inside_unit_sphere(sb) * e.vel;
 	ps[i].life = 0.001f * i;
 }
 

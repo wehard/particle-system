@@ -169,9 +169,10 @@ void ParticleSystem::InitParticlesEmitter()
 	auto kernel = clProgram->GetKernel("init_particles_emitter");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
+		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(GLint), &numParticles},
 		{sizeof(t_emitter), &e}};
-	kernel->SetArgs(args, 3);
+	kernel->SetArgs(args, 4);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	kernel->Enqueue(cl.queue, numParticles);
