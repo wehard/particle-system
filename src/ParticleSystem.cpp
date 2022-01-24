@@ -239,8 +239,9 @@ void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
 		{sizeof(int), &mouseGravity},
+		{sizeof(float), &mouseGravityScale},
 		{sizeof(t_emitter), &e}};
-	kernel->SetArgs(args, 8);
+	kernel->SetArgs(args, 9);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	cl.AquireGLObject(gpBuffer.clmem);

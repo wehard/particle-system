@@ -37,7 +37,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::SliderFloat("Mass", &ps.mouseGravityScale, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
-	ImGui::Text("Particle Settings", ps.numParticles);
+	ImGui::Text("Particle Settings");
 	ImGui::Text("Count %zu", ps.numParticles);
 	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::ColorEdit3("Background color", &ps.gl.clearColor.r);
@@ -67,18 +67,23 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
-		ImGui::DragFloat("Rate", &ps.emitter.rate);
-		ImGui::DragFloat("Life", &ps.emitter.life);
-		ImGui::DragFloat("Speed", &ps.emitter.velocity);
+		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 10000))
+			ps.InitParticlesEmitter();
+		if (ImGui::SliderFloat("Life", &ps.emitter.life, 0.1, 20.0, "%.2f", ImGuiSliderFlags_None))
+			ps.InitParticlesEmitter();
+		if (ImGui::SliderFloat("Speed", &ps.emitter.velocity, 5000, 20000, "%f", ImGuiSliderFlags_None))
+			ps.InitParticlesEmitter();
 		float v[3] = {ps.emitter.position.x, ps.emitter.position.y, ps.emitter.position.z};
 		if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
 		{
 			ps.emitter.position = glm::vec3(v[0], v[1], v[2]);
+			ps.InitParticlesEmitter();
 		}
 		float v2[3] = {ps.emitter.direction.x, ps.emitter.direction.y, ps.emitter.direction.z};
 		if (ImGui::DragFloat3("Direction", v2, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
 		{
 			ps.emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
+			ps.InitParticlesEmitter();
 		}
 	}
 	ImGui::Separator();

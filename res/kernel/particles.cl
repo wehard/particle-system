@@ -129,29 +129,34 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 	}
 
 	float init_mag = 1000.0;
-	float4 init_vel = normalize(random_point_inside_unit_sphere(sb)) * init_mag;
+	float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i])) * init_mag;
 
 	ps[i].vel = init_vel;
-	ps[i].life = 0.0f;
+	ps[i].life = 0.0;
 
+}
+
+static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitter e)
+{
+	int i = get_global_id(0);
+
+	float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i]) * i) * e.vel;
+
+	ps[i].pos = e.pos;
+	ps[i].vel = init_vel;
+	ps[i].life = -(float)i * (1.0 / e.rate);
 }
 
 __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb, int num_particles, t_emitter e)
 {
-	int i = get_global_id(0);
+	// ps[i].pos = e.pos;
 
-	ps[i].pos = e.pos;
+	// float init_mag = 1000.0;
+	// float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i]) * i) * init_mag;
 
-	float init_mag = 1000.0;
-	float4 init_vel = normalize(random_point_inside_unit_sphere(sb)) * init_mag;
-
-	ps[i].vel = init_vel;
-	ps[i].life = 5.0f;
-}
-
-static void emit_particle(__global t_particle *ps, __global ulong *sb, int num_particles, t_emitter e)
-{
-
+	// ps[i].vel = init_vel;
+	// ps[i].life = -(float)i * (1.0 / e.rate);
+	reset_particle(ps, sb, e);
 }
 
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
@@ -189,14 +194,22 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
 
-__kernel void update_particles_emitter(__global t_particle *ps,  __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, t_emitter e)
+__kernel void update_particles_emitter(__global t_particle *ps,  __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, float mgs, t_emitter e)
 {
 	int i = get_global_id(0);
 	
 	__global t_particle *p = ps + i;
 
-	if (ps[i].life <= 0.0)
+	if (ps[i].life < 0.0)
 	{
+		ps[i].life += dt;
+		return;
+	}
+
+	if (ps[i].life >= e.life)
+	{
+		// ps[i].pos.xyz = (float3)(1.0, 1.0, 0.0); 
+		reset_particle(ps, sb, e);
 		return;
 	}
 
@@ -204,7 +217,7 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 
 	if (mg == 1)
 	{
-		vel += velocity_from_gravity_point(p, (__global float4*)&m);
+		vel += velocity_from_gravity_point(p, (__global float4*)&m) * mgs;
 	}
 
 	for (int j = 0; j < num_gp; j++)
@@ -213,7 +226,7 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 		vel += velocity_from_gravity_point(p, g);
 	}
 
-	ps[i].life -= dt;
+	ps[i].life += dt;
 	ps[i].vel.xyz += vel;
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
