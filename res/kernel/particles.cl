@@ -1,6 +1,3 @@
-#define CUBE_SIZE 1.0
-#define SPHERE_RADIUS 0.5
-
 typedef struct
 {
 	float4 pos;
@@ -25,14 +22,6 @@ typedef enum e_init_shape
 	SINE
 } t_init_shape;
 
-static float noise3D(float x, float y, float z) {
-	float ptr = 0.0f;
-	return fract(sin(x*112.9898f + y*179.233f + z*237.212f) * 43758.5453f, &ptr);
-}
-
-/*
-	Return a random unsigned long
-*/
 static ulong rand_ulong(__global ulong* seed)
 {
 	ulong value = *seed * 1103515245 + 12345;
@@ -41,30 +30,16 @@ static ulong rand_ulong(__global ulong* seed)
 	return value;
 }
 
-/*
-	Return a random float in range [0, 1]
-*/
 static float rand_float(__global ulong* seed)
 {
 	return (float)rand_ulong(seed) / ULONG_MAX;
 }
 
-/*
-	Return a random float in range [a, b]
-*/
 static float rand_float_in_range(global ulong* seed, float a, float b)
 {
 	float	x = rand_float(seed);
 
 	return (b - a) * x + a;
-}
-
-float	random(int n)
-{
-	ulong	seed;
-
-	seed = (n * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
-	return ((float)(uint)(seed >> 16) / 4294967296.0);
 }
 
 static void init_cube(__global t_particle * ps, __global ulong *sb, int num_particles)
@@ -154,15 +129,10 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 	}
 
 	float init_mag = 1000.0;
-	float4 init_vel = (float4)(
-		rand_float_in_range(sb, -1.0, 1.0),
-		rand_float_in_range(sb, -1.0, 1.0),
-		rand_float_in_range(sb, -1.0, 1.0),
-		1.0f
-	);
+	float4 init_vel = normalize(random_point_inside_unit_sphere(sb)) * init_mag;
 
-	ps[i].vel = normalize(init_vel) * init_mag;
-	ps[i].life = 0.1f * i;
+	ps[i].vel = init_vel;
+	ps[i].life = 0.0f;
 
 }
 
@@ -171,19 +141,17 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 	int i = get_global_id(0);
 
 	ps[i].pos = e.pos;
-	ps[i].vel = random_point_inside_unit_sphere(sb) * e.vel;
-	ps[i].life = (1.0 / e.rate) * i;
+
+	float init_mag = 1000.0;
+	float4 init_vel = normalize(random_point_inside_unit_sphere(sb)) * init_mag;
+
+	ps[i].vel = init_vel;
+	ps[i].life = 5.0f;
 }
 
-float3 lerp(float3 v1, float3 v2, float amount)
+static void emit_particle(__global t_particle *ps, __global ulong *sb, int num_particles, t_emitter e)
 {
-	float3 v;
 
-	v.x = v1.x + (v2.x - v1.x) * amount;
-	v.y = v1.y + (v2.y - v1.y) * amount;
-	v.z = v1.z + (v2.z - v1.z) * amount;
-
-	return v;
 }
 
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
@@ -221,16 +189,16 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
 
-static void reset_particle_emitter()
-{
-
-}
-
 __kernel void update_particles_emitter(__global t_particle *ps,  __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, t_emitter e)
 {
 	int i = get_global_id(0);
 	
 	__global t_particle *p = ps + i;
+
+	if (ps[i].life <= 0.0)
+	{
+		return;
+	}
 
 	float3 vel = (float3)(0.0);
 
@@ -246,14 +214,6 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 	}
 
 	ps[i].life -= dt;
-	if (ps[i].life <= 0.0)
-	{
-		ps[i].pos = e.pos;
-		ps[i].vel = random_point_inside_unit_sphere(sb) * e.vel;
-		ps[i].life = e.life;
-		return;
-	}
-
 	ps[i].vel.xyz += vel;
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
