@@ -337,32 +337,35 @@ void ParticleSystem::Run()
 		glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
 		glDrawArrays(GL_POINTS, 0, numParticles);
 
-		if (renderGravityPoints && gravityPoints.size() > 0)
+		if (showOverlays)
 		{
-			for (auto a : gravityPoints)
+			if (gravityPoints.size() > 0)
 			{
-				gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
-				renderer.DrawBillboard(gp, 0.05, *billboardShader);
+				for (auto a : gravityPoints)
+				{
+					gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
+					renderer.DrawBillboard(gp, 0.05, *billboardShader);
+				}
 			}
+
+			if (mouseGravity)
+			{
+				gp.position = mouseInfo.world;
+				renderer.DrawBillboard(gp, 0.05 + (mouseGravityScale * 0.001), *billboardShader);
+			}
+
+			renderer.DrawLines(wAxis, *vertexColorShader);
+
+			if (useEmitter)
+			{
+				eStar.position = emitter.position;
+				renderer.DrawBillboard(eStar, 0.05, *billboardShader);
+			}
+
+			basicShader->use();
+			basicShader->setVec4("obj_color", grid.color);
+			renderer.DrawLines(grid, *basicShader);
 		}
-
-		if (mouseGravity)
-		{
-			gp.position = mouseInfo.world;
-			renderer.DrawBillboard(gp, 0.05 + (mouseGravityScale * 0.001), *billboardShader);
-		}
-
-		renderer.DrawLines(wAxis, *vertexColorShader);
-
-		if (useEmitter)
-		{
-			eStar.position = emitter.position;
-			renderer.DrawBillboard(eStar, 0.05, *billboardShader);
-		}
-
-		basicShader->use();
-		basicShader->setVec4("obj_color", grid.color);
-		renderer.DrawLines(grid, *basicShader);
 
 		gui.Render();
 

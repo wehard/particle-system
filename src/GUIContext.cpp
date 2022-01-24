@@ -21,6 +21,7 @@ void GUIContext::Update(ParticleSystem &ps)
 
 	ImGui::Begin("particle-system");
 	ImGui::Text("FPS %d", ps.fps);
+	ImGui::Checkbox("Show Overlays", &ps.showOverlays);
 	ImGui::Separator();
 
 	ImGui::Text("Camera");
@@ -90,7 +91,6 @@ void GUIContext::Update(ParticleSystem &ps)
 	}
 	ImGui::Separator();
 	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
-	ImGui::Checkbox("Show", &ps.renderGravityPoints);
 	if (ImGui::Button("Clear", ImVec2(50, 20)))
 		ps.gravityPoints.clear();
 

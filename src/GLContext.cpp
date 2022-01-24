@@ -21,8 +21,6 @@ static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double y
 {
 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
 	ps->camera.position.z += yoffset * 0.1f;
-	printf("scroll x %f, y %f ", xoffset, yoffset);
-	printf("camera z %f\n", ps->camera.position.z);
 }
 
 static void glfwMouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -54,23 +52,10 @@ static void glfwKeyCallback(GLFWwindow *window, int key, int scancode, int actio
 		else
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
-
-	// if (key == GLFW_KEY_W)
-	// {
-	// 	ps->camera.Move(FORWARD, ps->deltaTime);
-	// }
-	// if (key == GLFW_KEY_S)
-	// {
-	// 	ps->camera.Move(BACKWARD, ps->deltaTime);
-	// }
-	// if (key == GLFW_KEY_A)
-	// {
-	// 	ps->camera.Move(LEFT, ps->deltaTime);
-	// }
-	// if (key == GLFW_KEY_D)
-	// {
-	// 	ps->camera.Move(RIGHT, ps->deltaTime);
-	// }
+	if (key == GLFW_KEY_G && action == GLFW_PRESS)
+	{
+		ps->mouseGravity = !ps->mouseGravity;
+	}
 }
 
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)

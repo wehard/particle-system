@@ -136,7 +136,7 @@ public:
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	CLBuffer seedBuffer;
-	bool renderGravityPoints = true;
+	bool showOverlays = true;
 	bool useEmitter = false;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
