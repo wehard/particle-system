@@ -141,9 +141,13 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 	float init_mag = 1000.0;
 	float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i])) * init_mag;
 
+	if (shape == RECT)
+	{
+		init_vel.z = 0.0f;
+	}
+
 	ps[i].vel = init_vel;
 	ps[i].life = 0.0;
-
 }
 
 static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitter e)
