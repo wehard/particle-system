@@ -104,6 +104,10 @@ void ParticleSystem::CreateParticleBuffer()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(t_particle), (const GLvoid *)16);
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(t_particle), (const GLvoid *)32);
+	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -319,6 +323,7 @@ void ParticleSystem::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		particleShader->use();
+		particleShader->setFloat("max_life", emitter.life);
 		particleShader->setVec3("m_pos", mouseInfo.world);
 		particleShader->setVec4("min_color", minColor);
 		particleShader->setVec4("max_color", maxColor);

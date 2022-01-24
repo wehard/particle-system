@@ -208,7 +208,6 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 
 	if (ps[i].life >= e.life)
 	{
-		// ps[i].pos.xyz = (float3)(1.0, 1.0, 0.0); 
 		reset_particle(ps, sb, e);
 		return;
 	}
