@@ -67,6 +67,8 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
+		if (ImGui::SliderFloat("Angle", &ps.emitter.cone_angle, 0.0f, 360.0f, "%.2f", ImGuiSliderFlags_None))
+			ps.InitParticlesEmitter();
 		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 10000))
 			ps.InitParticlesEmitter();
 		if (ImGui::SliderFloat("Life", &ps.emitter.life, 0.1, 20.0, "%.2f", ImGuiSliderFlags_None))

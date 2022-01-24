@@ -45,6 +45,7 @@ typedef struct
 	cl_float vel;
 	cl_float rate;
 	cl_float life;
+	cl_float cone_angle;
 }		t_emitter;
 
 struct Emitter
@@ -54,6 +55,7 @@ struct Emitter
 	float velocity;
 	float rate;
 	float life;
+	float cone_angle;
 
 	Emitter()
 	{
@@ -62,6 +64,7 @@ struct Emitter
 		velocity = 10000.0;
 		rate = 500.0;
 		life = 5.0;
+		cone_angle = 30.0f;
 	}
 
 	t_emitter CLType()
@@ -72,6 +75,7 @@ struct Emitter
 		e.vel = velocity;
 		e.rate = rate;
 		e.life = life;
+		e.cone_angle = cone_angle;
 		return e;
 	}
 };

@@ -12,6 +12,7 @@ typedef struct
 	float vel;
 	float rate;
 	float life;
+	float cone_angle;
 }		t_emitter;
 
 typedef enum e_init_shape
@@ -67,7 +68,6 @@ static float4 random_point_inside_unit_sphere(__global ulong *sb)
 	float sinPhi = sin(phi);
 	float cosPhi = cos(phi);
 
-
 	float4 p = (float4)(
 		r * sinPhi * cosTheta * 0.5,
 		r * sinPhi * sinTheta * 0.5,
@@ -75,6 +75,16 @@ static float4 random_point_inside_unit_sphere(__global ulong *sb)
 		1.0
 	);
 	return p;
+}
+
+static float4 random_point_unit_circle(__global ulong *sb)
+{
+	float radius = 1.0f;
+	float r = radius * sqrt(rand_float_in_range(sb, 0.0, 1.0));
+	float theta = rand_float_in_range(sb, 0.0, 1.0) * 2.0 * M_PI;
+	float x = r * cos(theta);
+	float y = r * sin(theta);
+	return (float4)(x, 1.0, y, 1.0);
 }
 
 static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_particles)
@@ -140,7 +150,7 @@ static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitte
 {
 	int i = get_global_id(0);
 
-	float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i]) * i) * e.vel;
+	float4 init_vel = normalize(random_point_unit_circle(&sb[i])) * e.vel;
 
 	ps[i].pos = e.pos;
 	ps[i].vel = init_vel;
@@ -149,13 +159,6 @@ static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitte
 
 __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb, int num_particles, t_emitter e)
 {
-	// ps[i].pos = e.pos;
-
-	// float init_mag = 1000.0;
-	// float4 init_vel = normalize(random_point_inside_unit_sphere(&sb[i]) * i) * init_mag;
-
-	// ps[i].vel = init_vel;
-	// ps[i].life = -(float)i * (1.0 / e.rate);
 	reset_particle(ps, sb, e);
 }
 
