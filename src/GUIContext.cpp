@@ -97,12 +97,13 @@ void GUIContext::Update(ParticleSystem &ps)
 	for (size_t i = 0; i < ps.gravityPoints.size(); i++)
 	{
 		cl_float4 p = ps.gravityPoints[i];
-		float v[3] = {p.s[0], p.s[1], p.s[2]};
-		if (ImGui::DragFloat3(std::to_string(i).c_str(), v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		float v[4] = {p.s[0], p.s[1], p.s[2], p.s[3]};
+		if (ImGui::DragFloat4(std::to_string(i).c_str(), v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
 		{
 			ps.gravityPoints[i].s[0] = v[0];
 			ps.gravityPoints[i].s[1] = v[1];
 			ps.gravityPoints[i].s[2] = v[2];
+			ps.gravityPoints[i].s[3] = v[3];
 		}
 	}
 	

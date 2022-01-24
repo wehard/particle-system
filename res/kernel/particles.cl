@@ -194,7 +194,7 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 	for (int j = 0; j < num_gp; j++)
 	{
 		__global float4 *g = gps + j;
-		vel += velocity_from_gravity_point(p, g);
+		vel += velocity_from_gravity_point(p, g) * g->w;
 	}
 
 	ps[i].vel.xyz += vel;
@@ -229,7 +229,7 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 	for (int j = 0; j < num_gp; j++)
 	{
 		__global float4 *g = gps + j;
-		vel += velocity_from_gravity_point(p, g);
+		vel += velocity_from_gravity_point(p, g) * g->w;
 	}
 
 	ps[i].life += dt;

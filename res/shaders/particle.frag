@@ -9,8 +9,7 @@ uniform vec4 min_color;
 uniform vec4 max_color;
 uniform float max_life;
 
-#define	COLOR_MAX	vec4(1, 0, 0, 1.0)
-#define	COLOR_MIN	vec4(1.0, 1.0, 0.0, 1.0)
+#define	MAX_VEL 20000.0
 
 void main()
 {

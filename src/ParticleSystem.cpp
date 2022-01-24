@@ -141,6 +141,7 @@ void ParticleSystem::AddGravityPoint()
 		f.s[0] = this->mouseInfo.world.x;
 		f.s[1] = this->mouseInfo.world.y;
 		f.s[2] = this->mouseInfo.world.z;
+		f.s[3] = 1.0;
 		this->gravityPoints.push_back(f);
 	}
 }
