@@ -143,6 +143,7 @@ void ParticleSystem::AddGravityPoint()
 
 void ParticleSystem::InitParticles(t_init_shape shape)
 {
+	useEmitter = false;
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = cl.queue;
 
@@ -233,12 +234,13 @@ void ParticleSystem::UpdateParticlesEmitter(float deltaTime)
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(cl_mem), &gpBuffer.clmem},
+		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
 		{sizeof(int), &mouseGravity},
 		{sizeof(t_emitter), &e}};
-	kernel->SetArgs(args, 7);
+	kernel->SetArgs(args, 8);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	cl.AquireGLObject(gpBuffer.clmem);

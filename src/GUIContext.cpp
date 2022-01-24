@@ -21,15 +21,13 @@ void GUIContext::Update(ParticleSystem &ps)
 
 	ImGui::Begin("particle-system");
 	ImGui::Text("FPS %d", ps.fps);
-	ImGui::Text("Particles %zu", ps.numParticles);
-	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::Separator();
+
 	ImGui::Text("Camera");
 	ImGui::Text("Position x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
 	ImGui::Text("Yaw %f, Pitch %f", ps.camera.yaw, ps.camera.pitch);
-	ImGui::Checkbox("Movement", &ps.mouseMovement);
-	ImGui::ColorEdit4("Clear color", &ps.gl.clearColor.r);
 	ImGui::Separator();
+
 	ImGui::Text("Mouse");
 	ImGui::Text("Screen x %f, y %f, z %f", ps.mouseInfo.screen.x, ps.mouseInfo.screen.y, ps.mouseInfo.screen.z);
 	ImGui::Text("NDC x %f, y %f, z %f", ps.mouseInfo.ndc.x, ps.mouseInfo.ndc.y, ps.mouseInfo.ndc.z);
@@ -39,25 +37,30 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::SliderFloat("Mass", &ps.mouseGravityScale, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
+	ImGui::Text("Particle Settings", ps.numParticles);
+	ImGui::Text("Count %zu", ps.numParticles);
+	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+	ImGui::ColorEdit3("Background color", &ps.gl.clearColor.r);
 	ImGui::ColorEdit4("Min color", &ps.minColor.x);
 	ImGui::ColorEdit4("Max color", &ps.maxColor.x);
-	ImGui::Separator();
 	ImGui::Text("Reset");
-	if (ImGui::Button("Sphere", ImVec2(50, 20)))
+	if (ImGui::SmallButton("Sphere"))
 		ps.InitParticles(SPHERE);
 	ImGui::SameLine();
-	if (ImGui::Button("Cube", ImVec2(50, 20)))
+	if (ImGui::SmallButton("Cube"))
 		ps.InitParticles(CUBE);
 	ImGui::SameLine();
-	if (ImGui::Button("Rect", ImVec2(50, 20)))
+	if (ImGui::SmallButton("Rect"))
 		ps.InitParticles(RECT);
 	ImGui::SameLine();
-	if (ImGui::Button("Sine", ImVec2(50, 20)))
+	if (ImGui::SmallButton("Sine"))
 		ps.InitParticles(SINE);
 	ImGui::SameLine();
-	if (ImGui::Button("Emitter", ImVec2(50, 20)))
+	if (ImGui::SmallButton("Emitter"))
+	{
 		ps.InitParticlesEmitter();
-
+		ps.useEmitter = true;
+	}
 
 	ImGui::Separator();
 	ImGui::Text("Emitter");

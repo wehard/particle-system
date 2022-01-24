@@ -172,7 +172,7 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 
 	ps[i].pos = e.pos;
 	ps[i].vel = random_point_inside_unit_sphere(sb) * e.vel;
-	ps[i].life = 0.001f * i;
+	ps[i].life = (1.0 / e.rate) * i;
 }
 
 float3 lerp(float3 v1, float3 v2, float amount)
@@ -226,7 +226,7 @@ static void reset_particle_emitter()
 
 }
 
-__kernel void update_particles_emitter(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, t_emitter e)
+__kernel void update_particles_emitter(__global t_particle *ps,  __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, t_emitter e)
 {
 	int i = get_global_id(0);
 	
@@ -249,7 +249,7 @@ __kernel void update_particles_emitter(__global t_particle *ps, __global float4 
 	if (ps[i].life <= 0.0)
 	{
 		ps[i].pos = e.pos;
-		ps[i].vel = normalize(e.dir) * e.vel;
+		ps[i].vel = random_point_inside_unit_sphere(sb) * e.vel;
 		ps[i].life = e.life;
 		return;
 	}
