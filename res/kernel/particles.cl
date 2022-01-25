@@ -166,14 +166,22 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 	reset_particle(ps, sb, e);
 }
 
+#define MAX_VELOCITY 1000.0f
+
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
 {
-	const float gravity_scale = 1.0f;
+	const float gravity_scale = 0.01f;
 	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
-	float f = 9.186f * gravity_scale * (1.0f / dist * dist);
-	float3 vel = normalize(dir) * f;
+	float f = 9.186f * (1.0f / (dist * dist));
+	float3 vel = normalize(dir) * f * gravity_scale;
+
+	float vel_mag = length(vel);
+	if (vel_mag > MAX_VELOCITY)
+	{
+		vel = normalize(vel) * MAX_VELOCITY;
+	}
 
 	return vel;
 }

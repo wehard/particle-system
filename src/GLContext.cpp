@@ -20,7 +20,8 @@ static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, 
 static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-	ps->camera.position.z += yoffset * 0.1f;
+	if (ps->mouseGravity)
+		ps->mouseGravityScale += yoffset * 0.1f;
 }
 
 static void glfwMouseCallback(GLFWwindow *window, double xpos, double ypos)
