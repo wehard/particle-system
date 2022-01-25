@@ -170,18 +170,14 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
 {
-	const float gravity_scale = 0.01f;
+	const float gravity_scale = 1.0f;
 	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
-	float f = 9.186f * (1.0f / (dist * dist));
+	if (dist < 0.01f)
+		return (float3)(0.0, 0.0, 0.0);
+	float f = gp->w / (dist * dist);
 	float3 vel = normalize(dir) * f * gravity_scale;
-
-	float vel_mag = length(vel);
-	if (vel_mag > MAX_VELOCITY)
-	{
-		vel = normalize(vel) * MAX_VELOCITY;
-	}
 
 	return vel;
 }
@@ -206,6 +202,7 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 	}
 
 	ps[i].vel.xyz += vel;
+
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
 
@@ -215,15 +212,14 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 	
 	__global t_particle *p = ps + i;
 
-	if (ps[i].life < 0.0)
-	{
-		ps[i].life += dt;
-		return;
-	}
-
 	if (ps[i].life >= e.life)
 	{
 		reset_particle(ps, sb, e);
+	}
+
+	if (ps[i].life < 0.0)
+	{
+		ps[i].life += dt;
 		return;
 	}
 
@@ -240,7 +236,6 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 		vel += velocity_from_gravity_point(p, g) * g->w;
 	}
 
-	ps[i].life += dt;
 	ps[i].vel.xyz += vel;
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
