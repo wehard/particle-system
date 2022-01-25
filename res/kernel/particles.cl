@@ -182,17 +182,13 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	return vel;
 }
 
-__kernel void update_particles_gravity_points(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, float mgs)
+static float3 velocity_combined(__global t_particle *p, __global float4 *gps, int num_gp, bool use_mouse, float4 mouse_pos, float mouse_mass)
 {
-	int i = get_global_id(0);
-	
-	__global t_particle *p = ps + i;
+	float3 vel = (float3)(0.0, 0.0, 0.0);
 
-	float3 vel = (float3)(0.0);
-
-	if (mg == 1)
+	if (use_mouse)
 	{
-		vel += velocity_from_gravity_point(p, (__global float4*)&m) * mgs;
+		vel += velocity_from_gravity_point(p, (__global float4*)&mouse_pos) * mouse_mass;
 	}
 
 	for (int j = 0; j < num_gp; j++)
@@ -200,18 +196,21 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 		__global float4 *g = gps + j;
 		vel += velocity_from_gravity_point(p, g) * g->w;
 	}
-
-	ps[i].vel.xyz += vel;
-
-	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
+	return vel;
 }
 
-__kernel void update_particles_emitter(__global t_particle *ps,  __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, float mgs, t_emitter e)
+__kernel void update_particles_gravity_points(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, float mgs)
 {
 	int i = get_global_id(0);
 	
-	__global t_particle *p = ps + i;
+	ps[i].vel.xyz += velocity_combined(&ps[i], gps, num_gp, mg, m, mgs);
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
+}
 
+__kernel void update_particles_emitter(__global t_particle *ps, __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, float mgs, t_emitter e)
+{
+	int i = get_global_id(0);
+	
 	if (ps[i].life >= e.life)
 	{
 		reset_particle(ps, sb, e);
@@ -223,19 +222,7 @@ __kernel void update_particles_emitter(__global t_particle *ps,  __global float4
 		return;
 	}
 
-	float3 vel = (float3)(0.0);
-
-	if (mg == 1)
-	{
-		vel += velocity_from_gravity_point(p, (__global float4*)&m) * mgs;
-	}
-
-	for (int j = 0; j < num_gp; j++)
-	{
-		__global float4 *g = gps + j;
-		vel += velocity_from_gravity_point(p, g) * g->w;
-	}
-
-	ps[i].vel.xyz += vel;
+	ps[i].life += dt;
+	ps[i].vel.xyz += velocity_combined(&ps[i], gps, num_gp, mg, m, mgs);
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
 }
