@@ -77,14 +77,14 @@ static float4 random_point_inside_unit_sphere(__global ulong *sb)
 	return p;
 }
 
-static float4 random_point_unit_circle(__global ulong *sb)
+static float2 random_point_unit_circle(__global ulong *sb)
 {
 	float radius = 1.0f;
 	float r = radius * sqrt(rand_float_in_range(sb, 0.0, 1.0));
 	float theta = rand_float_in_range(sb, 0.0, 1.0) * 2.0 * M_PI;
 	float x = r * cos(theta);
 	float y = r * sin(theta);
-	return (float4)(x, 1.0, y, 1.0);
+	return (float2)(x, y);
 }
 
 static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_particles)
@@ -150,11 +150,31 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 	ps[i].life = 0.0;
 }
 
+static float3 rotate_vector(float3 v, float3 degrot)
+{
+	float3 res;
+	float3 rot;
+	rot.x = radians(degrot.x);
+	rot.y = radians(degrot.y);
+	rot.z = radians(degrot.z);
+
+	float3 ax = (float3)(1.0, 0.0, 0.0);
+	float3 ay = (float3)(0.0, 1.0, 0.0);
+	float3 az = (float3)(0.0, 0.0, 1.0);
+	v = v * cos(rot.x) + cross(ax, v) * sin(rot.x) + ax * dot(ax, v) * (1.0f - cos(rot.x));
+	v = v * cos(rot.y) + cross(ay, v) * sin(rot.y) + ay * dot(ay, v) * (1.0f - cos(rot.y));
+	v = v * cos(rot.z) + cross(az, v) * sin(rot.z) + az * dot(az, v) * (1.0f - cos(rot.z));
+	return v;
+}
+
 static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitter e)
 {
 	int i = get_global_id(0);
 
-	float4 init_vel = normalize(random_point_unit_circle(&sb[i])) * e.vel;
+	float2 c = random_point_unit_circle(&sb[i]);
+	float4 p = (float4)(c.x, 1.0, c.y, 1.0);
+	float3 rotated = rotate_vector(normalize(p.xyz), e.dir.xyz);
+	float4 init_vel = (float4)(rotated.xyz, 1.0) * e.vel;
 
 	ps[i].pos = e.pos;
 	ps[i].vel = init_vel;
@@ -166,7 +186,10 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 	reset_particle(ps, sb, e);
 }
 
-#define MAX_VELOCITY 1000.0f
+#define MAX_VELOCITY 20000.0f
+#define TIME_SCALE 0.00001f
+#define MIN_DISTANCE 0.025f
+#define G 1.0f
 
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
 {
@@ -174,10 +197,10 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
-	if (dist < 0.01f)
-		return (float3)(0.0, 0.0, 0.0);
-	float f = gp->w / (dist * dist);
-	float3 vel = normalize(dir) * f * gravity_scale;
+	if (dist < MIN_DISTANCE)
+		dist = MIN_DISTANCE;
+	float f = G * (gp->w / (dist * 3.0f));
+	float3 vel = normalize(dir) * f;
 
 	return vel;
 }
@@ -194,7 +217,7 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 	for (int j = 0; j < num_gp; j++)
 	{
 		__global float4 *g = gps + j;
-		vel += velocity_from_gravity_point(p, g) * g->w;
+		vel += velocity_from_gravity_point(p, g);
 	}
 	return vel;
 }
@@ -204,7 +227,7 @@ __kernel void update_particles_gravity_points(__global t_particle *ps, __global 
 	int i = get_global_id(0);
 	
 	ps[i].vel.xyz += velocity_combined(&ps[i], gps, num_gp, mg, m, mgs);
-	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * TIME_SCALE;
 }
 
 __kernel void update_particles_emitter(__global t_particle *ps, __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, float mgs, t_emitter e)
@@ -224,5 +247,5 @@ __kernel void update_particles_emitter(__global t_particle *ps, __global float4 
 
 	ps[i].life += dt;
 	ps[i].vel.xyz += velocity_combined(&ps[i], gps, num_gp, mg, m, mgs);
-	ps[i].pos.xyz += ps[i].vel.xyz * dt * 0.00005f;
+	ps[i].pos.xyz += ps[i].vel.xyz * dt * TIME_SCALE;
 }

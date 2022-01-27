@@ -68,7 +68,7 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
-		if (ImGui::SliderFloat("Angle", &ps.emitter.cone_angle, 0.0f, 360.0f, "%.2f", ImGuiSliderFlags_None))
+		if (ImGui::SliderFloat("Angle", &ps.emitter.cone_angle, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_None))
 			ps.InitParticlesEmitter();
 		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 10000))
 			ps.InitParticlesEmitter();
@@ -83,7 +83,7 @@ void GUIContext::Update(ParticleSystem &ps)
 			ps.InitParticlesEmitter();
 		}
 		float v2[3] = {ps.emitter.direction.x, ps.emitter.direction.y, ps.emitter.direction.z};
-		if (ImGui::DragFloat3("Direction", v2, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		if (ImGui::DragFloat3("Rotation", v2, 0.1, -180.0, 180.0, "%.3f", ImGuiSliderFlags_None))
 		{
 			ps.emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
 			ps.InitParticlesEmitter();
