@@ -279,6 +279,9 @@ void ParticleSystem::Run()
 	auto grid = GLObject::Grid(20, 20);
 	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
 
+
+	auto eAxis = GLObject::Axis();
+
 	glfwSetWindowUserPointer(gl.window, this);
 
 	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
@@ -360,6 +363,9 @@ void ParticleSystem::Run()
 			{
 				eStar.position = emitter.position;
 				renderer.DrawBillboard(eStar, 0.05, *billboardShader);
+				eAxis.position = emitter.position;
+				eAxis.rotation = emitter.direction;
+				renderer.DrawLines(eAxis, *vertexColorShader);
 			}
 
 			basicShader->use();
