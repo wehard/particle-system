@@ -273,9 +273,6 @@ void ParticleSystem::Run()
 
 	auto wAxis = GLObject::Axis();
 
-	auto eStar = GLObject::Star();
-	eStar.scale = glm::vec3(0.05);
-
 	auto grid = GLObject::Grid(20, 20);
 	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
 
@@ -326,7 +323,6 @@ void ParticleSystem::Run()
 
 		particleShader->use();
 		particleShader->setFloat("max_life", emitter.life);
-		particleShader->setVec3("m_pos", mouseInfo.world);
 		particleShader->setVec4("min_color", minColor);
 		particleShader->setVec4("max_color", maxColor);
 		particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
@@ -360,8 +356,6 @@ void ParticleSystem::Run()
 
 			if (useEmitter)
 			{
-				eStar.position = emitter.position;
-				renderer.DrawBillboard(eStar, 0.05, *billboardShader);
 				eAxis.position = emitter.position;
 				eAxis.rotation = emitter.direction;
 				renderer.DrawLines(eAxis, *vertexColorShader);
