@@ -68,13 +68,13 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
-		if (ImGui::SliderFloat("Angle", &ps.emitter.cone_angle, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_None))
+		if (ImGui::SliderFloat("Radius", &ps.emitter.radius, 0.01f, 1.0f, "%.2f", ImGuiSliderFlags_None))
 			ps.InitParticlesEmitter();
-		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 10000))
+		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 50000))
 			ps.InitParticlesEmitter();
 		if (ImGui::SliderFloat("Life", &ps.emitter.life, 0.1, 20.0, "%.2f", ImGuiSliderFlags_None))
 			ps.InitParticlesEmitter();
-		if (ImGui::SliderFloat("Speed", &ps.emitter.velocity, 5000, 20000, "%f", ImGuiSliderFlags_None))
+		if (ImGui::SliderFloat("Speed", &ps.emitter.velocity, 1000, 20000, "%f", ImGuiSliderFlags_None))
 			ps.InitParticlesEmitter();
 		float v[3] = {ps.emitter.position.x, ps.emitter.position.y, ps.emitter.position.z};
 		if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))

@@ -12,7 +12,7 @@ typedef struct
 	float vel;
 	float rate;
 	float life;
-	float cone_angle;
+	float radius;
 }		t_emitter;
 
 typedef enum e_init_shape
@@ -171,7 +171,7 @@ static void reset_particle(__global t_particle *ps, __global ulong *sb, t_emitte
 {
 	int i = get_global_id(0);
 
-	float2 c = random_point_unit_circle(&sb[i]);
+	float2 c = random_point_unit_circle(&sb[i]) * e.radius;
 	float4 p = (float4)(c.x, 1.0, c.y, 1.0);
 	float3 rotated = rotate_vector(normalize(p.xyz), e.dir.xyz);
 	float4 init_vel = (float4)(rotated.xyz, 1.0) * e.vel;
@@ -199,7 +199,7 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	float dist = length(dir);
 	if (dist < MIN_DISTANCE)
 		dist = MIN_DISTANCE;
-	float f = G * (gp->w / (dist * 3.0f));
+	float f = G * (gp->w / (dist * dist));
 	float3 vel = normalize(dir) * f;
 
 	return vel;
