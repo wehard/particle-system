@@ -42,8 +42,6 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Count %zu", ps.numParticles);
 	ImGui::SliderFloat("Size", &ps.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::ColorEdit3("Background color", &ps.gl.clearColor.r);
-	ImGui::ColorEdit4("Min color", &ps.minColor.x);
-	ImGui::ColorEdit4("Max color", &ps.maxColor.x);
 	ImGui::Text("Reset");
 	if (ImGui::SmallButton("Sphere"))
 		ps.InitParticles(SPHERE);
@@ -64,10 +62,11 @@ void GUIContext::Update(ParticleSystem &ps)
 	}
 
 	ImGui::Separator();
-	ImGui::Text("Emitter");
-	ImGui::Checkbox("Active", &ps.useEmitter);
 	if (ps.useEmitter)
 	{
+		ImGui::Text("Emitter");
+		ImGui::ColorEdit4("Min color", &ps.minColor.x);
+		ImGui::ColorEdit4("Max color", &ps.maxColor.x);
 		if (ImGui::SliderFloat("Radius", &ps.emitter.radius, 0.01f, 1.0f, "%.2f", ImGuiSliderFlags_None))
 			ps.InitParticlesEmitter();
 		if (ImGui::SliderFloat("Rate", &ps.emitter.rate, 1, 50000))
@@ -88,8 +87,8 @@ void GUIContext::Update(ParticleSystem &ps)
 			ps.emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
 			ps.InitParticlesEmitter();
 		}
+		ImGui::Separator();
 	}
-	ImGui::Separator();
 	ImGui::Text("Gravity points: %lu", ps.gravityPoints.size());
 	if (ImGui::Button("Clear", ImVec2(50, 20)))
 		ps.gravityPoints.clear();

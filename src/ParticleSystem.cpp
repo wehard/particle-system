@@ -322,9 +322,7 @@ void ParticleSystem::Run()
 		gui.Update(*this);
 
 		// Render here!
-		renderer.Begin(camera);
-		glClearColor(gl.clearColor.x, gl.clearColor.y, gl.clearColor.z, gl.clearColor.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderer.Begin(camera, gl.clearColor);
 
 		particleShader->use();
 		particleShader->setFloat("max_life", emitter.life);
@@ -334,6 +332,7 @@ void ParticleSystem::Run()
 		particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
 		particleShader->setMat4("view_matrix", camera.getViewMatrix());
 		particleShader->setMat4("model_matrix", getModelMatrix(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0), glm::vec3(1.0)));
+		particleShader->setInt("draw_normals", !useEmitter);
 
 		glPointSize(particleSize);
 		glBindVertexArray(pBuffer.vao);

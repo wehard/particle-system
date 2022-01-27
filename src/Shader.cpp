@@ -41,11 +41,18 @@ void Shader::use()
 	glUseProgram(p_id);
 }
 
+void Shader::setInt(std::string name, int i)
+{
+	GLuint location = glGetUniformLocation(p_id, name.c_str());
+	glUniform1i(location, i);
+}
+
 void Shader::setFloat(std::string name, float f)
 {
 	GLuint location = glGetUniformLocation(p_id, name.c_str());
 	glUniform1f(location, f);
 }
+
 void Shader::setVec2(std::string name, glm::vec2 v)
 {
 	GLuint location = glGetUniformLocation(p_id, name.c_str());

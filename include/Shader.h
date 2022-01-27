@@ -25,6 +25,7 @@ public:
 	Shader(std::string vert_path, std::string frag_path);
 	~Shader();
 	void use();
+	void setInt(std::string name, int i);
 	void setFloat(std::string name, float f);
 	void setVec2(std::string name, glm::vec2 v);
 	void setVec3(std::string name, glm::vec3 v);

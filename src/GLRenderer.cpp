@@ -10,9 +10,11 @@ GLRenderer::~GLRenderer()
 {
 }
 
-void GLRenderer::Begin(Camera &camera)
+void GLRenderer::Begin(Camera &camera, glm::vec4 clearColor)
 {
 	this->camera = &camera;
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLRenderer::Draw(GLObject &object)

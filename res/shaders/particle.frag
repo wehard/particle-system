@@ -9,7 +9,7 @@ uniform vec4 min_color;
 uniform vec4 max_color;
 uniform float max_life;
 
-#define	MAX_VEL 20000.0
+uniform int draw_normals;
 
 vec3 rgb2hsv(vec3 c)
 {
@@ -32,7 +32,15 @@ vec3 hsv2rgb(vec3 c)
 void main()
 {
 	vec4 l_color = mix(min_color, max_color, life / max_life);
-
 	vec3 n = normalize(abs(velocity));
-	color = vec4(n, 1.0);
+
+	if (draw_normals > 0)
+	{
+		color = vec4(n, 1.0);
+	}
+	else
+	{
+		color = l_color;
+	}
+
 }
