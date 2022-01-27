@@ -27,6 +27,7 @@ typedef enum e_init_shape
 {
 	CUBE,
 	SPHERE,
+	TORUS,
 	RECT,
 	SINE
 } t_init_shape;

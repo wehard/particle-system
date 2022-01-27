@@ -46,7 +46,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
-	maxColor = glm::vec4(1.0, 0.0, 0.0, 1.0);
+	maxColor = glm::vec4(1.0, 0.0, 0.0, 0.0);
 
 	camera = Camera(glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
 	CreateParticleBuffer();

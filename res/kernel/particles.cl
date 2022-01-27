@@ -19,6 +19,7 @@ typedef enum e_init_shape
 {
 	CUBE,
 	SPHERE,
+	TORUS,
 	RECT,
 	SINE
 } t_init_shape;
@@ -77,6 +78,24 @@ static float4 random_point_inside_unit_sphere(__global ulong *sb)
 	return p;
 }
 
+static float4 random_point_inside_torus(__global ulong *sb, float radius, float radius2)
+{
+	float rad_angle = rand_float_in_range(sb, 0.0f, 1.0) * M_PI * 2.0f;
+
+	float cx = sin(rad_angle);
+	float cz = cos(rad_angle);
+
+	float4 rpos = (float4)(cx, 0.0f, cz, 1.0f);
+	rpos *= radius;
+
+	float4 spos = random_point_inside_unit_sphere(sb);
+	spos *= radius2;
+
+	float4 res = rpos + spos;
+
+	return res; 
+}
+
 static float2 random_point_unit_circle(__global ulong *sb)
 {
 	float radius = 1.0f;
@@ -92,6 +111,12 @@ static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_pa
 	int i = get_global_id(0);
 	ps[i].pos = random_point_inside_unit_sphere(sb);
 };
+
+static void init_torus(__global t_particle *ps, __global ulong *sb, int num_particles)
+{
+	int i = get_global_id(0);
+	ps[i].pos = random_point_inside_torus(sb, 0.40, 0.20);
+}
 
 static void init_rect(__global t_particle * ps, __global ulong *sb, int num_particles)
 {
@@ -127,6 +152,9 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 			break;
 		case SPHERE:
 			init_sphere(ps, &sb[i], num_particles);
+			break;
+		case TORUS:
+			init_torus(ps, &sb[i], num_particles);
 			break;
 		case RECT:
 			init_rect(ps, &sb[i], num_particles);

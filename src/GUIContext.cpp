@@ -46,6 +46,9 @@ void GUIContext::Update(ParticleSystem &ps)
 	if (ImGui::SmallButton("Sphere"))
 		ps.InitParticles(SPHERE);
 	ImGui::SameLine();
+	if (ImGui::SmallButton("Torus"))
+		ps.InitParticles(TORUS);
+	ImGui::SameLine();
 	if (ImGui::SmallButton("Cube"))
 		ps.InitParticles(CUBE);
 	ImGui::SameLine();
