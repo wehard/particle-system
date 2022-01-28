@@ -225,9 +225,7 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
-	if (dist < MIN_DISTANCE)
-		dist = MIN_DISTANCE;
-	float f = G * (gp->w / (dist * dist));
+	float f = G * (gp->w / (dist * dist + 0.0001f));
 	float3 vel = normalize(dir) * f;
 
 	return vel;
