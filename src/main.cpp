@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 		CLContext cl = CLContext(0, deviceIndex);
 
 		ParticleSystem ps = ParticleSystem(gl, cl);
-		ps.InitParticles(RECT);
+		ps.InitParticles(SPHERE);
 		ps.Run();
 	}
 
