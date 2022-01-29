@@ -116,7 +116,11 @@ static void init_sphere(__global t_particle * ps, __global ulong *sb, int num_pa
 static void init_torus(__global t_particle *ps, __global ulong *sb, int num_particles)
 {
 	int i = get_global_id(0);
-	ps[i].pos = random_point_inside_torus(sb, 0.40, 0.20);
+	float4 p = random_point_inside_torus(sb, 0.40, 0.20);
+	float4 v = cross(normalize((float4)(p.xyz, 1.0f)), (float4)(0.0, 1.0, 0.0, 1.0)) * 10000.0f;
+	ps[i].pos = p;
+	float4 r = random_point_inside_unit_sphere(sb) * 0.0f;
+	ps[i].vel = v + r;
 }
 
 static void init_rect(__global t_particle * ps, __global ulong *sb, int num_particles)
@@ -197,7 +201,6 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 			break;
 		case TORUS:
 			init_torus(ps, &sb[i], num_particles);
-			init_vel(ps, sb);
 			break;
 		case RECT:
 			init_rect(ps, &sb[i], num_particles);
@@ -265,7 +268,7 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
-	float f = G * (gp->w / (dist * dist + 0.0001f));
+	float f = G * (gp->w / (dist * dist + 0.006544f));
 	float3 vel = normalize(dir) * f;
 
 	return vel;

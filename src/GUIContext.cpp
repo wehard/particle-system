@@ -73,16 +73,28 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::ColorEdit3("Background color", &ps.gl.clearColor.r);
 	ImGui::Text("Reset");
 	if (ImGui::SmallButton("Sphere"))
+	{
 		ps.InitParticles(SPHERE);
+	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Torus"))
+	{
+		ps.ClearGravityPoints();
+		ps.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 0.5));
+		ps.AddGravityPoint(glm::vec4(-0.25, 0.0, 0.0, 0.0017));
+		ps.AddGravityPoint(glm::vec4(-0.45, 0.0, 0.0, 0.0087));
 		ps.InitParticles(TORUS);
+	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Cube"))
+	{
 		ps.InitParticles(CUBE);
+	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Rect"))
+	{
 		ps.InitParticles(RECT);
+	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Circle"))
 	{
@@ -92,7 +104,9 @@ void GUIContext::Update(ParticleSystem &ps)
 	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Sine"))
+	{
 		ps.InitParticles(SINE);
+	}
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Emitter"))
 	{

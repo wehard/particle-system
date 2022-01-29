@@ -116,6 +116,7 @@ class ParticleSystem
 private:
 	GLRenderer renderer;
 	Shader *particleShader;
+	Shader *emitterShader;
 	Shader *basicShader;
 	Shader *vertexColorShader;
 	Shader *billboardShader;
