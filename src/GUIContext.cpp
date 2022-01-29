@@ -27,6 +27,30 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Camera");
 	ImGui::Text("Position x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
 	ImGui::Text("Yaw %f, Pitch %f", ps.camera.yaw, ps.camera.pitch);
+	if (ImGui::SmallButton("Front"))
+	{
+		ps.camera.Reset(glm::vec3(0.0, 0.0, 2.0), -90.0f, 0.0f);
+	}
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Back"))
+	{
+		ps.camera.Reset(glm::vec3(0.0, 0.0, -2.0), 90.0f, 0.0f);
+	}
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Left"))
+	{
+		ps.camera.Reset(glm::vec3(-2.0, 0.0, 0.0), 0.0f, 0.0f);
+	}
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Right"))
+	{
+		ps.camera.Reset(glm::vec3(2.0, 0.0, 0.0), 180.0f, 0.0f);
+	}
+	ImGui::SameLine();
+	if (ImGui::SmallButton("Top"))
+	{
+		ps.camera.Reset(glm::vec3(0.0, 2.0, 0.0), -90.0f, -89.0f);
+	}
 	ImGui::Separator();
 
 	ImGui::Text("Mouse");

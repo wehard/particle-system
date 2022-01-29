@@ -24,6 +24,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : forwa
 	this->worldUp = up;
 	this->yaw = yaw;
 	this->pitch = pitch;
+	this->initPosition = position;
 	update();
 }
 
@@ -79,4 +80,12 @@ void Camera::update()
 	forward = glm::normalize(temp);
 	right = glm::normalize(glm::cross(forward, worldUp));
 	up = glm::normalize(glm::cross(right, forward));
+}
+
+void Camera::Reset(glm::vec3 position, float yaw, float pitch)
+{
+	this->position = position;
+	this->yaw = yaw;
+	this->pitch = pitch;
+	update();
 }
