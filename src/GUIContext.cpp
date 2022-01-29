@@ -84,6 +84,13 @@ void GUIContext::Update(ParticleSystem &ps)
 	if (ImGui::SmallButton("Rect"))
 		ps.InitParticles(RECT);
 	ImGui::SameLine();
+	if (ImGui::SmallButton("Circle"))
+	{
+		ps.ClearGravityPoints();
+		ps.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 3.0));
+		ps.InitParticles(CIRCLE);
+	}
+	ImGui::SameLine();
 	if (ImGui::SmallButton("Sine"))
 		ps.InitParticles(SINE);
 	ImGui::SameLine();

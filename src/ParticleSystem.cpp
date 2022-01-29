@@ -146,6 +146,24 @@ void ParticleSystem::AddGravityPoint()
 	}
 }
 
+void ParticleSystem::AddGravityPoint(glm::vec4 pos)
+{
+	if (this->gravityPoints.size() < MAX_GP)
+	{
+		cl_float4 f;
+		f.s[0] = pos.x;
+		f.s[1] = pos.y;
+		f.s[2] = pos.z;
+		f.s[3] = pos.w;
+		this->gravityPoints.push_back(f);
+	}
+}
+
+void ParticleSystem::ClearGravityPoints()
+{
+	this->gravityPoints.clear();
+}
+
 void ParticleSystem::InitParticles(t_init_shape shape)
 {
 	useEmitter = false;

@@ -29,6 +29,7 @@ typedef enum e_init_shape
 	SPHERE,
 	TORUS,
 	RECT,
+	CIRCLE,
 	SINE
 } t_init_shape;
 
@@ -156,6 +157,8 @@ public:
 
 	void Reset();
 	void AddGravityPoint();
+	void AddGravityPoint(glm::vec4 pos);
+	void ClearGravityPoints();
 
 	void Run();
 	~ParticleSystem();
