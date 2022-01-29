@@ -27,6 +27,11 @@ void GUIContext::Update(ParticleSystem &ps)
 	ImGui::Text("Camera");
 	ImGui::Text("Position x %f, y %f, z %f", ps.camera.position.x, ps.camera.position.y, ps.camera.position.z);
 	ImGui::Text("Yaw %f, Pitch %f", ps.camera.yaw, ps.camera.pitch);
+	if (ImGui::SmallButton("TopLeft"))
+	{
+		ps.camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
+	}
+	ImGui::SameLine();
 	if (ImGui::SmallButton("Front"))
 	{
 		ps.camera.Reset(glm::vec3(0.0, 0.0, 2.0), -90.0f, 0.0f);

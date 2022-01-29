@@ -48,7 +48,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 0.0);
 
-	camera = Camera(glm::vec3(-1.0, 2.0, 2.0), glm::vec3(0.0, 1.0, 0.0), -65.0, -40.0);
+	camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
 	CreateParticleBuffer();
 	CreateGravityPointBuffer();
 	CreateSeedBuffer();	
