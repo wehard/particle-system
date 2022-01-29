@@ -237,7 +237,8 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 
 	if (use_mouse)
 	{
-		vel += velocity_from_gravity_point(p, (__global float4*)&mouse_pos) * mouse_mass;
+		mouse_pos.w = mouse_mass;
+		vel += velocity_from_gravity_point(p, (__global float4*)&mouse_pos);
 	}
 
 	for (int j = 0; j < num_gp; j++)
