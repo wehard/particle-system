@@ -67,8 +67,8 @@ void GUIContext::Update(Application &app)
 	ImGui::SliderFloat("Mass", &app.mouseGravityMass, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
-	ImGui::Text("Particle Settings");
-	ImGui::Text("Count %zu", app.numParticles);
+	ImGui::Text("Info");
+	ImGui::Text("Count %zu", app.GetNumParticles());
 	ImGui::SliderFloat("Size", &app.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::ColorEdit3("Background color", &app.gl.clearColor.r);
 

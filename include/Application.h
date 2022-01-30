@@ -41,6 +41,7 @@ public:
 	void ClearGravityPoints();
 	void AddGravityPoint();
 	void AddGravityPoint(glm::vec4 pos);
+	size_t GetNumParticles();
 	Application(GLContext &gl, CLContext &cl);
 	~Application();
 	void Run();

@@ -241,3 +241,13 @@ void Application::ClearGravityPoints()
 {
 	this->gravityPoints.clear();
 }
+
+size_t Application::GetNumParticles()
+{
+	size_t n = 0;
+	for (auto ps : particleSystems)
+	{
+		n += ps->numParticles;
+	}
+	return n;
+}
