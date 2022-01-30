@@ -45,6 +45,7 @@ public:
 	Application(GLContext &gl, CLContext &cl);
 	~Application();
 	void Run();
+	void AddParticleSystem();
 };
 
 

@@ -80,9 +80,6 @@ Application::Application(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	glfwSetScrollCallback(gl.window, glfwMouseScrollCallback);
 	glfwSetKeyCallback(gl.window, glfwKeyCallback);
 	glfwSetCursorPosCallback(gl.window, glfwMouseCallback);
-
-	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
-	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
 }
 
 Application::~Application()
@@ -250,4 +247,9 @@ size_t Application::GetNumParticles()
 		n += ps->numParticles;
 	}
 	return n;
+}
+
+void Application::AddParticleSystem()
+{
+	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
 }

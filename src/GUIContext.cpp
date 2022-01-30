@@ -19,7 +19,14 @@ void GUIContext::Update(Application &app)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("particle-system");
+	UpdatePlatformInfo(app);
+	UpdateApplicationInfo(app);
+	UpdateSystems(app);
+}
+
+void GUIContext::UpdateApplicationInfo(Application &app)
+{
+	ImGui::Begin("application");
 	ImGui::Text("FPS %d", app.fps);
 	ImGui::Checkbox("Show Overlays", &app.showOverlays);
 	ImGui::Separator();
@@ -88,10 +95,38 @@ void GUIContext::Update(Application &app)
 			app.gravityPoints[i].s[3] = v[3];
 		}
 	}
+	ImGui::End();
+}
+
+void GUIContext::UpdatePlatformInfo(Application &app)
+{
+	ImGui::Begin("platform");
+	ImGui::Text("GL version: %d.%d", app.gl.glInfo.glMajorVersion, app.gl.glInfo.glMinorVersion);
+	ImGui::Text("GLSL version: %s", app.gl.glInfo.shadingLanguageVersion);
+	ImGui::Text("GL Vendor: %s", app.gl.glInfo.vendor);
+	ImGui::Text("GL Renderer: %s", app.gl.glInfo.renderer);
+	ImGui::Separator();
+	ImGui::Text("CL Platform: %s, %s", app.cl.clInfo.platformVendor, app.cl.clInfo.platformName);
+	ImGui::Text("CL Device: %s", app.cl.clInfo.deviceName);
+	ImGui::Separator();
+	ImGui::Text("CL Program");
+	for (auto k : app.clProgram->clKernels)
+	{
+		ImGui::Text("%s", k->name);
+	}
 
 	ImGui::End();
+}
 
-	ImGui::Begin("systems");
+void GUIContext::UpdateSystems(Application &app)
+{
+	ImGui::Begin("particle systems");
+	if (ImGui::Button("Add"))
+	{
+		app.AddParticleSystem();
+	}
+	ImGui::Separator();
+
 	for (auto ps : app.particleSystems)
 	{
 		ImGui::PushID(ps);
@@ -163,33 +198,11 @@ void GUIContext::Update(Application &app)
 				ps->emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
 				ps->InitParticlesEmitter();
 			}
-			ImGui::Separator();
 		}
+		ImGui::Separator();
 		ImGui::PopID();
 	}
 	ImGui::End();
-
-	ImGui::Begin("opencl");
-	ImGui::Text("Platform: %s, %s", app.cl.clInfo.platformVendor, app.cl.clInfo.platformName);
-	ImGui::Text("Device: %s", app.cl.clInfo.deviceName);
-	ImGui::Separator();
-	ImGui::Text("Program");
-	for (auto k : app.clProgram->clKernels)
-	{
-		ImGui::Text("%s", k->name);
-	}
-	ImGui::End();
-
-	ImGui::Begin("opengl");
-	ImGui::Text("GL version: %d.%d", app.gl.glInfo.glMajorVersion, app.gl.glInfo.glMinorVersion);
-	ImGui::Text("GLSL version: %s", app.gl.glInfo.shadingLanguageVersion);
-	ImGui::Text("Vendor: %s", app.gl.glInfo.vendor);
-	ImGui::Text("Renderer: %s", app.gl.glInfo.renderer);
-	ImGui::End();
-}
-
-void GUIContext::Update(ParticleSystem &ps)
-{
 }
 
 // void GUIContext::Update(ParticleSystem &ps)

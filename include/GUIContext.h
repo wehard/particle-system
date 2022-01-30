@@ -12,6 +12,9 @@ class GUIContext
 {
 private:
     ImGuiContext *context;
+    void UpdatePlatformInfo(Application &app);
+    void UpdateSystems(Application &app);
+    void UpdateApplicationInfo(Application &app);
 public:
     GUIContext();
     void Init(GLFWwindow *window, const char *glslVersion);
