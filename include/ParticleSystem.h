@@ -21,6 +21,8 @@
 #include "Shader.h"
 #include "Camera.h"
 
+#include "Utils.h"
+
 #define MAX_GP 10
 
 typedef enum e_init_shape
@@ -79,23 +81,6 @@ struct Emitter
 		e.life = life;
 		e.radius = radius;
 		return e;
-	}
-};
-
-struct MouseInfo
-{
-	glm::vec3 screen;
-	glm::vec3 ndc;
-	glm::vec3 world;
-
-	cl_float4 CLTypeWorld()
-	{
-		cl_float4 m;
-		m.s[0] = world.x;
-		m.s[1] = world.y;
-		m.s[2] = world.z;
-		m.s[3] = 1.0f;
-		return m;
 	}
 };
 

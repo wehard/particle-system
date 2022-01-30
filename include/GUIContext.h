@@ -5,6 +5,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "ParticleSystem.h"
+#include "Application.h"
 #include "CLContext.h"
 
 class GUIContext
@@ -15,6 +16,7 @@ public:
     GUIContext();
     void Init(GLFWwindow *window, const char *glslVersion);
     void Update(ParticleSystem &ps);
+    void Update(Application &app);
     void Render();
     void Shutdown();
     ~GUIContext();

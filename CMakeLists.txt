@@ -5,6 +5,7 @@ project(particle-system)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES src/main.cpp
+			src/Application.cpp
 			src/ParticleSystem.cpp
 			src/CLContext.cpp
 			src/GLContext.cpp

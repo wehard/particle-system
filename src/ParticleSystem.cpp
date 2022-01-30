@@ -59,7 +59,6 @@ void ParticleSystem::CreateSeedBuffer()
 {
 	cl_int result = CL_SUCCESS;
 
-
 	std::default_random_engine generator;
 	std::uniform_int_distribution<u_long> distribution(0, ULONG_MAX);
 
