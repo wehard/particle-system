@@ -81,8 +81,8 @@ Application::Application(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	glfwSetKeyCallback(gl.window, glfwKeyCallback);
 	glfwSetCursorPosCallback(gl.window, glfwMouseCallback);
 
-	particleSystem = new ParticleSystem(gl, cl, *clProgram);
-	particleSystem->InitParticles(SPHERE);
+	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
+	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
 }
 
 Application::~Application()
@@ -92,6 +92,11 @@ Application::~Application()
 	delete basicShader;
 	delete vertexColorShader;
 	delete billboardShader;
+
+	for (auto ps : particleSystems)
+	{
+		delete ps;
+	}
 }
 
 void Application::Run()
@@ -148,14 +153,19 @@ void Application::Run()
 			camera.Move(RIGHT, deltaTime);
 		}
 
-		particleSystem->Update(deltaTime, gravityPoints, mouseInfo);
+		for (auto ps : particleSystems)
+		{
+			ps->Update(deltaTime, gravityPoints, mouseInfo);
+		}
 		gui.Update(*this);
 
 		// Render here!
 		renderer.Begin(camera, gl.clearColor);
 
-		particleSystem->Render(camera, mouseInfo);
-
+		for (auto ps : particleSystems)
+		{
+			ps->Render(camera, mouseInfo);
+		}
 		if (showOverlays)
 		{
 			if (gravityPoints.size() > 0)

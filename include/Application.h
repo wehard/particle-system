@@ -17,15 +17,14 @@ private:
 	Shader *vertexColorShader;
 	Shader *billboardShader;
 
-	ParticleSystem *particleSystem;
 
 
 	float lastTime;
 	float deltaTime;
 
 
-	void ClearGravityPoints();
 public:
+	std::vector<ParticleSystem *> particleSystems;
 	CLProgram *clProgram;
 	bool showOverlays = true;
 	std::vector<cl_float4> gravityPoints;
@@ -39,6 +38,7 @@ public:
 	bool mouseGravity;
 	Camera camera;
 	MouseInfo mouseInfo;
+	void ClearGravityPoints();
 	void AddGravityPoint();
 	void AddGravityPoint(glm::vec4 pos);
 	Application(GLContext &gl, CLContext &cl);

@@ -102,22 +102,13 @@ private:
 	GLRenderer renderer;
 	Shader *particleShader;
 	Shader *emitterShader;
-	// Shader *basicShader;
-	// Shader *vertexColorShader;
-	// Shader *billboardShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 	void CreateSeedBuffer();
-	// double lastTime = 0.0;
 	CLProgram &clProgram;
 public:
-	// int fps;
-	// double deltaTime;
 	int mouseGravity = 0;
 	float mouseGravityScale = 1.0f;
-	// std::vector<cl_float4> gravityPoints;
-	// MouseInfo mouseInfo;
-	// CLProgram &clProgram;
 	CLContext &cl;
 	GLContext &gl;
 	const size_t numParticles = 2000000;
@@ -125,13 +116,10 @@ public:
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	CLBuffer seedBuffer;
-	// bool showOverlays = true;
 	bool useEmitter = false;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
-	// Camera camera;
 	Emitter emitter;
-	// bool mouseMovement = false;
 	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p);
 	void InitParticles(t_init_shape shape);
 	void InitParticlesEmitter();
@@ -143,9 +131,6 @@ public:
 	void Render(Camera &camera, MouseInfo mouseInfo);
 
 	void Reset();
-	// void AddGravityPoint();
-	// void AddGravityPoint(glm::vec4 pos);
-	// void ClearGravityPoints();
 
 	~ParticleSystem();
 };

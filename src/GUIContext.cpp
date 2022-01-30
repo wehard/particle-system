@@ -62,7 +62,7 @@ void GUIContext::Update(Application &app)
 	ImGui::Text("Screen x %f, y %f, z %f", app.mouseInfo.screen.x, app.mouseInfo.screen.y, app.mouseInfo.screen.z);
 	ImGui::Text("NDC x %f, y %f, z %f", app.mouseInfo.ndc.x, app.mouseInfo.ndc.y, app.mouseInfo.ndc.z);
 	ImGui::Text("World x %f, y %f, z %f", app.mouseInfo.world.x, app.mouseInfo.world.y, app.mouseInfo.world.z);
-	ImGui::Checkbox("Gravity", (bool*)&app.mouseGravity);
+	ImGui::Checkbox("Gravity", (bool *)&app.mouseGravity);
 	ImGui::SameLine();
 	ImGui::SliderFloat("Mass", &app.mouseGravityMass, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
@@ -71,7 +71,7 @@ void GUIContext::Update(Application &app)
 	ImGui::Text("Count %zu", app.numParticles);
 	ImGui::SliderFloat("Size", &app.particleSize, 1.0f, 5.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	ImGui::ColorEdit3("Background color", &app.gl.clearColor.r);
-	
+
 	ImGui::Text("Gravity points: %lu", app.gravityPoints.size());
 	if (ImGui::Button("Clear", ImVec2(50, 20)))
 		app.gravityPoints.clear();
@@ -88,7 +88,83 @@ void GUIContext::Update(Application &app)
 			app.gravityPoints[i].s[3] = v[3];
 		}
 	}
-	
+
+	ImGui::Separator();
+	for (auto ps : app.particleSystems)
+	{
+		ImGui::PushID(ps);
+		ImGui::Text("Reset");
+		if (ImGui::SmallButton("Sphere"))
+		{
+			ps->InitParticles(SPHERE);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Torus"))
+		{
+			app.ClearGravityPoints();
+			app.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 0.5));
+			app.AddGravityPoint(glm::vec4(-0.25, 0.0, 0.0, 0.0017));
+			app.AddGravityPoint(glm::vec4(-0.45, 0.0, 0.0, 0.0087));
+			ps->InitParticles(TORUS);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Cube"))
+		{
+			ps->InitParticles(CUBE);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Rect"))
+		{
+			ps->InitParticles(RECT);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Circle"))
+		{
+			app.ClearGravityPoints();
+			app.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 3.0));
+			ps->InitParticles(CIRCLE);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Sine"))
+		{
+			ps->InitParticles(SINE);
+		}
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Emitter"))
+		{
+			ps->InitParticlesEmitter();
+			ps->useEmitter = true;
+		}
+
+		if (ps->useEmitter)
+		{
+			ImGui::Text("Emitter");
+			ImGui::ColorEdit4("Min color", &ps->minColor.x);
+			ImGui::ColorEdit4("Max color", &ps->maxColor.x);
+			if (ImGui::SliderFloat("Radius", &ps->emitter.radius, 0.01f, 1.0f, "%.2f", ImGuiSliderFlags_None))
+				ps->InitParticlesEmitter();
+			if (ImGui::SliderFloat("Rate", &ps->emitter.rate, 1, 50000))
+				ps->InitParticlesEmitter();
+			if (ImGui::SliderFloat("Life", &ps->emitter.life, 0.1, 20.0, "%.2f", ImGuiSliderFlags_None))
+				ps->InitParticlesEmitter();
+			if (ImGui::SliderFloat("Speed", &ps->emitter.velocity, 1000, 20000, "%f", ImGuiSliderFlags_None))
+				ps->InitParticlesEmitter();
+			float v[3] = {ps->emitter.position.x, ps->emitter.position.y, ps->emitter.position.z};
+			if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+			{
+				ps->emitter.position = glm::vec3(v[0], v[1], v[2]);
+				ps->InitParticlesEmitter();
+			}
+			float v2[3] = {ps->emitter.direction.x, ps->emitter.direction.y, ps->emitter.direction.z};
+			if (ImGui::DragFloat3("Rotation", v2, 0.1, -180.0, 180.0, "%.3f", ImGuiSliderFlags_None))
+			{
+				ps->emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
+				ps->InitParticlesEmitter();
+			}
+			ImGui::Separator();
+		}
+		ImGui::PopID();
+	}
 	ImGui::End();
 
 	ImGui::Begin("opencl");
@@ -112,7 +188,6 @@ void GUIContext::Update(Application &app)
 
 void GUIContext::Update(ParticleSystem &ps)
 {
-	
 }
 
 // void GUIContext::Update(ParticleSystem &ps)
@@ -260,7 +335,7 @@ void GUIContext::Update(ParticleSystem &ps)
 // 			ps.gravityPoints[i].s[3] = v[3];
 // 		}
 // 	}
-	
+
 // 	ImGui::End();
 
 // 	ImGui::Begin("opencl");
@@ -295,4 +370,4 @@ void GUIContext::Shutdown()
 	ImGui::DestroyContext(context);
 }
 
-GUIContext::~GUIContext(){}
+GUIContext::~GUIContext() {}

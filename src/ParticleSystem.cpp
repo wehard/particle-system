@@ -38,21 +38,17 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p) : gl(gl), cl(cl), clProgram(p)
 {
-	// clProgram = new CLProgram(this->cl, "./res/kernel/particles.cl");
-
-	// basicShader = new Shader("res/shaders/basic.vert", "res/shaders/basic.frag");
-	// vertexColorShader = new Shader("res/shaders/vertex_color.vert", "res/shaders/vertex_color.frag");
-	// billboardShader = new Shader("res/shaders/billboard.vert", "res/shaders/billboard.frag");
 	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	emitterShader = new Shader("./res/shaders/particle_emitter.vert", "./res/shaders/particle_emitter.frag");
 
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 0.0);
 
-	// camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
 	CreateParticleBuffer();
 	CreateGravityPointBuffer();
 	CreateSeedBuffer();	
+
+	InitParticles(SPHERE);
 }
 
 void ParticleSystem::CreateSeedBuffer()
@@ -76,11 +72,9 @@ void ParticleSystem::CreateSeedBuffer()
 
 ParticleSystem::~ParticleSystem()
 {
-	// delete particleShader;
-	// delete emitterShader;
-	// delete basicShader;
-	// delete vertexColorShader;
-	// delete billboardShader;
+	delete particleShader;
+	delete emitterShader;
+	
 
 	glDeleteBuffers(1, &pBuffer.vbo);
 	glDeleteVertexArrays(1, &pBuffer.vao);
@@ -133,37 +127,6 @@ void ParticleSystem::CreateGravityPointBuffer()
 	gpBuffer.clmem = clCreateFromGLBuffer(cl.ctx, CL_MEM_READ_WRITE, gpBuffer.vbo, &result);
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
 }
-
-// void ParticleSystem::AddGravityPoint()
-// {
-// 	if (this->gravityPoints.size() < MAX_GP)
-// 	{
-// 		cl_float4 f;
-// 		f.s[0] = this->mouseInfo.world.x;
-// 		f.s[1] = this->mouseInfo.world.y;
-// 		f.s[2] = this->mouseInfo.world.z;
-// 		f.s[3] = 1.0;
-// 		this->gravityPoints.push_back(f);
-// 	}
-// }
-
-// void ParticleSystem::AddGravityPoint(glm::vec4 pos)
-// {
-// 	if (this->gravityPoints.size() < MAX_GP)
-// 	{
-// 		cl_float4 f;
-// 		f.s[0] = pos.x;
-// 		f.s[1] = pos.y;
-// 		f.s[2] = pos.z;
-// 		f.s[3] = pos.w;
-// 		this->gravityPoints.push_back(f);
-// 	}
-// }
-
-// void ParticleSystem::ClearGravityPoints()
-// {
-// 	this->gravityPoints.clear();
-// }
 
 void ParticleSystem::InitParticles(t_init_shape shape)
 {
@@ -314,136 +277,3 @@ void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo)
 		glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
 		glDrawArrays(GL_POINTS, 0, numParticles);
 }
-
-// void ParticleSystem::Run()
-// {
-// 	lastTime = glfwGetTime();
-// 	double lastUpdateFpsTime = lastTime;
-// 	int frameCount = 0;
-
-// 	auto renderer = GLRenderer();
-// 	GUIContext gui;
-// 	gui.Init(gl.window, gl.glslVersion);
-
-// 	auto plane = GLObject::Plane();
-// 	auto gp = GLObject::Triangle();
-// 	gp.color = glm::vec4(0.0, 0.8, 0.8, 1.0);
-// 	gp.scale = glm::vec3(0.05);
-
-// 	auto wAxis = GLObject::Axis();
-
-// 	auto grid = GLObject::Grid(20, 20);
-// 	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
-
-
-// 	auto eAxis = GLObject::Axis();
-
-// 	glfwSetWindowUserPointer(gl.window, this);
-
-// 	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
-// 	{
-// 		double currentTime = glfwGetTime();
-// 		deltaTime = currentTime - lastTime;
-
-// 		if (currentTime - lastUpdateFpsTime > 1.0)
-// 		{
-// 			fps = frameCount / lastUpdateFpsTime;
-// 			lastUpdateFpsTime = currentTime;
-// 		}
-
-// 		if (glfwGetKey(gl.window, GLFW_KEY_W))
-// 		{
-// 			camera.Move(FORWARD, deltaTime);
-// 		}
-// 		if (glfwGetKey(gl.window, GLFW_KEY_S))
-// 		{
-// 			camera.Move(BACKWARD, deltaTime);
-// 		}
-// 		if (glfwGetKey(gl.window, GLFW_KEY_A))
-// 		{
-// 			camera.Move(LEFT, deltaTime);
-// 		}
-// 		if (glfwGetKey(gl.window, GLFW_KEY_D))
-// 		{
-// 			camera.Move(RIGHT, deltaTime);
-// 		}
-
-// 		if (useEmitter)
-// 		{
-// 			this->UpdateParticlesEmitter(deltaTime);
-// 		}
-// 		else
-// 			this->UpdateParticles(deltaTime);
-
-// 		gui.Update(*this);
-
-// 		// Render here!
-// 		renderer.Begin(camera, gl.clearColor);
-
-// 		if (useEmitter)
-// 		{
-// 			emitterShader->use();
-// 			emitterShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-// 			emitterShader->setMat4("view_matrix", camera.getViewMatrix());
-// 			emitterShader->setFloat("max_life", emitter.life);
-// 			emitterShader->setVec4("min_color", minColor);
-// 			emitterShader->setVec4("max_color", maxColor);
-// 		}
-// 		else
-// 		{
-// 			particleShader->use();
-// 			particleShader->setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
-// 			particleShader->setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
-// 			particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-// 			particleShader->setMat4("view_matrix", camera.getViewMatrix());
-// 			particleShader->setInt("draw_mouse", true);
-// 			particleShader->setVec3("m_pos", mouseInfo.world);
-// 		}
-
-// 		glPointSize(particleSize);
-// 		glBindVertexArray(pBuffer.vao);
-// 		glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
-// 		glDrawArrays(GL_POINTS, 0, numParticles);
-
-// 		if (showOverlays)
-// 		{
-// 			if (gravityPoints.size() > 0)
-// 			{
-// 				for (auto a : gravityPoints)
-// 				{
-// 					gp.position = glm::vec3(a.s[0], a.s[1], a.s[2]);
-// 					renderer.DrawBillboard(gp, 0.05, *billboardShader);
-// 				}
-// 			}
-
-// 			if (mouseGravity)
-// 			{
-// 				gp.position = mouseInfo.world;
-// 				renderer.DrawBillboard(gp, 0.05 + (mouseGravityScale * 0.001), *billboardShader);
-// 			}
-
-// 			renderer.DrawLines(wAxis, *vertexColorShader);
-
-// 			if (useEmitter)
-// 			{
-// 				eAxis.position = emitter.position;
-// 				eAxis.rotation = emitter.direction;
-// 				renderer.DrawLines(eAxis, *vertexColorShader);
-// 			}
-
-// 			basicShader->use();
-// 			basicShader->setVec4("obj_color", grid.color);
-// 			renderer.DrawLines(grid, *basicShader);
-// 		}
-
-// 		gui.Render();
-
-// 		glfwSwapBuffers(gl.window);
-
-// 		lastTime = currentTime;
-// 		frameCount++;
-
-// 		glfwPollEvents();
-// 	}
-// 	gui.Shutdown();
-// }
