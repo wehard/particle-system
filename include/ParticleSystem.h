@@ -102,21 +102,22 @@ private:
 	GLRenderer renderer;
 	Shader *particleShader;
 	Shader *emitterShader;
-	Shader *basicShader;
-	Shader *vertexColorShader;
-	Shader *billboardShader;
+	// Shader *basicShader;
+	// Shader *vertexColorShader;
+	// Shader *billboardShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 	void CreateSeedBuffer();
-	double lastTime = 0.0;
+	// double lastTime = 0.0;
+	CLProgram &clProgram;
 public:
-	int fps;
-	double deltaTime;
+	// int fps;
+	// double deltaTime;
 	int mouseGravity = 0;
 	float mouseGravityScale = 1.0f;
-	std::vector<cl_float4> gravityPoints;
-	MouseInfo mouseInfo;
-	CLProgram *clProgram;
+	// std::vector<cl_float4> gravityPoints;
+	// MouseInfo mouseInfo;
+	// CLProgram &clProgram;
 	CLContext &cl;
 	GLContext &gl;
 	const size_t numParticles = 2000000;
@@ -124,29 +125,28 @@ public:
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	CLBuffer seedBuffer;
-	bool showOverlays = true;
+	// bool showOverlays = true;
 	bool useEmitter = false;
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
-	Camera camera;
+	// Camera camera;
 	Emitter emitter;
-	bool mouseMovement = false;
-	ParticleSystem(GLContext &gl, CLContext &cl);
+	// bool mouseMovement = false;
+	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p);
 	void InitParticles(t_init_shape shape);
 	void InitParticlesEmitter();
-	void UpdateParticles(float deltaTime);
-	void UpdateParticlesEmitter(float deltaTime);
-	void UpdateGpBuffer();
+	void UpdateParticles(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
+	void UpdateParticlesEmitter(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
+	void UpdateGpBuffer(std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
 
-	void Update();
-	void Render();
+	void Update(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
+	void Render(Camera &camera, MouseInfo mouseInfo);
 
 	void Reset();
-	void AddGravityPoint();
-	void AddGravityPoint(glm::vec4 pos);
-	void ClearGravityPoints();
+	// void AddGravityPoint();
+	// void AddGravityPoint(glm::vec4 pos);
+	// void ClearGravityPoints();
 
-	void Run();
 	~ParticleSystem();
 };
 

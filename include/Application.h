@@ -17,6 +17,7 @@ private:
 	Shader *vertexColorShader;
 	Shader *billboardShader;
 
+	ParticleSystem *particleSystem;
 
 
 	float lastTime;

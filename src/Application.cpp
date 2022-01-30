@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ParticleSystem.h"
 #include "GUIContext.h"
 #include "GLRenderer.h"
 #include <glm/gtx/euler_angles.hpp>
@@ -79,6 +80,9 @@ Application::Application(GLContext &gl, CLContext &cl) : gl(gl), cl(cl)
 	glfwSetScrollCallback(gl.window, glfwMouseScrollCallback);
 	glfwSetKeyCallback(gl.window, glfwKeyCallback);
 	glfwSetCursorPosCallback(gl.window, glfwMouseCallback);
+
+	particleSystem = new ParticleSystem(gl, cl, *clProgram);
+	particleSystem->InitParticles(SPHERE);
 }
 
 Application::~Application()
@@ -144,43 +148,13 @@ void Application::Run()
 			camera.Move(RIGHT, deltaTime);
 		}
 
-		// if (useEmitter)
-		// {
-		// 	this->UpdateParticlesEmitter(deltaTime);
-		// }
-		// else
-		// 	this->UpdateParticles(deltaTime);
-
-		// ParticleSystem *ptemp;
+		particleSystem->Update(deltaTime, gravityPoints, mouseInfo);
 		gui.Update(*this);
 
 		// Render here!
 		renderer.Begin(camera, gl.clearColor);
 
-		// if (useEmitter)
-		// {
-		// 	emitterShader->use();
-		// 	emitterShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-		// 	emitterShader->setMat4("view_matrix", camera.getViewMatrix());
-		// 	emitterShader->setFloat("max_life", emitter.life);
-		// 	emitterShader->setVec4("min_color", minColor);
-		// 	emitterShader->setVec4("max_color", maxColor);
-		// }
-		// else
-		// {
-		// 	particleShader->use();
-		// 	particleShader->setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
-		// 	particleShader->setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
-		// 	particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-		// 	particleShader->setMat4("view_matrix", camera.getViewMatrix());
-		// 	particleShader->setInt("draw_mouse", true);
-		// 	particleShader->setVec3("m_pos", mouseInfo.world);
-		// }
-
-		// glPointSize(particleSize);
-		// glBindVertexArray(pBuffer.vao);
-		// glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
-		// glDrawArrays(GL_POINTS, 0, numParticles);
+		particleSystem->Render(camera, mouseInfo);
 
 		if (showOverlays)
 		{
