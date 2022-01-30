@@ -89,7 +89,9 @@ void GUIContext::Update(Application &app)
 		}
 	}
 
-	ImGui::Separator();
+	ImGui::End();
+
+	ImGui::Begin("systems");
 	for (auto ps : app.particleSystems)
 	{
 		ImGui::PushID(ps);
