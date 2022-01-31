@@ -38,9 +38,6 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 
 ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p, Shader &pShader, Shader &eShader) : gl(gl), cl(cl), clProgram(p), particleShader(pShader), emitterShader(eShader), initShape(SPHERE)
 {
-	// particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
-	// emitterShader = new Shader("./res/shaders/particle_emitter.vert", "./res/shaders/particle_emitter.frag");
-
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 0.0);
 
@@ -72,10 +69,6 @@ void ParticleSystem::CreateSeedBuffer()
 
 ParticleSystem::~ParticleSystem()
 {
-	// delete particleShader;
-	// delete emitterShader;
-	
-
 	glDeleteBuffers(1, &pBuffer.vbo);
 	glDeleteVertexArrays(1, &pBuffer.vao);
 	glDeleteBuffers(1, &gpBuffer.vbo);
