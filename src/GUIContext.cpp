@@ -1,5 +1,6 @@
 #include "GUIContext.h"
 #include <string>
+#include <algorithm>
 
 GUIContext::GUIContext() {}
 
@@ -130,7 +131,12 @@ void GUIContext::UpdateSystems(Application &app)
 	for (auto ps : app.particleSystems)
 	{
 		ImGui::PushID(ps);
-		ImGui::Text("Reset");
+		ImGui::Text("Particle System");
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Remove"))
+		{
+			app.particleSystems.erase(std::remove(app.particleSystems.begin(), app.particleSystems.end(), ps), app.particleSystems.end());
+		}
 		if (ImGui::SmallButton("Sphere"))
 		{
 			ps->SetShape(SPHERE);

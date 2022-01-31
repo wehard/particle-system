@@ -20,7 +20,6 @@
 #include "imgui_impl_opengl3.h"
 
 #include <stdlib.h>
-// #include "ParticleSystem.h"
 #include "Application.h"
 #include "CLContext.h"
 #include "GLContext.h"
@@ -48,9 +47,6 @@ int main(int argc, char **argv)
 		GLContext gl = GLContext("particle-system", 1920, 1080);
 		CLContext cl = CLContext(0, deviceIndex);
 
-		// ParticleSystem ps = ParticleSystem(gl, cl);
-		// ps.InitParticles(SPHERE);
-		// ps.Run();
 		Application app = Application(gl, cl);
 		app.Run();
 	}
