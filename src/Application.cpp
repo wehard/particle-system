@@ -28,8 +28,8 @@ static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, 
 static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	auto app = (Application *)glfwGetWindowUserPointer(window);
-	if (app->mouseGravity)
-		app->mouseGravityMass += yoffset * 0.1f;
+	if (app->mouseInfo.gravity)
+		app->mouseInfo.mass += yoffset * 0.1f;
 }
 
 static void glfwMouseCallback(GLFWwindow *window, double xpos, double ypos)
@@ -63,7 +63,7 @@ static void glfwKeyCallback(GLFWwindow *window, int key, int scancode, int actio
 	}
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
 	{
-		app->mouseGravity = !app->mouseGravity;
+		app->mouseInfo.gravity = !app->mouseInfo.gravity;
 	}
 }
 
@@ -183,10 +183,10 @@ void Application::Run()
 				}
 			}
 
-			if (mouseGravity)
+			if (mouseInfo.gravity)
 			{
 				gp.position = mouseInfo.world;
-				renderer.DrawBillboard(gp, 0.05 + (mouseGravityMass * 0.001), *billboardShader);
+				renderer.DrawBillboard(gp, 0.05 + (mouseInfo.mass * 0.001), *billboardShader);
 			}
 
 			renderer.DrawLines(wAxis, *vertexColorShader);
@@ -207,8 +207,6 @@ void Application::Run()
 	}
 	gui.Shutdown();
 }
-
-
 
 void Application::AddGravityPoint()
 {

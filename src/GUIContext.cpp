@@ -70,9 +70,9 @@ void GUIContext::UpdateApplicationInfo(Application &app)
 	ImGui::Text("Screen x %f, y %f, z %f", app.mouseInfo.screen.x, app.mouseInfo.screen.y, app.mouseInfo.screen.z);
 	ImGui::Text("NDC x %f, y %f, z %f", app.mouseInfo.ndc.x, app.mouseInfo.ndc.y, app.mouseInfo.ndc.z);
 	ImGui::Text("World x %f, y %f, z %f", app.mouseInfo.world.x, app.mouseInfo.world.y, app.mouseInfo.world.z);
-	ImGui::Checkbox("Gravity", (bool *)&app.mouseGravity);
+	ImGui::Checkbox("Gravity", (bool *)&app.mouseInfo.gravity);
 	ImGui::SameLine();
-	ImGui::SliderFloat("Mass", &app.mouseGravityMass, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
+	ImGui::SliderFloat("Mass", &app.mouseInfo.mass, 1.0, 100.0, "%.2f", ImGuiSliderFlags_None);
 	ImGui::Separator();
 
 	ImGui::Text("Info");

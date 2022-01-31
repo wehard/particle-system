@@ -13,6 +13,8 @@ struct MouseInfo
 	glm::vec3 screen;
 	glm::vec3 ndc;
 	glm::vec3 world;
+	bool gravity = false;
+	float mass = 1.0f;
 
 	cl_float4 CLTypeWorld()
 	{

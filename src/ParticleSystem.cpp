@@ -194,6 +194,9 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 	clm.s[2] = mouseInfo.world.z;
 	clm.s[3] = 1.0f;
 
+	bool mouseGravity = mouseInfo.gravity;
+	float mouseMass = mouseInfo.mass;
+
 	UpdateGpBuffer(gravityPoints, mouseInfo);
 	int numGp = gravityPoints.size();
 	auto kernel = clProgram.GetKernel("update_particles_gravity_points");
@@ -203,8 +206,8 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(int), &mouseGravity},
-		{sizeof(float), &mouseGravityScale}
+		{sizeof(bool), &mouseGravity},
+		{sizeof(float), &mouseMass}
 		};
 	kernel->SetArgs(args, 7);
 	glFinish();
@@ -231,8 +234,8 @@ void ParticleSystem::UpdateParticlesEmitter(float deltaTime, std::vector<cl_floa
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(int), &mouseGravity},
-		{sizeof(float), &mouseGravityScale},
+		{sizeof(bool), &mouseInfo.gravity},
+		{sizeof(float), &mouseInfo.mass},
 		{sizeof(t_emitter), &e}};
 	kernel->SetArgs(args, 9);
 	glFinish();
@@ -259,27 +262,27 @@ void ParticleSystem::Update(float deltaTime, std::vector<cl_float4> gravityPoint
 void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo)
 {
 	if (useEmitter)
-		{
-			emitterShader.use();
-			emitterShader.setMat4("proj_matrix", camera.getProjectionMatrix());
-			emitterShader.setMat4("view_matrix", camera.getViewMatrix());
-			emitterShader.setFloat("max_life", emitter.life);
-			emitterShader.setVec4("min_color", minColor);
-			emitterShader.setVec4("max_color", maxColor);
-		}
-		else
-		{
-			particleShader.use();
-			particleShader.setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
-			particleShader.setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
-			particleShader.setMat4("proj_matrix", camera.getProjectionMatrix());
-			particleShader.setMat4("view_matrix", camera.getViewMatrix());
-			particleShader.setInt("draw_mouse", true);
-			particleShader.setVec3("m_pos", mouseInfo.world);
-		}
+	{
+		emitterShader.use();
+		emitterShader.setMat4("proj_matrix", camera.getProjectionMatrix());
+		emitterShader.setMat4("view_matrix", camera.getViewMatrix());
+		emitterShader.setFloat("max_life", emitter.life);
+		emitterShader.setVec4("min_color", minColor);
+		emitterShader.setVec4("max_color", maxColor);
+	}
+	else
+	{
+		particleShader.use();
+		particleShader.setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
+		particleShader.setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
+		particleShader.setMat4("proj_matrix", camera.getProjectionMatrix());
+		particleShader.setMat4("view_matrix", camera.getViewMatrix());
+		particleShader.setInt("draw_mouse", true);
+		particleShader.setVec3("m_pos", mouseInfo.world);
+	}
 
-		glPointSize(particleSize);
-		glBindVertexArray(pBuffer.vao);
-		glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
-		glDrawArrays(GL_POINTS, 0, numParticles);
+	glPointSize(particleSize);
+	glBindVertexArray(pBuffer.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, pBuffer.vbo);
+	glDrawArrays(GL_POINTS, 0, numParticles);
 }

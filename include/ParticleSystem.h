@@ -107,8 +107,8 @@ private:
 	void CreateSeedBuffer();
 	CLProgram &clProgram;
 public:
-	int mouseGravity = 0;
-	float mouseGravityScale = 1.0f;
+	// int mouseGravity = 0;
+	// float mouseGravityScale = 1.0f;
 	CLContext &cl;
 	GLContext &gl;
 	const size_t numParticles = 2000000;

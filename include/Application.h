@@ -34,8 +34,6 @@ public:
 	CLContext &cl;
 	GLContext &gl;
 	bool mouseMovement = false;
-	float mouseGravityMass = 1.0f;
-	bool mouseGravity;
 	Camera camera;
 	MouseInfo mouseInfo;
 	void ClearGravityPoints();
