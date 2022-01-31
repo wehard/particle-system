@@ -24,6 +24,7 @@ private:
 
 
 public:
+	float angle = 0.0f;
 	std::vector<ParticleSystem *> particleSystems;
 	CLProgram *clProgram;
 	bool showOverlays = true;

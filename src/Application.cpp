@@ -151,6 +151,22 @@ void Application::Run()
 			camera.Move(RIGHT, deltaTime);
 		}
 
+		angle += 2.4f * deltaTime;
+		if (gravityPoints.size() > 0)
+		{
+			float s = sin(angle);
+  			float c = cos(angle);
+
+			// translate point back to origin:
+			// rotate point
+			float xnew = 0.0f * c - 0.25 * s;
+			float ynew = 0.0f * s + 0.25 * c;
+
+			// translate point back:
+			gravityPoints[0].x = xnew;
+			gravityPoints[0].y = ynew;
+		}
+
 		for (auto ps : particleSystems)
 		{
 			ps->Update(deltaTime, gravityPoints, mouseInfo);
