@@ -120,8 +120,10 @@ public:
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
 	Emitter emitter;
+	glm::vec3 position;
+	t_init_shape initShape;
 	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p);
-	void InitParticles(t_init_shape shape);
+	void InitParticles();
 	void InitParticlesEmitter();
 	void UpdateParticles(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
 	void UpdateParticlesEmitter(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
@@ -131,6 +133,7 @@ public:
 	void Render(Camera &camera, MouseInfo mouseInfo);
 
 	void Reset();
+	void SetShape(t_init_shape shape);
 
 	~ParticleSystem();
 };

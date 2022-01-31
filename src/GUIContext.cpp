@@ -133,7 +133,8 @@ void GUIContext::UpdateSystems(Application &app)
 		ImGui::Text("Reset");
 		if (ImGui::SmallButton("Sphere"))
 		{
-			ps->InitParticles(SPHERE);
+			ps->SetShape(SPHERE);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Torus"))
@@ -142,42 +143,67 @@ void GUIContext::UpdateSystems(Application &app)
 			app.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 0.5));
 			app.AddGravityPoint(glm::vec4(-0.25, 0.0, 0.0, 0.0017));
 			app.AddGravityPoint(glm::vec4(-0.45, 0.0, 0.0, 0.0087));
-			ps->InitParticles(TORUS);
+			ps->SetShape(TORUS);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Cube"))
 		{
-			ps->InitParticles(CUBE);
+			ps->SetShape(CUBE);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Rect"))
 		{
-			ps->InitParticles(RECT);
+			ps->SetShape(RECT);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Circle"))
 		{
 			app.ClearGravityPoints();
 			app.AddGravityPoint(glm::vec4(0.0, 0.0, 0.0, 3.0));
-			ps->InitParticles(CIRCLE);
+			ps->SetShape(CIRCLE);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Sine"))
 		{
-			ps->InitParticles(SINE);
+			ps->SetShape(SINE);
+			ps->Reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Emitter"))
 		{
-			ps->InitParticlesEmitter();
 			ps->useEmitter = true;
+			ps->InitParticlesEmitter();
+		}
+		ImGui::ColorEdit4("Min color", &ps->minColor.x);
+		ImGui::ColorEdit4("Max color", &ps->maxColor.x);
+
+		float v[3] = {ps->emitter.position.x, ps->emitter.position.y, ps->emitter.position.z};
+		if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
+		{
+			ps->emitter.position = glm::vec3(v[0], v[1], v[2]);
+			ps->position = glm::vec3(v[0], v[1], v[2]);
+			if (ps->useEmitter)
+			{
+				ps->InitParticlesEmitter();
+			}
+			else
+			{
+				ps->InitParticles();
+			}
 		}
 
 		if (ps->useEmitter)
 		{
-			ImGui::Text("Emitter");
-			ImGui::ColorEdit4("Min color", &ps->minColor.x);
-			ImGui::ColorEdit4("Max color", &ps->maxColor.x);
+			float v2[3] = {ps->emitter.direction.x, ps->emitter.direction.y, ps->emitter.direction.z};
+			if (ImGui::DragFloat3("Rotation", v2, 0.1, -180.0, 180.0, "%.3f", ImGuiSliderFlags_None))
+			{
+				ps->emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
+				ps->InitParticlesEmitter();
+			}
 			if (ImGui::SliderFloat("Radius", &ps->emitter.radius, 0.01f, 1.0f, "%.2f", ImGuiSliderFlags_None))
 				ps->InitParticlesEmitter();
 			if (ImGui::SliderFloat("Rate", &ps->emitter.rate, 1, 50000))
@@ -186,18 +212,6 @@ void GUIContext::UpdateSystems(Application &app)
 				ps->InitParticlesEmitter();
 			if (ImGui::SliderFloat("Speed", &ps->emitter.velocity, 1000, 20000, "%f", ImGuiSliderFlags_None))
 				ps->InitParticlesEmitter();
-			float v[3] = {ps->emitter.position.x, ps->emitter.position.y, ps->emitter.position.z};
-			if (ImGui::DragFloat3("Position", v, 0.01, -100.0, 100.0, "%.3f", ImGuiSliderFlags_None))
-			{
-				ps->emitter.position = glm::vec3(v[0], v[1], v[2]);
-				ps->InitParticlesEmitter();
-			}
-			float v2[3] = {ps->emitter.direction.x, ps->emitter.direction.y, ps->emitter.direction.z};
-			if (ImGui::DragFloat3("Rotation", v2, 0.1, -180.0, 180.0, "%.3f", ImGuiSliderFlags_None))
-			{
-				ps->emitter.direction = glm::vec3(v2[0], v2[1], v2[2]);
-				ps->InitParticlesEmitter();
-			}
 		}
 		ImGui::Separator();
 		ImGui::PopID();

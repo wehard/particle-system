@@ -11,17 +11,16 @@
 class GUIContext
 {
 private:
-    ImGuiContext *context;
-    void UpdatePlatformInfo(Application &app);
-    void UpdateSystems(Application &app);
-    void UpdateApplicationInfo(Application &app);
+	ImGuiContext *context;
+	void UpdatePlatformInfo(Application &app);
+	void UpdateSystems(Application &app);
+	void UpdateApplicationInfo(Application &app);
 public:
-    GUIContext();
-    void Init(GLFWwindow *window, const char *glslVersion);
-    void Update(ParticleSystem &ps);
-    void Update(Application &app);
-    void Render();
-    void Shutdown();
-    ~GUIContext();
+	GUIContext();
+	void Init(GLFWwindow *window, const char *glslVersion);
+	void Update(Application &app);
+	void Render();
+	void Shutdown();
+	~GUIContext();
 };
 

@@ -119,6 +119,7 @@ void Application::Run()
 	grid.scale = glm::vec3(2.0); // TODO: Needs to be done during vertex creation
 
 	auto eAxis = GLObject::Axis();
+	eAxis.scale = glm::vec3(0.5);
 
 	glfwSetWindowUserPointer(gl.window, this);
 
@@ -162,6 +163,14 @@ void Application::Run()
 		for (auto ps : particleSystems)
 		{
 			ps->Render(camera, mouseInfo);
+
+			eAxis.position = ps->position;
+			if (ps->useEmitter)
+			{
+				eAxis.position = ps->emitter.position;
+				eAxis.rotation = ps->emitter.direction;
+			}
+			renderer.DrawLines(eAxis, *vertexColorShader);
 		}
 		if (showOverlays)
 		{
@@ -181,13 +190,6 @@ void Application::Run()
 			}
 
 			renderer.DrawLines(wAxis, *vertexColorShader);
-
-			// if (useEmitter)
-			// {
-			// 	eAxis.position = emitter.position;
-			// 	eAxis.rotation = emitter.direction;
-			// 	renderer.DrawLines(eAxis, *vertexColorShader);
-			// }
 
 			basicShader->use();
 			basicShader->setVec4("obj_color", grid.color);

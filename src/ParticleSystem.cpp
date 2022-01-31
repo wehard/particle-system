@@ -36,7 +36,7 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 	return (m);
 }
 
-ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p) : gl(gl), cl(cl), clProgram(p)
+ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p) : gl(gl), cl(cl), clProgram(p), initShape(SPHERE)
 {
 	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
 	emitterShader = new Shader("./res/shaders/particle_emitter.vert", "./res/shaders/particle_emitter.frag");
@@ -48,7 +48,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p) : gl(
 	CreateGravityPointBuffer();
 	CreateSeedBuffer();	
 
-	InitParticles(SPHERE);
+	InitParticles();
 }
 
 void ParticleSystem::CreateSeedBuffer()
@@ -128,7 +128,7 @@ void ParticleSystem::CreateGravityPointBuffer()
 	CLContext::CheckCLResult(result, "ParticleSystem::createGravityPointBuffer");
 }
 
-void ParticleSystem::InitParticles(t_init_shape shape)
+void ParticleSystem::InitParticles()
 {
 	useEmitter = false;
 	cl_int result = CL_SUCCESS;
@@ -139,7 +139,7 @@ void ParticleSystem::InitParticles(t_init_shape shape)
 		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(GLint), &numParticles},
-		{sizeof(t_init_shape), &shape}};
+		{sizeof(t_init_shape), &initShape}};
 	k->SetArgs(args, 4);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -168,9 +168,22 @@ void ParticleSystem::InitParticlesEmitter()
 	CLContext::CheckCLResult(clFinish(cl.queue), "clFinish");
 }
 
+void ParticleSystem::SetShape(t_init_shape shape)
+{
+	useEmitter = false;
+	initShape = shape;
+}
+
 void ParticleSystem::Reset()
 {
-	InitParticles(RECT);
+	if (useEmitter)
+	{
+		InitParticlesEmitter();
+	}
+	else
+	{
+		InitParticles();
+	}
 }
 
 void ParticleSystem::UpdateGpBuffer(std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo)
