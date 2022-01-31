@@ -194,9 +194,6 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 	clm.s[2] = mouseInfo.world.z;
 	clm.s[3] = 1.0f;
 
-	bool mouseGravity = mouseInfo.gravity;
-	float mouseMass = mouseInfo.mass;
-
 	UpdateGpBuffer(gravityPoints, mouseInfo);
 	int numGp = gravityPoints.size();
 	auto kernel = clProgram.GetKernel("update_particles_gravity_points");
@@ -206,8 +203,8 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 		{sizeof(int), &numGp},
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
-		{sizeof(bool), &mouseGravity},
-		{sizeof(float), &mouseMass}
+		{sizeof(bool), &mouseInfo.gravity},
+		{sizeof(float), &mouseInfo.mass}
 		};
 	kernel->SetArgs(args, 7);
 	glFinish();
