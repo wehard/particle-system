@@ -127,13 +127,21 @@ void ParticleSystem::InitParticles()
 	cl_int result = CL_SUCCESS;
 	cl_command_queue queue = cl.queue;
 
+	cl_float4 pos;
+	pos.x = position.x;
+	pos.y = position.y;
+	pos.z = position.z;
+	pos.w = 1.0f;
+
 	auto k = clProgram.GetKernel("init_particles");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(GLint), &numParticles},
-		{sizeof(t_init_shape), &initShape}};
-	k->SetArgs(args, 4);
+		{sizeof(t_init_shape), &initShape},
+		{sizeof(cl_float4), &pos}
+		};
+	k->SetArgs(args, 5);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
 	k->Enqueue(cl.queue, numParticles);

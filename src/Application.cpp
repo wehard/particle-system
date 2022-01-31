@@ -164,13 +164,16 @@ void Application::Run()
 		{
 			ps->Render(camera, mouseInfo);
 
-			eAxis.position = ps->position;
-			if (ps->useEmitter)
+			if (showOverlays)
 			{
-				eAxis.position = ps->emitter.position;
-				eAxis.rotation = ps->emitter.direction;
+				eAxis.position = ps->position;
+				if (ps->useEmitter)
+				{
+					eAxis.position = ps->emitter.position;
+					eAxis.rotation = ps->emitter.direction;
+				}
+				renderer.DrawLines(eAxis, *vertexColorShader);
 			}
-			renderer.DrawLines(eAxis, *vertexColorShader);
 		}
 		if (showOverlays)
 		{

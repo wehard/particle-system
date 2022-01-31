@@ -120,7 +120,7 @@ public:
 	glm::vec4 minColor;
 	glm::vec4 maxColor;
 	Emitter emitter;
-	glm::vec3 position;
+	glm::vec3 position = glm::vec3(0.0f);
 	t_init_shape initShape;
 	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p, Shader &pShader, Shader &eShader);
 	void InitParticles();

@@ -186,7 +186,7 @@ static void init_vel(__global t_particle *ps, __global ulong *sb)
 	ps[i].vel = init_vel;
 }
 
-__kernel void init_particles(__global t_particle * ps, __global ulong *sb, int num_particles, t_init_shape shape)
+__kernel void init_particles(__global t_particle * ps, __global ulong *sb, int num_particles, t_init_shape shape, float4 init_pos)
 {
 	int i = get_global_id(0);
 	switch (shape)
@@ -218,6 +218,7 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 			break;
 	}
 
+	ps[i].pos += init_pos;
 	ps[i].life = 0.0;
 }
 
