@@ -100,8 +100,8 @@ class ParticleSystem
 {
 private:
 	GLRenderer renderer;
-	Shader *particleShader;
-	Shader *emitterShader;
+	Shader &particleShader;
+	Shader &emitterShader;
 	void CreateParticleBuffer();
 	void CreateGravityPointBuffer();
 	void CreateSeedBuffer();
@@ -122,7 +122,7 @@ public:
 	Emitter emitter;
 	glm::vec3 position;
 	t_init_shape initShape;
-	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p);
+	ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p, Shader &pShader, Shader &eShader);
 	void InitParticles();
 	void InitParticlesEmitter();
 	void UpdateParticles(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);

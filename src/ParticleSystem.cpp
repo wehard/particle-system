@@ -36,10 +36,10 @@ static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec
 	return (m);
 }
 
-ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p) : gl(gl), cl(cl), clProgram(p), initShape(SPHERE)
+ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p, Shader &pShader, Shader &eShader) : gl(gl), cl(cl), clProgram(p), particleShader(pShader), emitterShader(eShader), initShape(SPHERE)
 {
-	particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
-	emitterShader = new Shader("./res/shaders/particle_emitter.vert", "./res/shaders/particle_emitter.frag");
+	// particleShader = new Shader("./res/shaders/particle.vert", "./res/shaders/particle.frag");
+	// emitterShader = new Shader("./res/shaders/particle_emitter.vert", "./res/shaders/particle_emitter.frag");
 
 	minColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 	maxColor = glm::vec4(1.0, 0.0, 0.0, 0.0);
@@ -72,8 +72,8 @@ void ParticleSystem::CreateSeedBuffer()
 
 ParticleSystem::~ParticleSystem()
 {
-	delete particleShader;
-	delete emitterShader;
+	// delete particleShader;
+	// delete emitterShader;
 	
 
 	glDeleteBuffers(1, &pBuffer.vbo);
@@ -267,22 +267,22 @@ void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo)
 {
 	if (useEmitter)
 		{
-			emitterShader->use();
-			emitterShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-			emitterShader->setMat4("view_matrix", camera.getViewMatrix());
-			emitterShader->setFloat("max_life", emitter.life);
-			emitterShader->setVec4("min_color", minColor);
-			emitterShader->setVec4("max_color", maxColor);
+			emitterShader.use();
+			emitterShader.setMat4("proj_matrix", camera.getProjectionMatrix());
+			emitterShader.setMat4("view_matrix", camera.getViewMatrix());
+			emitterShader.setFloat("max_life", emitter.life);
+			emitterShader.setVec4("min_color", minColor);
+			emitterShader.setVec4("max_color", maxColor);
 		}
 		else
 		{
-			particleShader->use();
-			particleShader->setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
-			particleShader->setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
-			particleShader->setMat4("proj_matrix", camera.getProjectionMatrix());
-			particleShader->setMat4("view_matrix", camera.getViewMatrix());
-			particleShader->setInt("draw_mouse", true);
-			particleShader->setVec3("m_pos", mouseInfo.world);
+			particleShader.use();
+			particleShader.setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
+			particleShader.setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
+			particleShader.setMat4("proj_matrix", camera.getProjectionMatrix());
+			particleShader.setMat4("view_matrix", camera.getViewMatrix());
+			particleShader.setInt("draw_mouse", true);
+			particleShader.setVec3("m_pos", mouseInfo.world);
 		}
 
 		glPointSize(particleSize);

@@ -253,5 +253,5 @@ size_t Application::GetNumParticles()
 
 void Application::AddParticleSystem()
 {
-	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram));
+	particleSystems.push_back(new ParticleSystem(gl, cl, *clProgram, *particleShader, *emitterShader));
 }
