@@ -4,6 +4,7 @@
 
 Uses `cmake` as build system
 brew install cmake
+brew install glm
 
 
 - [ ] Particles allocated on GPU
