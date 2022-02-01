@@ -278,8 +278,8 @@ void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo)
 	else
 	{
 		particleShader.use();
-		particleShader.setVec4("min_color", glm::vec4(1.0, 0.0, 0.0, 0.1));
-		particleShader.setVec4("max_color", glm::vec4(1.0, 1.0, 0.0, 0.1));
+		particleShader.setVec4("min_color", maxColor);
+		particleShader.setVec4("max_color", minColor);
 		particleShader.setMat4("proj_matrix", camera.getProjectionMatrix());
 		particleShader.setMat4("view_matrix", camera.getViewMatrix());
 		particleShader.setInt("draw_mouse", true);
