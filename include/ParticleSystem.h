@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2021/12/31 21:46:18 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/02/01 18:40:08 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,9 @@ private:
 	void CreateSeedBuffer();
 	CLProgram &clProgram;
 public:
-	// int mouseGravity = 0;
-	// float mouseGravityScale = 1.0f;
 	CLContext &cl;
 	GLContext &gl;
 	const size_t numParticles = 2000000;
-	float particleSize = 1.0f;
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	CLBuffer seedBuffer;
@@ -130,7 +127,7 @@ public:
 	void UpdateGpBuffer(std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
 
 	void Update(float deltaTime, std::vector<cl_float4> gravityPoints, MouseInfo mouseInfo);
-	void Render(Camera &camera, MouseInfo mouseInfo);
+	void Render(Camera &camera, MouseInfo mouseInfo, float particleSize);
 
 	void Reset();
 	void SetShape(t_init_shape shape);

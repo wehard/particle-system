@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2022/01/06 14:47:20 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/02/01 18:40:20 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ ParticleSystem::ParticleSystem(GLContext &gl, CLContext &cl, CLProgram &p, Shade
 
 	CreateParticleBuffer();
 	CreateGravityPointBuffer();
-	CreateSeedBuffer();	
+	CreateSeedBuffer();
 
 	InitParticles();
 }
@@ -60,7 +60,7 @@ void ParticleSystem::CreateSeedBuffer()
 	{
 		hostseed[i] = distribution(generator);
 	}
-	
+
 	seedBuffer.clmem = clCreateBuffer(cl.ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, numParticles * 8, hostseed, &result);
 	free(hostseed);
 
@@ -106,7 +106,7 @@ void ParticleSystem::CreateParticleBuffer()
 void ParticleSystem::CreateGravityPointBuffer()
 {
 	cl_int result = CL_SUCCESS;
-	
+
 	glGenVertexArrays(1, &gpBuffer.vao);
 	glBindVertexArray(gpBuffer.vao);
 	glGenBuffers(1, &gpBuffer.vbo);
@@ -264,7 +264,7 @@ void ParticleSystem::Update(float deltaTime, std::vector<cl_float4> gravityPoint
 	}
 }
 
-void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo)
+void ParticleSystem::Render(Camera &camera, MouseInfo mouseInfo, float particleSize)
 {
 	if (useEmitter)
 	{

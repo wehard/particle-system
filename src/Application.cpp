@@ -178,7 +178,7 @@ void Application::Run()
 
 		for (auto ps : particleSystems)
 		{
-			ps->Render(camera, mouseInfo);
+			ps->Render(camera, mouseInfo, particleSize);
 
 			if (showOverlays)
 			{
