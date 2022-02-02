@@ -204,7 +204,7 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 
 	UpdateGpBuffer(gravityPoints, mouseInfo);
 	int numGp = gravityPoints.size();
-	auto kernel = clProgram.GetKernel("update_particles_gravity_points");
+	auto kernel = clProgram.GetKernel("update_particles");
 	std::vector<CLKernelArg> args = {
 		{sizeof(cl_mem), &pBuffer.clmem},
 		{sizeof(cl_mem), &gpBuffer.clmem},

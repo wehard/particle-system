@@ -293,7 +293,7 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 	return vel;
 }
 
-__kernel void update_particles_gravity_points(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, float mgs)
+__kernel void update_particles(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, float mgs)
 {
 	int i = get_global_id(0);
 	
