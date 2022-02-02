@@ -100,9 +100,7 @@ void Application::Run()
 {
 	camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
 
-	lastTime = glfwGetTime();
-	double lastUpdateFpsTime = lastTime;
-	int frameCount = 0;
+	
 
 	auto renderer = GLRenderer();
 	GUIContext gui;
@@ -123,16 +121,22 @@ void Application::Run()
 
 	glfwSetWindowUserPointer(gl.window, this);
 
+	lastTime = glfwGetTime();
+	double lastUpdateFpsTime = lastTime;
+	int frameCount = 0;
 	while (!glfwWindowShouldClose(gl.window) && glfwGetKey(gl.window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		double currentTime = glfwGetTime();
-		deltaTime = currentTime - lastTime;
-
-		if (currentTime - lastUpdateFpsTime > 1.0)
+		frameCount++;
+		if (currentTime - lastUpdateFpsTime >= 1.0f)
 		{
-			fps = frameCount / lastUpdateFpsTime;
+			msPerFrame = 1000.0 / (double)frameCount;
+			fps = 1000.0 * (1.0 / msPerFrame);
+			frameCount = 0;
 			lastUpdateFpsTime = currentTime;
 		}
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
 
 		if (glfwGetKey(gl.window, GLFW_KEY_W))
 		{
@@ -218,10 +222,6 @@ void Application::Run()
 		gui.Render();
 
 		glfwSwapBuffers(gl.window);
-
-		lastTime = currentTime;
-		frameCount++;
-
 		glfwPollEvents();
 	}
 	gui.Shutdown();

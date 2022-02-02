@@ -29,6 +29,7 @@ void GUIContext::UpdateApplicationInfo(Application &app)
 {
 	ImGui::Begin("application");
 	ImGui::Text("FPS %d", app.fps);
+	ImGui::Text("ms %f", app.msPerFrame);
 	ImGui::Checkbox("Show Overlays", &app.showOverlays);
 	ImGui::Separator();
 
