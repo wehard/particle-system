@@ -28,6 +28,7 @@ void GUIContext::Update(Application &app)
 void GUIContext::UpdateApplicationInfo(Application &app)
 {
 	ImGui::Begin("application");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::Text("FPS %d", app.fps);
 	ImGui::Text("ms %f", app.msPerFrame);
 	ImGui::Checkbox("Show Overlays", &app.showOverlays);

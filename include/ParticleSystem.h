@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:18:54 by wkorande          #+#    #+#             */
-/*   Updated: 2022/02/01 18:40:08 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/06/20 15:29:51 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ private:
 public:
 	CLContext &cl;
 	GLContext &gl;
-	const size_t numParticles = 2000000;
+	const size_t numParticles = 1000000;
 	GLBuffer pBuffer;
 	GLBuffer gpBuffer;
 	CLBuffer seedBuffer;

@@ -6,7 +6,7 @@
 #    By: wkorande <willehard@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/01 15:48:04 by rjaakonm          #+#    #+#              #
-#    Updated: 2022/06/20 15:20:52 by wkorande         ###   ########.fr        #
+#    Updated: 2022/06/20 15:23:06 by wkorande         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,19 +25,19 @@ SRC = Application.cpp\
 	GUIContext.cpp\
 	ParticleSystem.cpp\
 	Shader.cpp\
-	main.cpp\
+	main.cpp
 
 IMGGUI_SRC = lib/imgui/imgui.cpp\
-lib/imgui/imgui_demo.cpp\
-lib/imgui/imgui_draw.cpp\
-lib/imgui/imgui_impl_glfw.cpp\
-lib/imgui/imgui_impl_opengl3.cpp\
-lib/imgui/imgui_tables.cpp\
-lib/imgui/imgui_widgets.cpp\
+	lib/imgui/imgui_demo.cpp\
+	lib/imgui/imgui_draw.cpp\
+	lib/imgui/imgui_impl_glfw.cpp\
+	lib/imgui/imgui_impl_opengl3.cpp\
+	lib/imgui/imgui_tables.cpp\
+	lib/imgui/imgui_widgets.cpp
 
 SRCS = $(addprefix $(SRCDIR)/, $(SRC)) $(IMGGUI_SRC)
 
-CFLAGS = -std=c++17 -Wall -Wextra -Werror
+CFLAGS = -std=c++17 #-Wall -Wextra -Werror
 
 OBJS = $(SRCS:.c=.o)
 
