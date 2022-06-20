@@ -14,6 +14,8 @@ NAME = particle-system
 
 SRCDIR = src
 
+IMGUIDIR = lib/imgui
+
 SRC = Application.cpp\
 	CLContext.cpp\
 	CLKernel.cpp\
@@ -27,19 +29,20 @@ SRC = Application.cpp\
 	Shader.cpp\
 	main.cpp
 
-IMGGUI_SRC = lib/imgui/imgui.cpp\
-	lib/imgui/imgui_demo.cpp\
-	lib/imgui/imgui_draw.cpp\
-	lib/imgui/imgui_impl_glfw.cpp\
-	lib/imgui/imgui_impl_opengl3.cpp\
-	lib/imgui/imgui_tables.cpp\
-	lib/imgui/imgui_widgets.cpp
+IMGGUI_SRC = imgui.cpp\
+	imgui_demo.cpp\
+	imgui_draw.cpp\
+	imgui_impl_glfw.cpp\
+	imgui_impl_opengl3.cpp\
+	imgui_tables.cpp\
+	imgui_widgets.cpp
 
-SRCS = $(addprefix $(SRCDIR)/, $(SRC)) $(IMGGUI_SRC)
+SRCS = $(addprefix $(SRCDIR)/, $(SRC)) $(addprefix $(IMGUIDIR)/, $(IMGGUI_SRC))
 
 CFLAGS = -std=c++17 #-Wall -Wextra -Werror
-
+OUTDIR = out
 OBJS = $(SRCS:.cpp=.o)
+OUT = $(notdir $(OBJS))
 
 INCL = -I include -I lib/imgui/include -I lib/GLFW -I lib/glm -I lib -I /usr/local/include
 
@@ -63,26 +66,25 @@ endif
 
 CC = clang++
 
-vpath %.cpp $(SRCDIR)
-
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@printf "Platform: %s\n" "$(UNAME_S)"
-	@printf "Architecture: %s\n" "$(UNAME_P)"
-	@printf "compiling %s\n" "$(NAME)"
-	@$(CC) $(CFLAGS) $(INCL) $(OBJS) $(LDFLAGS) -o $(NAME) -O3
+	@printf "Architecture: %s Platform: %s\n" "$(UNAME_S)" "$(UNAME_P)"
+	@printf "compiling \n" "$(NAME)"
+	@$(CC) $(CFLAGS) $(INCL) $(addprefix $(OUTDIR)/, $(OUT)) $(LDFLAGS) -o $(NAME) -O3
 
 %.o: %.cpp
-	@printf "compiling %s\n" "$<"
-	@$(CC) $(CFLAGS) $(INCL) -c $< -o $@ -O3
+	@mkdir -p out
+	@printf "compiling %s -> %s\n" "$<" "$@"
+	@$(CC) $(CFLAGS) $(INCL) -c $< -o $(addprefix $(OUTDIR)/, $(notdir $@)) -O3
 
 
 debug:
 	$(CC) -g $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJS)
+	@rm -rf $(addprefix $(OUTDIR)/, $(OUT))
+	@rm -Rf $(OUTDIR)
 
 fclean: clean
 	@rm -f $(NAME)
