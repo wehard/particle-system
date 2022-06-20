@@ -158,7 +158,7 @@ void Application::Run()
 		if (gravityPoints.size() > 0)
 		{
 			float s = sin(angle);
-  			float c = cos(angle);
+			float c = cos(angle);
 
 			// translate point back to origin:
 			// rotate point
@@ -166,8 +166,8 @@ void Application::Run()
 			float ynew = 0.0f * s + 0.25 * c;
 
 			// translate point back:
-			gravityPoints[0].v4[0] = xnew;
-			gravityPoints[0].v4[1] = ynew;
+			gravityPoints[0].s[0] = xnew;
+			gravityPoints[0].s[1] = ynew;
 		}
 
 		for (auto ps : particleSystems)

@@ -43,13 +43,23 @@ OBJS = $(SRCS:.cpp=.o)
 
 INCL = -I include -I lib/imgui/include -I lib/GLFW -I lib/glm -I lib -I /usr/local/include
 
+UNAME_P := $(shell uname -p)
+ifeq ($(UNAME_P),intel)
+	LIBGLFW = -lglfw3
+	LIBGLEW = -lGLEW
+endif
+ifeq ($(UNAME_P),arm)
+	LIBGLFW =  -lglfw3_arm64
+	LIBGLEW = -lGLEW_arm64
+endif
+
 UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		LDFLAGS =  -lglfw -lGL -lGLEW -lm -lXext -lX11
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		LDFLAGS =  -L lib -lglfw3 -L lib -lGLEW -lm -framework OpenGL -framework OpenCL -framework Cocoa -framework IOKit -framework CoreVideo
-	endif
+ifeq ($(UNAME_S),Linux)
+	LDFLAGS =  -lglfw -lGL -lGLEW -lm -lXext -lX11
+endif
+ifeq ($(UNAME_S),Darwin)
+	LDFLAGS =  -L lib $(LIBGLFW) -L lib $(LIBGLEW) -lm -framework OpenGL -framework OpenCL -framework Cocoa -framework IOKit -framework CoreVideo
+endif
 
 CC = clang++
 
@@ -58,6 +68,8 @@ vpath %.cpp $(SRCDIR)
 all: $(NAME)
 
 $(NAME): $(OBJS)
+	@printf "Platform: %s\n" "$(UNAME_S)"
+	@printf "Architecture: %s\n" "$(UNAME_P)"
 	@printf "compiling %s\n" "$(NAME)"
 	@$(CC) $(CFLAGS) $(INCL) $(OBJS) $(LDFLAGS) -o $(NAME) -O3
 

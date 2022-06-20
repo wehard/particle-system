@@ -55,7 +55,7 @@ void ParticleSystem::CreateSeedBuffer()
 	std::default_random_engine generator;
 	std::uniform_int_distribution<u_long> distribution(0, ULONG_MAX);
 
-	u_long *hostseed = (u_long*)malloc(sizeof(u_long) * numParticles);
+	u_long *hostseed = (u_long *)malloc(sizeof(u_long) * numParticles);
 	for (size_t i = 0; i < numParticles; i++)
 	{
 		hostseed[i] = distribution(generator);
@@ -128,10 +128,10 @@ void ParticleSystem::InitParticles()
 	cl_command_queue queue = cl.queue;
 
 	cl_float4 pos;
-	pos.v4[0] = position.x;
-	pos.v4[1] = position.y;
-	pos.v4[2] = position.z;
-	pos.v4[3] = 1.0f;
+	pos.s[0] = position.x;
+	pos.s[1] = position.y;
+	pos.s[2] = position.z;
+	pos.s[3] = 1.0f;
 
 	auto k = clProgram.GetKernel("init_particles");
 	std::vector<CLKernelArg> args = {
@@ -139,8 +139,7 @@ void ParticleSystem::InitParticles()
 		{sizeof(cl_mem), &seedBuffer.clmem},
 		{sizeof(GLint), &numParticles},
 		{sizeof(t_init_shape), &initShape},
-		{sizeof(cl_float4), &pos}
-		};
+		{sizeof(cl_float4), &pos}};
 	k->SetArgs(args, 5);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
@@ -212,8 +211,7 @@ void ParticleSystem::UpdateParticles(float deltaTime, std::vector<cl_float4> gra
 		{sizeof(cl_float4), &clm},
 		{sizeof(GLfloat), &deltaTime},
 		{sizeof(bool), &mouseInfo.gravity},
-		{sizeof(float), &mouseInfo.mass}
-		};
+		{sizeof(float), &mouseInfo.mass}};
 	kernel->SetArgs(args, 7);
 	glFinish();
 	cl.AquireGLObject(pBuffer.clmem);
