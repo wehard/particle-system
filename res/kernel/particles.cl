@@ -94,7 +94,7 @@ static float4 random_point_inside_torus(__global ulong *sb, float radius, float 
 
 	float4 res = rpos + spos;
 
-	return res; 
+	return res;
 }
 
 static float2 random_point_unit_circle(__global ulong *sb)
@@ -265,8 +265,6 @@ __kernel void init_particles_emitter(__global t_particle *ps, __global ulong *sb
 
 static float3 velocity_from_gravity_point(__global t_particle *p, __global float4 *gp)
 {
-	const float gravity_scale = 1.0f;
-	
 	float3 dir = gp->xyz - p->pos.xyz;
 	float dist = length(dir);
 	float f = G * (gp->w / (dist * dist + 0.006544f));
@@ -296,7 +294,7 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 __kernel void update_particles(__global t_particle *ps, __global float4 *gps, int num_gp, float4 m, float dt, int mg, float mgs)
 {
 	int i = get_global_id(0);
-	
+
 	ps[i].vel.xyz += velocity_combined(&ps[i], gps, num_gp, mg, m, mgs);
 	ps[i].pos.xyz += ps[i].vel.xyz * dt * TIME_SCALE;
 }
@@ -304,7 +302,7 @@ __kernel void update_particles(__global t_particle *ps, __global float4 *gps, in
 __kernel void update_particles_emitter(__global t_particle *ps, __global float4 *gps, __global ulong *sb, int num_gp, float4 m, float dt, int mg, float mgs, t_emitter e)
 {
 	int i = get_global_id(0);
-	
+
 	if (ps[i].life >= e.life)
 	{
 		reset_particle(ps, sb, e);

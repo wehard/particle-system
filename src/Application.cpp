@@ -98,9 +98,8 @@ Application::~Application()
 
 void Application::Run()
 {
+	AddParticleSystem();
 	camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
-
-
 
 	auto renderer = GLRenderer();
 	GUIContext gui;

@@ -6,7 +6,7 @@
 #    By: wkorande <willehard@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/01 15:48:04 by rjaakonm          #+#    #+#              #
-#    Updated: 2022/06/20 15:23:06 by wkorande         ###   ########.fr        #
+#    Updated: 2022/06/20 17:18:34 by wkorande         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ SRCS = $(addprefix $(SRCDIR)/, $(SRC)) $(IMGGUI_SRC)
 
 CFLAGS = -std=c++17 #-Wall -Wextra -Werror
 
-OBJS = $(SRCS:.c=.o)
+OBJS = $(SRCS:.cpp=.o)
 
 INCL = -I include -I lib/imgui/include -I lib/GLFW -I lib/glm -I lib -I /usr/local/include
 
@@ -53,15 +53,24 @@ UNAME_S := $(shell uname -s)
 
 CC = clang++
 
+vpath %.cpp $(SRCDIR)
+
 all: $(NAME)
 
-$(NAME):
-	$(CC) $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME) -O3
+$(NAME): $(OBJS)
+	@printf "compiling %s\n" "$(NAME)"
+	@$(CC) $(CFLAGS) $(INCL) $(OBJS) $(LDFLAGS) -o $(NAME) -O3
+
+%.o: %.cpp
+	@printf "compiling %s\n" "$<"
+	@$(CC) $(CFLAGS) $(INCL) -c $< -o $@ -O3
+
 
 debug:
 	$(CC) -g $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME)
 
 clean:
+	rm -rf $(OBJS)
 
 fclean: clean
 	@rm -f $(NAME)
