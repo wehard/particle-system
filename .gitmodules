@@ -1,6 +1,0 @@
-[submodule "vendor/OpenCL-SDK"]
-	path = vendor/OpenCL-SDK
-	url = https://github.com/KhronosGroup/OpenCL-SDK.git
-[submodule "imgui"]
-	path = imgui
-	url = https://github.com/ocornut/imgui.git

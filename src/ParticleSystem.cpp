@@ -6,7 +6,7 @@
 /*   By: wkorande <willehard@gmail.com>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/19 21:19:16 by wkorande          #+#    #+#             */
-/*   Updated: 2022/02/01 18:40:20 by wkorande         ###   ########.fr       */
+/*   Updated: 2022/06/20 14:55:07 by wkorande         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,10 +128,10 @@ void ParticleSystem::InitParticles()
 	cl_command_queue queue = cl.queue;
 
 	cl_float4 pos;
-	pos.x = position.x;
-	pos.y = position.y;
-	pos.z = position.z;
-	pos.w = 1.0f;
+	pos.v4[0] = position.x;
+	pos.v4[1] = position.y;
+	pos.v4[2] = position.z;
+	pos.v4[3] = 1.0f;
 
 	auto k = clProgram.GetKernel("init_particles");
 	std::vector<CLKernelArg> args = {

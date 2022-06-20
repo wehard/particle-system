@@ -100,7 +100,7 @@ void Application::Run()
 {
 	camera.Reset(glm::vec3(-1.0, 2.0, 2.0), -65.0f, -40.0f);
 
-	
+
 
 	auto renderer = GLRenderer();
 	GUIContext gui;
@@ -167,8 +167,8 @@ void Application::Run()
 			float ynew = 0.0f * s + 0.25 * c;
 
 			// translate point back:
-			gravityPoints[0].x = xnew;
-			gravityPoints[0].y = ynew;
+			gravityPoints[0].v4[0] = xnew;
+			gravityPoints[0].v4[1] = ynew;
 		}
 
 		for (auto ps : particleSystems)
