@@ -6,7 +6,7 @@
 #    By: wkorande <willehard@gmail.com>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/01 15:48:04 by rjaakonm          #+#    #+#              #
-#    Updated: 2022/06/20 15:02:54 by wkorande         ###   ########.fr        #
+#    Updated: 2022/06/20 15:20:52 by wkorande         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ lib/imgui/imgui_widgets.cpp\
 
 SRCS = $(addprefix $(SRCDIR)/, $(SRC)) $(IMGGUI_SRC)
 
-CFLAGS = -std=c++17 #-Wall -Wextra -Werror
+CFLAGS = -std=c++17 -Wall -Wextra -Werror
 
 OBJS = $(SRCS:.c=.o)
 
@@ -56,7 +56,7 @@ CC = clang++
 all: $(NAME)
 
 $(NAME):
-	$(CC) $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME) -O2
+	$(CC) $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME) -O3
 
 debug:
 	$(CC) -g $(CFLAGS) $(INCL) $(SRCS) $(LDFLAGS) -o $(NAME)
