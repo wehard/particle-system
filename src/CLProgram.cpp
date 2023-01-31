@@ -31,6 +31,7 @@ void CLProgram::compileProgram()
 {
 	cl_int error = CL_SUCCESS;
 	FILE *program_handle;
+
 	char *program_buffer, *program_log;
 	size_t program_size, log_size;
 
@@ -74,26 +75,6 @@ void CLProgram::createKernels()
 		clKernels.push_back(new CLKernel(program, k));
 	}
 }
-
-// void CLProgram::SetKernelArgs(const char *kernelName, std::vector<CLKernelArg> args)
-// {
-// 	cl_int result = CL_SUCCESS;
-
-// 	for (auto k : clKernels)
-// 	{
-// 		if (strcmp(kernelName, k->name) == 0)
-// 		{
-// 			cl_kernel kernel = k->kernel;
-// 			for (size_t i = 0; i < args.size(); i++)
-// 			{
-// 				auto arg = args[i];
-// 				result = clSetKernelArg(kernel, i, arg.size, arg.arg);
-// 				CLContext::CheckCLResult(result, "clSetKernelArg");
-// 			}
-// 			break;
-// 		}
-// 	}
-// }
 
 cl_kernel CLProgram::CreateKernel(const char *kernelFunc)
 {
