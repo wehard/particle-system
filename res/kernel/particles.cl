@@ -272,6 +272,16 @@ static float3 velocity_from_gravity_point(__global t_particle *p, __global float
 	return vel;
 }
 
+static float3 velocity_from_mouse(__global t_particle *p, float4 *m)
+{
+	float3 dir = m->xyz - p->pos.xyz;
+	float dist = length(dir);
+	float f = G * (m->w / (dist * dist + 0.006544f));
+	float3 vel = normalize(dir) * f;
+
+	return vel;
+}
+
 static float3 velocity_combined(__global t_particle *p, __global float4 *gps, int num_gp, bool use_mouse, float4 mouse_pos, float mouse_mass)
 {
 	float3 vel = (float3)(0.0, 0.0, 0.0);
@@ -279,7 +289,7 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 	if (use_mouse)
 	{
 		mouse_pos.w = mouse_mass;
-		// vel += velocity_from_gravity_point(p, &mouse_pos);
+		vel += velocity_from_mouse(p, &mouse_pos);
 	}
 
 	for (int j = 0; j < num_gp; j++)

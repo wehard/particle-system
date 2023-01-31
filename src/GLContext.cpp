@@ -6,59 +6,6 @@
 #include "GUIContext.h"
 #include "GLObject.h"
 
-// static void glfwMouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
-// {
-// 	if (ImGui::GetIO().WantCaptureMouse)
-// 		return;
-// 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-// 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-// 	{
-// 		ps->AddGravityPoint();
-// 	}
-// }
-
-// static void glfwMouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-// {
-// 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-// 	if (ps->mouseGravity)
-// 		ps->mouseGravityScale += yoffset * 0.1f;
-// }
-
-// static void glfwMouseCallback(GLFWwindow *window, double xpos, double ypos)
-// {
-// 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-
-// 	float offsetX = xpos - ps->mouseInfo.screen.x;
-// 	float offsetY = ypos - ps->mouseInfo.screen.y;
-
-// 	glm::vec2 offset = glm::vec2(offsetX, offsetY);
-
-// 	if (ps->mouseMovement)
-// 		ps->camera.Rotate(offsetX, offsetY, true);
-
-// 	ps->mouseInfo.screen = glm::vec3(xpos, ypos, 0.0);
-// 	ps->mouseInfo.ndc = glm::vec3((float)xpos / ((float)ps->gl.width * 0.5f) - 1.0f, (float)ypos / ((float)ps->gl.height * 0.5f) - 1.0f, 0.0);
-// 	ps->mouseInfo.world = ps->gl.GetMouseWorldCoord(&ps->camera);
-// }
-
-// static void glfwKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
-// {
-// 	auto ps = (ParticleSystem *)glfwGetWindowUserPointer(window);
-
-// 	if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
-// 	{
-// 		ps->mouseMovement = !ps->mouseMovement;
-// 		if (ps->mouseMovement)
-// 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-// 		else
-// 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-// 	}
-// 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
-// 	{
-// 		ps->mouseGravity = !ps->mouseGravity;
-// 	}
-// }
-
 static glm::mat4 getModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
@@ -106,11 +53,6 @@ GLContext::GLContext(std::string title, int width, int height) : width(width), h
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-
-	// glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
-	// glfwSetScrollCallback(window, glfwMouseScrollCallback);
-	// glfwSetKeyCallback(window, glfwKeyCallback);
-	// glfwSetCursorPosCallback(window, glfwMouseCallback);
 
 	glfwSwapInterval(0);
 	readGLInfo();

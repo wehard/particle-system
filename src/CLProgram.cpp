@@ -37,13 +37,6 @@ void CLProgram::compileProgram()
 	program_buffer = (char *)source.c_str();
 	program_size = source.size();
 
-	// program_handle = fopen("res/kernel/particles.cl", "r");
-	// fseek(program_handle, 0, SEEK_END);
-	// program_size = ftell(program_handle);
-	// rewind(program_handle);
-	// program_buffer = (char*)malloc(program_size + 1); program_buffer[program_size] = '\0'; fread(program_buffer, sizeof(char), program_size, program_handle);
-	// fclose(program_handle);
-
 	cl_device_id device = cl.GetDeviceID();
 	size_t logLength = 0;
 
@@ -51,7 +44,7 @@ void CLProgram::compileProgram()
 	CLContext::CheckCLResult(error, "clCreateProgramWithSource");
 
 	error = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-	// CLContext::CheckCLResult(error, "clBuildProgram");
+	CLContext::CheckCLResult(error, "clBuildProgram");
 	if (error != CL_SUCCESS)
 	{
 		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logLength);
