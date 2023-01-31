@@ -44,11 +44,22 @@ void CLProgram::compileProgram()
 	// program_buffer = (char*)malloc(program_size + 1); program_buffer[program_size] = '\0'; fread(program_buffer, sizeof(char), program_size, program_handle);
 	// fclose(program_handle);
 
+	cl_device_id device = cl.GetDeviceID();
+	size_t logLength = 0;
+
 	program = clCreateProgramWithSource(cl.ctx, 1, (const char **)&program_buffer, NULL, &error);
 	CLContext::CheckCLResult(error, "clCreateProgramWithSource");
 
 	error = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-	CLContext::CheckCLResult(error, "clBuildProgram");
+	// CLContext::CheckCLResult(error, "clBuildProgram");
+	if (error != CL_SUCCESS)
+	{
+		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logLength);
+		char *buffer = (char *)malloc(sizeof(char) * logLength);
+		clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, logLength, buffer, NULL);
+		std::cout << "OpenCL build error " << buffer << " : " << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 	std::cout << "Successully created and compiled kernel program." << std::endl;
 }

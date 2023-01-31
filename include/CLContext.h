@@ -46,8 +46,9 @@ private:
 	void createCommandQueue();
 	static cl_device_id getDevice(cl_platform_id platform, CLInfo &outInfo, int deviceIndex);
 	static cl_platform_id getPlatform(CLInfo &outInfo, int platformIndex);
-	
+
 public:
+	cl_device_id GetDeviceID() { return device; }
 	CLInfo clInfo;
 	cl_context ctx;
 	cl_command_queue queue;

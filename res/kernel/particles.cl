@@ -224,7 +224,6 @@ __kernel void init_particles(__global t_particle * ps, __global ulong *sb, int n
 
 static float3 rotate_vector(float3 v, float3 degrot)
 {
-	float3 res;
 	float3 rot;
 	rot.x = radians(degrot.x);
 	rot.y = radians(degrot.y);
@@ -280,7 +279,7 @@ static float3 velocity_combined(__global t_particle *p, __global float4 *gps, in
 	if (use_mouse)
 	{
 		mouse_pos.w = mouse_mass;
-		vel += velocity_from_gravity_point(p, (__global float4*)&mouse_pos);
+		// vel += velocity_from_gravity_point(p, &mouse_pos);
 	}
 
 	for (int j = 0; j < num_gp; j++)
